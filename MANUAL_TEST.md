@@ -96,7 +96,3 @@ For a full, up-to-date list of available tools and their JSON-RPC method names, 
   - Ensure your `.env` file is present and correctly configured.
 
 ---
-
-## 7. Next Steps
-
-- Try more grouped tool actions by changing the `

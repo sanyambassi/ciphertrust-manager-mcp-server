@@ -24,7 +24,14 @@ This document lists all grouped tools available in the CipherTrust MCP Server, w
 - **crypto_operations**: Cryptographic operations (encrypt, decrypt, reencrypt, sign, verify, hide, unhide).
 
 ## CTE (CipherTrust Transparent Encryption)
-- **cte_clientgroup_management**: CTE client group management (create, list, get, delete, modify, add_clients, remove_client, list_clients, get_client, create_guardpoint, list_guardpoints, get_guardpoint, modify_guardpoint, unguard_guardpoint, unguard_bulk_guardpoints, modify_password, modify_auth_binaries, send_ldt_pause).
+- **cte_clientgroup_management**: Manage CTE client groups, clients, guardpoints, and special operations (create, list, get, delete, modify, add_clients, remove_client, list_clients, get_client, create_guardpoint, list_guardpoints, get_guardpoint, modify_guardpoint, unguard_guardpoint, unguard_bulk_guardpoints, modify_password, modify_auth_binaries, send_ldt_pause).
+- **cte_client_management**: Manage CTE clients and related operations (create, list, get, delete, modify, enroll, unenroll, guardpoints, agent info, password, auth binaries, LDT pause, compatibility matrix, etc.).
+- **cte_csi_storagegroup_management**: Manage CTE CSI StorageGroups, clients, and guard policies (create, list, get, delete, modify, add_clients, remove_client, list_clients, get_client, add_guardpolicy, remove_guardpolicy, list_guardpolicy, get_guardpolicy, modify_guardpolicy).
+- **cte_policy_management**: Manage CTE policies and related operations (create, list, get, delete, modify, add/delete/modify rules, etc.).
+- **cte_profile_management**: Manage CTE profiles (create, list, get, delete, modify, delete_server).
+- **cte_process_set_management**: Manage CTE process sets (create, list, get, delete, modify, add_processes, delete_process, update_process, list_processes, list_policies).
+- **cte_user_set_management**: Manage CTE user sets (create, list, get, delete, modify, add_users, delete_user, update_user, list_users, list_policies).
+- **cte_resource_set_management**: Manage CTE resource sets (create, list, get, delete, modify, add_resources, delete_resource, update_resource, list_resources, list_policies).
 
 ---
 
@@ -49,5 +56,3 @@ This document lists all grouped tools available in the CipherTrust MCP Server, w
 - **vkeys_management**: Versioned key management operations (create, list, get, export).
 
 ---
-
-> **Tip:** For a full list of actions and parameters for each tool, see the code or use the `get_schema` method if available. 
