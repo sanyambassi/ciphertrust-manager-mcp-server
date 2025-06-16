@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "ciphertrust_01": {
+      "command": "C:\\mcp-server\\.venv\\Scripts\\ciphertrust-mcp-server",
+      "args": [],
+      "env": {
+        "CIPHERTRUST_URL": "https://ciphertrust.thalescryptolabs.com",
+        "CIPHERTRUST_USER": "sanyamadmin",
+        "CIPHERTRUST_PASSWORD": "Sfnt@1111"
+      }
+    }
+  }
+} 
