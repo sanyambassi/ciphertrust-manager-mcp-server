@@ -37,6 +37,24 @@ The MCP server exposes a set of tools and endpoints for clients (such as Claude 
 
 You can install Python and `uv` using either the manual method or with `winget` (Windows only).
 
+### Install Git (if not already installed)
+
+If you don't have Git installed on Windows, follow these steps:
+
+1. **Download and install Git for Windows:**  
+   [https://git-scm.com/download/win](https://git-scm.com/download/win)
+
+2. **Or install via winget:**
+   ```powershell
+   winget install --id Git.Git -e --source winget
+   ```
+
+3. **Verify installation:**
+   ```powershell
+   git --version
+   ```
+   You should see the installed Git version.
+
 ### Method 1: Manual Installation (Recommended for Fresh Systems)
 
 1. **Download Python**
