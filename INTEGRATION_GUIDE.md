@@ -6,63 +6,89 @@ Your CipherTrust MCP Server is now ready for use! Here's how to integrate it wit
 
 ### macOS
 
-1. Open Claude Desktop configuration:
-```bash
-nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
-```
-
-2. Add the CipherTrust server configuration:
-```json
-{
-  "mcpServers": {
-    "ciphertrust": {
-      "command": "/mcp_servers/v1/ciphertrust-mcp-server/.venv/bin/ciphertrust-mcp-server"
-    }
-  }
-}
-```
-
-3. Restart Claude Desktop
+1. Open (or create) the Claude Desktop configuration file:
+   ```bash
+   nano ~/Library/Application\ Support/Claude/claude_desktop_config.json
+   ```
+2. Add or update the CipherTrust server configuration (adjust the path as needed):
+   ```json
+   {
+     "mcpServers": {
+       "ciphertrust": {
+         "command": "/absolute/path/to/.venv/bin/ciphertrust-mcp-server"
+       }
+     }
+   }
+   ```
+   - Replace `/absolute/path/to/` with the actual path to your project directory.
+   - If you use a virtual environment, make sure the path points to the executable inside `.venv/bin/`.
+3. Restart Claude Desktop.
 
 ### Windows
 
-1. Open Claude Desktop configuration:
-```
-notepad %APPDATA%\Claude\claude_desktop_config.json
-```
-
-2. Add the CipherTrust server configuration:
-```json
-{
-  "mcpServers": {
-    "ciphertrust": {
-      "command": "C:\\mcp_servers\\v1\\ciphertrust-mcp-server\\.venv\\Scripts\\ciphertrust-mcp-server.exe"
-    }
-  }
-}
-```
-
-3. Restart Claude Desktop
+1. Open (or create) the Claude Desktop configuration file:
+   ```
+   notepad %APPDATA%\Claude\claude_desktop_config.json
+   ```
+2. Add or update the CipherTrust server configuration (adjust the path as needed):
+   ```json
+   {
+     "mcpServers": {
+       "ciphertrust": {
+         "command": "C:\\absolute\\path\\to\\.venv\\Scripts\\ciphertrust-mcp-server.exe"
+       }
+     }
+   }
+   ```
+   - If you are using a virtual environment, the executable may be `.bat` or `.ps1` (e.g., `ciphertrust-mcp-server.bat`).
+   - Make sure the path is absolute and points to the correct script in your virtual environment.
+3. Restart Claude Desktop.
 
 ### Linux
 
-1. Open Claude Desktop configuration:
-```bash
-nano ~/.config/Claude/claude_desktop_config.json
-```
+1. Open (or create) the Claude Desktop configuration file:
+   ```bash
+   nano ~/.config/Claude/claude_desktop_config.json
+   ```
+2. Add or update the CipherTrust server configuration (adjust the path as needed):
+   ```json
+   {
+     "mcpServers": {
+       "ciphertrust": {
+         "command": "/absolute/path/to/.venv/bin/ciphertrust-mcp-server"
+       }
+     }
+   }
+   ```
+   - Replace `/absolute/path/to/` with the actual path to your project directory.
+   - If you use a virtual environment, make sure the path points to the executable inside `.venv/bin/`.
+3. Restart Claude Desktop.
 
-2. Add the CipherTrust server configuration (your current setup):
+**Note:**
+- The config file may not exist by default; you may need to create it.
+- The `"command"` path must be absolute and executable.
+- If you use environment variables, see the section below.
+
+## Environment Variables
+
+If you need to pass environment variables to the server in the Claude config, add them under the `"env"` key:
+
 ```json
 {
   "mcpServers": {
     "ciphertrust": {
-      "command": "/mcp_servers/v1/ciphertrust-mcp-server/.venv/bin/ciphertrust-mcp-server"
+      "command": "/absolute/path/to/.venv/bin/ciphertrust-mcp-server",
+      "env": {
+        "CIPHERTRUST_URL": "https://your-server.com",
+        "CIPHERTRUST_USER": "your-username",
+        "CIPHERTRUST_PASSWORD": "your-password"
+      }
     }
   }
 }
 ```
-
-3. Restart Claude Desktop
+- You can set any required environment variables this way.
+- For production, consider using a `.env` file and not committing secrets.
 
 ## Available Tools in Claude
 
@@ -86,6 +112,8 @@ Once configured, you can use these tools in Claude:
 - **ct_user_delete**: Delete users
 - **ct_user_modify**: Modify user settings
 
+*For a full list of available tools, see the server logs or documentation.*
+
 ## Example Usage in Claude
 
 Once integrated, you can ask Claude things like:
@@ -99,46 +127,33 @@ Once integrated, you can ask Claude things like:
 
 ### If Claude doesn't see the tools:
 
-1. Check Claude's logs:
+1. **Check Claude's logs:**
    - macOS: `~/Library/Logs/Claude/`
    - Windows: `%APPDATA%\Claude\logs\`
    - Linux: `~/.config/Claude/logs/`
-
-2. Verify the server runs correctly:
-```bash
-/mcp_servers/v1/ciphertrust-mcp-server/.venv/bin/ciphertrust-mcp-server
-```
-Then paste: `{"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"0.1.0","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}},"id":1}`
-
-3. Check permissions on the executable:
-```bash
-ls -la /mcp_servers/v1/ciphertrust-mcp-server/.venv/bin/ciphertrust-mcp-server
-```
-
-### Environment Variables
-
-If you need to pass environment variables to the server in Claude config:
-
-```json
-{
-  "mcpServers": {
-    "ciphertrust": {
-      "command": "/mcp_servers/v1/ciphertrust-mcp-server/.venv/bin/ciphertrust-mcp-server",
-      "env": {
-        "CIPHERTRUST_URL": "https://your-server.com",
-        "CIPHERTRUST_USER": "different-user"
-      }
-    }
-  }
-}
-```
+2. **Verify the server runs correctly:**
+   ```bash
+   /absolute/path/to/.venv/bin/ciphertrust-mcp-server
+   ```
+   Then paste:
+   ```json
+   {"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"0.1.0","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}},"id":1}
+   ```
+   You should see a JSON response.
+3. **Check permissions on the executable:**
+   ```bash
+   ls -la /absolute/path/to/.venv/bin/ciphertrust-mcp-server
+   chmod +x /absolute/path/to/.venv/bin/ciphertrust-mcp-server  # if needed
+   ```
+4. **Check that your virtual environment is activated and dependencies are installed.**
 
 ## Security Notes
 
-- The server uses the credentials from your `.env` file
-- Logs are written to stderr and don't contain passwords
-- All communication with CipherTrust Manager uses your configured SSL settings
-- Consider using JWT tokens instead of passwords for production use
+- The server uses the credentials from your `.env` file or environment variables.
+- Logs are written to stderr and do not contain passwords.
+- All communication with CipherTrust Manager uses your configured SSL settings.
+- Consider using JWT tokens instead of passwords for production use.
+- Do not commit secrets to version control. Use a `.env.example` for sharing config structure.
 
 ## Next Steps
 
