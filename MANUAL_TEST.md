@@ -36,16 +36,36 @@ You can manually type or paste a JSON-RPC message into the terminal where the se
 
 ---
 
-## 3. Test a Tool (e.g., System Info)
+## 3. Test Grouped Tools (Modern Usage)
 
-After initialization, you can send another JSON-RPC message, such as:
+Most tools are now grouped and use the following pattern:
 
 ```json
-{"jsonrpc":"2.0","method":"ct_system_info_get","params":{},"id":2}
+{"jsonrpc":"2.0","method":"<grouped_tool_name>","params":{"action": "<action>", ...},"id":X}
 ```
 
+### Example: List Users
+
+```json
+{"jsonrpc":"2.0","method":"user_management","params":{"action": "list"},"id":2}
+```
+
+### Example: List CTE Client Groups
+
+```json
+{"jsonrpc":"2.0","method":"ct_cte_clientgroup_management","params":{"action": "list"},"id":3}
+```
+
+### Example: System Info (if available as a grouped tool)
+
+If system info is still available as a single method, you can use:
+```json
+{"jsonrpc":"2.0","method":"ct_system_info_get","params":{},"id":4}
+```
+Otherwise, check your tool list for the correct grouped method name.
+
 **Expected Result:**
-- The response should include CipherTrust Manager system information (e.g., version, name, etc.).
+- The response should include the requested information (e.g., user list, client group list, or system info).
 
 ---
 
