@@ -71,12 +71,14 @@ winget install --id Python.Python.3.12 --source winget --accept-package-agreemen
 
 This ensures the new Python is available in your PATH.
 
-**Step 3: Verify Python installation**
+**Step 3: Verify installation**
 
 ```powershell
 python --version
 pip --version
 ```
+
+### After a successful installation of python and uv packages, follow the steps below:
 
 **Step 4: Install uv using pip**
 
