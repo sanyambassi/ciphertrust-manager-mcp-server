@@ -63,7 +63,7 @@ You can install Python and `uv` using either the manual method or with `winget` 
 5. **Clone the Repository**
    ```bash
    git clone https://github.com/sanyambassi/ciphertrust-manager-mcp-server.git
-   cd ciphertrust-manager-mcp-server
+   cd ciphertrust-mcp-server
    ```
 6. **Create a Virtual Environment and Install Dependencies**
    ```bash
@@ -107,7 +107,7 @@ You can install Python and `uv` using either the manual method or with `winget` 
 5. **Clone the Repository**
    ```bash
    git clone https://github.com/sanyambassi/ciphertrust-manager-mcp-server.git
-   cd ciphertrust-manager-mcp-server
+   cd ciphertrust-mcp-server
    ```
 6. **Create a Virtual Environment and Install Dependencies**
    ```bash
@@ -211,19 +211,19 @@ To use this server with Cursor:
    - Go to Settings > MCP Tools > Add Custom MCP
    - Add the following contents in the config file (e.g., `mcp.json`):
      ```json
-     {
-       "mcpServers": {
-         "ciphertrust": {
-           "command": "uv",
-           "args": ["run", "ciphertrust-mcp-server"],
-           "env": {
-             "CIPHERTRUST_URL": "https://your-ciphertrust-manager.example.com",
-             "CIPHERTRUST_USER": "admin",
-             "CIPHERTRUST_PASSWORD": "your-password-here"
-           }
-         }
-       }
-     }
+{
+    "mcpServers": {
+      "ciphertrust_01": {
+        "command": "C:\\cm-mcp-optimized\\.venv\\Scripts\\ciphertrust-mcp-server",
+        "args": [],
+        "env": {
+          "CIPHERTRUST_URL": "https://your-ciphertrust.example.com",
+          "CIPHERTRUST_USER": "admin",
+          "CIPHERTRUST_PASSWORD": "your-password-here"
+        }
+      }
+    }
+  } 
      ```
 2. **Disable and Re-enable the CipherTrust MCP server** in Cursor to apply the changes.
 
