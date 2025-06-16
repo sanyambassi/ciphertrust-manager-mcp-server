@@ -36,40 +36,45 @@ You can manually type or paste a JSON-RPC message into the terminal where the se
 
 ---
 
-## 3. Test Grouped Tools (Modern Usage)
+## 3. Try These Common Tool Examples
 
-Most tools are now grouped and use the following pattern:
+Copy and paste each of these JSON-RPC messages (one at a time) into the running server terminal. Each will test a different grouped tool.
 
+### a) Get System Information
 ```json
-{"jsonrpc":"2.0","method":"<grouped_tool_name>","params":{"action": "<action>", ...},"id":X}
+{"jsonrpc":"2.0","method":"system_information_management","params":{"action": "get"},"id":2}
 ```
 
-### Example: List Users
-
+### b) List Users
 ```json
-{"jsonrpc":"2.0","method":"user_management","params":{"action": "list"},"id":2}
+{"jsonrpc":"2.0","method":"user_management","params":{"action": "list"},"id":3}
 ```
 
-### Example: List CTE Client Groups
-
+### c) List CTE Client Groups
 ```json
-{"jsonrpc":"2.0","method":"ct_cte_clientgroup_management","params":{"action": "list"},"id":3}
+{"jsonrpc":"2.0","method":"ct_cte_clientgroup_management","params":{"action": "list"},"id":4}
 ```
 
-### Example: System Info (if available as a grouped tool)
-
-If system info is still available as a single method, you can use:
+### d) List Keys
 ```json
-{"jsonrpc":"2.0","method":"ct_system_info_get","params":{},"id":4}
+{"jsonrpc":"2.0","method":"key_management","params":{"action": "list"},"id":5}
 ```
-Otherwise, check your tool list for the correct grouped method name.
 
 **Expected Result:**
-- The response should include the requested information (e.g., user list, client group list, or system info).
+- Each request should return a JSON response with the relevant information (system info, user list, client group list, or key list).
 
 ---
 
-## 4. Tips for Manual Testing
+## 4. Tool Reference
+
+For a full, up-to-date list of available tools and their JSON-RPC method names, see [TOOLS.md](./TOOLS.md).
+
+- TOOLS.md lists every grouped tool, its method name, and a short description.
+- Use these method names in your JSON-RPC requests for manual testing or integration.
+
+---
+
+## 5. Tips for Manual Testing
 
 - **Copy and paste** JSON-RPC messages into the terminal where the server is running.
 - **Each message must be on a single line** and followed by Enter.
@@ -78,7 +83,7 @@ Otherwise, check your tool list for the correct grouped method name.
 
 ---
 
-## 5. Troubleshooting
+## 6. Troubleshooting
 
 - **No response?**
   - Make sure you pressed Enter after pasting the JSON.
@@ -92,8 +97,6 @@ Otherwise, check your tool list for the correct grouped method name.
 
 ---
 
-## 6. Next Steps
+## 7. Next Steps
 
-- Try other available tools (see `INTEGRATION_GUIDE.md` for a list).
-- Integrate with Claude Desktop or other MCP clients for end-to-end testing.
-- Report any issues or unexpected behavior.
+- Try more grouped tool actions by changing the `
