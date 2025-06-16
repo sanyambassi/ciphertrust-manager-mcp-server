@@ -63,7 +63,7 @@ You can install Python and `uv` using either the manual method or with `winget` 
 5. **Clone the Repository**
    ```bash
    git clone https://github.com/sanyambassi/ciphertrust-manager-mcp-server.git
-   cd ciphertrust-mcp-server
+   cd ciphertrust-manager-mcp-server
    ```
 6. **Create a Virtual Environment and Install Dependencies**
    ```bash
