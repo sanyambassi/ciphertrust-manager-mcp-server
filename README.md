@@ -211,21 +211,83 @@ To use this server with Cursor:
    - Go to Settings > MCP Tools > Add Custom MCP
    - Add the following contents in the config file (e.g., `mcp.json`):
      ```json
-{
-    "mcpServers": {
-      "ciphertrust_01": {
-        "command": "C:\\cm-mcp-optimized\\.venv\\Scripts\\ciphertrust-mcp-server",
-        "args": [],
-        "env": {
-          "CIPHERTRUST_URL": "https://your-ciphertrust.example.com",
-          "CIPHERTRUST_USER": "admin",
-          "CIPHERTRUST_PASSWORD": "your-password-here"
-        }
-      }
-    }
-  } 
+     {
+       "mcpServers": {
+         "ciphertrust": {
+           "command": "Path to your project folder/ciphertrust-manager-mcp-server/.venv/bin/ciphertrust-mcp-server",
+           "args": [],
+           "env": {
+             "CIPHERTRUST_URL": "https://your-ciphertrust.example.com",
+             "CIPHERTRUST_USER": "admin",
+             "CIPHERTRUST_PASSWORD": "your-password-here"
+           }
+         }
+       }
+     }
+     ```
+     - On Windows, use the `.venv\Scripts\ciphertrust-mcp-server.exe` path and double backslashes:
+     ```json
+     {
+       "mcpServers": {
+         "ciphertrust": {
+           "command": "C:\\path\\to\\ciphertrust-manager-mcp-server\\.venv\\Scripts\\ciphertrust-mcp-server.exe",
+           "args": [],
+           "env": {
+             "CIPHERTRUST_URL": "https://your-ciphertrust.example.com",
+             "CIPHERTRUST_USER": "admin",
+             "CIPHERTRUST_PASSWORD": "your-password-here"
+           }
+         }
+       }
+     }
      ```
 2. **Disable and Re-enable the CipherTrust MCP server** in Cursor to apply the changes.
+
+---
+
+## 🖥️ Using with Claude Desktop
+
+To use this server with Claude Desktop:
+
+1. **Locate or create the Claude Desktop config file:**
+   - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+   - **Linux:** `~/.config/Claude/claude_desktop_config.json`
+
+2. **Add or update the MCP server configuration:**
+   - **macOS/Linux Example:**
+     ```json
+     {
+       "mcpServers": {
+         "ciphertrust": {
+           "command": "/absolute/path/to/ciphertrust-manager-mcp-server/.venv/bin/ciphertrust-mcp-server",
+           "env": {
+             "CIPHERTRUST_URL": "https://your-ciphertrust.example.com",
+             "CIPHERTRUST_USER": "admin",
+             "CIPHERTRUST_PASSWORD": "your-password-here"
+           }
+         }
+       }
+     }
+     ```
+   - **Windows Example:**
+     ```json
+     {
+       "mcpServers": {
+         "ciphertrust": {
+           "command": "C:\\absolute\\path\\to\\ciphertrust-manager-mcp-server\\.venv\\Scripts\\ciphertrust-mcp-server.exe",
+           "env": {
+             "CIPHERTRUST_URL": "https://your-ciphertrust.example.com",
+             "CIPHERTRUST_USER": "admin",
+             "CIPHERTRUST_PASSWORD": "your-password-here"
+           }
+         }
+       }
+     }
+     ```
+   - Adjust the path to match your actual project location and environment.
+
+3. **Restart Claude Desktop** to apply the changes.
 
 ---
 
