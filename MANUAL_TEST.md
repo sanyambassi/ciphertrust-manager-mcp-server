@@ -1,6 +1,6 @@
-# Manual Test Guide: CipherTrust MCP Server
+# Manual Test Guide: CipherTrust MCP Server (STDIO)
 
-This guide will help you manually test your CipherTrust MCP Server to ensure it is working as expected.
+This guide will help you manually test your CipherTrust MCP Server, which communicates via JSON-RPC over stdin/stdout (not HTTP).
 
 ---
 
@@ -19,34 +19,29 @@ Activate your virtual environment (if using one), then run:
   ```
 - Make sure you are in your project directory.
 
+The server will wait for JSON-RPC messages on stdin.
+
 ---
 
-## 2. Send a Test JSON-RPC Request
+## 2. Send a Test JSON-RPC Message
 
-You can use `curl`, `httpie`, or any HTTP client to send a request. Here's how to do it with `curl`:
+You can manually type or paste a JSON-RPC message into the terminal where the server is running. For example, paste this and press Enter:
 
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  --data '{"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"0.1.0","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}},"id":1}' \
-  http://localhost:PORT/
+```json
+{"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"0.1.0","capabilities":{},"clientInfo":{"name":"manual-test","version":"1.0"}},"id":1}
 ```
-- Replace `PORT` with the port your server is running on (default is usually 8000 or as configured).
 
 **Expected Result:**
-- You should receive a JSON response with server information and supported methods.
+- You should see a JSON response printed to stdout, containing server information and supported methods.
 
 ---
 
 ## 3. Test a Tool (e.g., System Info)
 
-Send a request to get system info:
+After initialization, you can send another JSON-RPC message, such as:
 
-```bash
-curl -X POST \
-  -H "Content-Type: application/json" \
-  --data '{"jsonrpc":"2.0","method":"ct_system_info_get","params":{},"id":2}' \
-  http://localhost:PORT/
+```json
+{"jsonrpc":"2.0","method":"ct_system_info_get","params":{},"id":2}
 ```
 
 **Expected Result:**
@@ -54,21 +49,23 @@ curl -X POST \
 
 ---
 
-## 4. Check Logs
+## 4. Tips for Manual Testing
 
-- The server logs output to the terminal (stderr).
-- Look for errors or stack traces if something fails.
+- **Copy and paste** JSON-RPC messages into the terminal where the server is running.
+- **Each message must be on a single line** and followed by Enter.
+- **To exit** the server, press `Ctrl+C`.
+- **Log output** is written to stderr and will appear in the terminal.
 
 ---
 
 ## 5. Troubleshooting
 
+- **No response?**
+  - Make sure you pressed Enter after pasting the JSON.
+  - Check for errors in the terminal output.
 - **Server not starting?**
-  - Check that your virtual environment is activated and dependencies are installed.
+  - Ensure your virtual environment is activated and dependencies are installed.
   - Run `python --version` to ensure you are using Python 3.11+.
-- **No response or connection refused?**
-  - Make sure the server is running and listening on the correct port.
-  - Check firewall or security group settings if running on a remote server.
 - **Unexpected errors?**
   - Review the logs for error messages.
   - Ensure your `.env` file is present and correctly configured.
