@@ -55,6 +55,40 @@ python --version
 pip --version
 ```
 
+
+### Method 2: Install Python and uv using winget (Windows Only)
+
+If you are on Windows 10 or later, you can use [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) to quickly install Python and uv.
+
+**Step 1: Install Python using winget**
+
+```powershell
+# Open PowerShell as Administrator
+winget install --id Python.Python.3.12 --source winget --accept-package-agreements --accept-source-agreements
+```
+
+**Step 2: Close and reopen PowerShell**
+
+This ensures the new Python is available in your PATH.
+
+**Step 3: Verify Python installation**
+
+```powershell
+python --version
+pip --version
+```
+
+**Step 4: Install uv using pip**
+
+```powershell
+pip install uv
+uv --version
+```
+
+**Step 5: Continue with repository setup**
+
+Follow steps 3-6 from Method 1 above to clone the repository, set up the virtual environment, and configure your `.env` file.
+
 **Step 4: Install uv**:
    - Open PowerShell and run:
      ```powershell
