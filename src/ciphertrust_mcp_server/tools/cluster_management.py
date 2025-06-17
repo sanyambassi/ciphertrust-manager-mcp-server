@@ -123,4 +123,4 @@ class ClusterManagementTool(BaseTool):
         else:
             raise ValueError(f"Unknown action: {action}")
 
-CLUSTER_MANAGEMENT_TOOLS = [ClusterManagementTool()] 
+CLUSTER_MANAGEMENT_TOOLS = [ClusterManagementTool] 
