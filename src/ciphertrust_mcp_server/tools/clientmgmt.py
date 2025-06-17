@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 from pydantic import BaseModel
 from .base import BaseTool
 
@@ -169,15 +169,26 @@ class ClientMgmtTool(BaseTool):
 
     def get_schema(self):
         return {
-            "action": {"type": "string", "enum": [
-                "clients_list", "clients_get", "clients_register", "clients_delete", "clients_renew", "clients_revoke", "clients_self",
-                "profiles_create", "profiles_delete", "profiles_get", "profiles_list", "profiles_update",
-                "tokens_create", "tokens_delete", "tokens_get", "tokens_list", "tokens_update", "tokens_webcert_fingerprint"
-            ]},
-            "params": {"type": "object"}
+            "type": "object",
+            "properties": {
+                "action": {"type": "string", "enum": [
+                    "clients_list", "clients_get", "clients_register", "clients_delete", "clients_renew", "clients_revoke", "clients_self",
+                    "profiles_create", "profiles_delete", "profiles_get", "profiles_list", "profiles_update",
+                    "tokens_create", "tokens_delete", "tokens_get", "tokens_list", "tokens_update", "tokens_webcert_fingerprint"
+                ]},
+                "params": {"type": "object"}
+            },
+            "required": ["action"]
         }
 
-    async def execute(self, action: str, params: dict):
+    async def execute(self, **kwargs: Any) -> Any:
+        """Execute the client management tool with the given parameters."""
+        action = kwargs.get("action")
+        params = kwargs.get("params", {})
+        
+        if not action:
+            raise ValueError("Action is required")
+            
         if action == "clients_list":
             p = ClientListParams(**params)
             cmd = ["clientmgmt", "clients", "list"]
