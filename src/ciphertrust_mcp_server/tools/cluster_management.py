@@ -26,6 +26,19 @@ class ClusterJoinParams(BaseModel):
     public_address: Optional[str] = None
     yes: bool = True
 
+class ClusterFullJoinParams(BaseModel):
+    member: str
+    newnodehost: str
+    newnodeconfig: Optional[str] = None
+    newnodepass: Optional[str] = None
+    newnodepublic: Optional[str] = None
+    newnodeurl: Optional[str] = None
+    newnodeuser: Optional[str] = None
+    shared_hsm_partition: Optional[bool] = False
+    writetoconfig: Optional[bool] = False
+    yes: bool = True
+    block: Optional[bool] = False
+
 class ClusterNodesListParams(BaseModel):
     allowlist: Optional[str] = None
 
@@ -46,7 +59,7 @@ class ClusterManagementTool(BaseTool):
             "type": "object",
             "properties": {
                 "action": {"type": "string", "enum": [
-                    "new", "delete", "info", "summary", "join", "nodes_list", "nodes_get", "nodes_delete"
+                    "new", "delete", "info", "summary", "join", "fulljoin", "nodes_list", "nodes_get", "nodes_delete"
                 ]},
                 "host": {"type": "string"},
                 "public_address": {"type": ["string", "null"]},
@@ -60,6 +73,15 @@ class ClusterManagementTool(BaseTool):
                 "allowlist": {"type": ["string", "null"]},
                 "id": {"type": "string"},
                 "force": {"type": "boolean"},
+                "newnodehost": {"type": "string"},
+                "newnodeconfig": {"type": ["string", "null"]},
+                "newnodepass": {"type": ["string", "null"]},
+                "newnodepublic": {"type": ["string", "null"]},
+                "newnodeurl": {"type": ["string", "null"]},
+                "newnodeuser": {"type": ["string", "null"]},
+                "shared_hsm_partition": {"type": "boolean"},
+                "writetoconfig": {"type": "boolean"},
+                "block": {"type": "boolean"}
             },
             "required": ["action"],
         }
@@ -101,6 +123,30 @@ class ClusterManagementTool(BaseTool):
                 cmd += ["--public-address", params.public_address]
             if params.yes:
                 cmd.append("-y")
+            return self.ksctl.execute(cmd)
+        elif action == "fulljoin":
+            params = ClusterFullJoinParams(**kwargs)
+            cmd = ["cluster", "fulljoin", "--member", params.member, "--newnodehost", params.newnodehost]
+            
+            if params.newnodeconfig:
+                cmd += ["--newnodeconfig", params.newnodeconfig]
+            if params.newnodepass:
+                cmd += ["--newnodepass", params.newnodepass]
+            if params.newnodepublic:
+                cmd += ["--newnodepublic", params.newnodepublic]
+            if params.newnodeurl:
+                cmd += ["--newnodeurl", params.newnodeurl]
+            if params.newnodeuser:
+                cmd += ["--newnodeuser", params.newnodeuser]
+            if params.shared_hsm_partition:
+                cmd.append("--shared-hsm-partition")
+            if params.writetoconfig:
+                cmd.append("--writetoconfig")
+            if params.yes:
+                cmd.append("-y")
+            if params.block:
+                cmd.append("--block")
+                
             return self.ksctl.execute(cmd)
         elif action == "nodes_list":
             params = ClusterNodesListParams(**kwargs)
