@@ -76,7 +76,7 @@ Restrict Update:
 from typing import Any, Optional, Literal
 from enum import Enum
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .base import BaseTool
 
@@ -116,25 +116,28 @@ class CTEPolicyCreateParams(BaseModel):
     domain: Optional[str] = Field(None, description="Domain to create policy in (defaults to global setting)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
 
-    @validator('policy_type')
-    def validate_policy_type(cls, v):
+    @field_validator('policy_type')
+    @classmethod
+    def validate_policy_type(cls, v: PolicyType) -> PolicyType:
         """Validate policy type."""
         if v not in PolicyType:
             raise ValueError(f"Invalid policy type: {v}. Must be one of: {', '.join(PolicyType)}")
         return v
 
-    @validator('security_rules_json', 'key_rules_json', 'data_tx_rules_json', 'ldt_rules_json', 'idt_rules_json', 'signature_rules_json')
-    def validate_json_format(cls, v, field):
+    @field_validator('security_rules_json', 'key_rules_json', 'data_tx_rules_json', 'ldt_rules_json', 'idt_rules_json', 'signature_rules_json')
+    @classmethod
+    def validate_json_format(cls, v: Optional[str], info) -> Optional[str]:
         """Validate JSON format for rules."""
         if v:
             try:
                 import json
                 json.loads(v)
             except json.JSONDecodeError:
-                raise ValueError(f"Invalid JSON format for {field.name}")
+                raise ValueError(f"Invalid JSON format for {info.field_name}")
         return v
 
-    def validate_rule_requirement(self):
+    @model_validator(mode='after')
+    def validate_rule_requirement(self) -> 'CTEPolicyCreateParams':
         """Validate that at least one rule is provided."""
         has_rule = any([
             self.security_rules_json or self.security_rules_json_file,
@@ -146,6 +149,7 @@ class CTEPolicyCreateParams(BaseModel):
         ])
         if not has_rule:
             raise ValueError("At least one rule (Security, Key, LDT, IDT, or Signature) must be provided")
+        return self
 
 
 class CTEPolicyListParams(BaseModel):
