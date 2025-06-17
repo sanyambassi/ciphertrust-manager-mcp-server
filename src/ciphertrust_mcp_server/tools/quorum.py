@@ -1,4 +1,9 @@
-"""Quorum management tools for CipherTrust Manager with built-in domain support."""
+"""Quorum management tools for CipherTrust Manager with built-in domain support.
+
+This module provides tools for managing quorums, quorum policies, and quorum profiles in CipherTrust Manager.
+It supports operations like activating, approving, denying, and revoking quorums, as well as managing quorum
+policies and profiles. All operations support domain-specific execution.
+"""
 
 from typing import Any, Optional
 
@@ -9,7 +14,11 @@ from .base import BaseTool
 
 # Quorum Management Parameter Models
 class QuorumListParams(BaseModel):
-    """Parameters for listing quorums."""
+    """Parameters for listing quorums.
+    
+    Supports filtering by operation, requester ID, state, and URI. Includes pagination
+    controls and sorting options. All operations support domain-specific execution.
+    """
     limit: int = Field(10, description="Maximum number of quorum structures to return")
     skip: int = Field(0, description="Offset at which to start the search")
     sort: Optional[str] = Field(None, description="Sort by name, createdAt, or updatedAt (prefix with '-' for descending)")
@@ -23,7 +32,11 @@ class QuorumListParams(BaseModel):
 
 
 class QuorumGetParams(BaseModel):
-    """Parameters for getting a quorum."""
+    """Parameters for getting a quorum.
+    
+    Retrieves detailed information about a specific quorum by its ID.
+    Supports domain-specific execution.
+    """
     id: str = Field(..., description="Quorum ID")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to get quorum from (defaults to global setting)")
@@ -31,7 +44,10 @@ class QuorumGetParams(BaseModel):
 
 
 class QuorumActivateParams(BaseModel):
-    """Parameters for activating a quorum."""
+    """Parameters for activating a quorum.
+    
+    Activates a quorum with an optional reason. Supports domain-specific execution.
+    """
     id: str = Field(..., description="Quorum ID")
     quorum_reason: Optional[str] = Field(None, description="Reason to activate the quorum")
     # Domain support
@@ -40,7 +56,10 @@ class QuorumActivateParams(BaseModel):
 
 
 class QuorumApproveParams(BaseModel):
-    """Parameters for approving a quorum."""
+    """Parameters for approving a quorum.
+    
+    Approves a quorum with an optional note. Supports domain-specific execution.
+    """
     id: str = Field(..., description="Quorum ID")
     note: Optional[str] = Field(None, description="Additional note for approval")
     # Domain support
@@ -49,7 +68,10 @@ class QuorumApproveParams(BaseModel):
 
 
 class QuorumDenyParams(BaseModel):
-    """Parameters for denying a quorum."""
+    """Parameters for denying a quorum.
+    
+    Denies a quorum with an optional note. Supports domain-specific execution.
+    """
     id: str = Field(..., description="Quorum ID")
     note: Optional[str] = Field(None, description="Additional note for denial")
     # Domain support
@@ -58,7 +80,10 @@ class QuorumDenyParams(BaseModel):
 
 
 class QuorumRevokeParams(BaseModel):
-    """Parameters for revoking a quorum vote."""
+    """Parameters for revoking a quorum vote.
+    
+    Revokes a previously cast vote on a quorum. Supports domain-specific execution.
+    """
     id: str = Field(..., description="Quorum ID")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to revoke quorum vote in (defaults to global setting)")
@@ -66,7 +91,10 @@ class QuorumRevokeParams(BaseModel):
 
 
 class QuorumDeleteParams(BaseModel):
-    """Parameters for deleting a quorum."""
+    """Parameters for deleting a quorum.
+    
+    Deletes a quorum by its ID. Supports domain-specific execution.
+    """
     id: str = Field(..., description="Quorum ID")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to delete quorum from (defaults to global setting)")
@@ -74,7 +102,10 @@ class QuorumDeleteParams(BaseModel):
 
 
 class QuorumGetResourcesListParams(BaseModel):
-    """Parameters for getting quorum resources list."""
+    """Parameters for getting quorum resources list.
+    
+    Retrieves a list of resource URIs associated with a quorum. Supports domain-specific execution.
+    """
     id: str = Field(..., description="Quorum ID")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to get resources from (defaults to global setting)")
@@ -83,7 +114,11 @@ class QuorumGetResourcesListParams(BaseModel):
 
 # Quorum Policy Parameter Models
 class QuorumPolicyActivateParams(BaseModel):
-    """Parameters for activating quorum policy."""
+    """Parameters for activating quorum policy.
+    
+    Activates quorum policy for specified actions. Each action must be activated individually.
+    Supports domain-specific execution.
+    """
     actions: str = Field(..., description="Comma-separated list of actions/operations to enable quorum for")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to activate policy in (defaults to global setting)")
@@ -91,7 +126,10 @@ class QuorumPolicyActivateParams(BaseModel):
 
 
 class QuorumPolicyDeactivateParams(BaseModel):
-    """Parameters for deactivating quorum policy."""
+    """Parameters for deactivating quorum policy.
+    
+    Deactivates quorum policy for specified actions. Supports domain-specific execution.
+    """
     actions: str = Field(..., description="Comma-separated list of actions/operations to disable quorum for")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to deactivate policy in (defaults to global setting)")
@@ -99,7 +137,11 @@ class QuorumPolicyDeactivateParams(BaseModel):
 
 
 class QuorumPolicyStatusParams(BaseModel):
-    """Parameters for getting quorum policy status."""
+    """Parameters for getting quorum policy status.
+    
+    Retrieves the status of quorum policies with filtering and pagination options.
+    Supports domain-specific execution.
+    """
     limit: int = Field(10, description="Maximum number of policies to return")
     skip: int = Field(0, description="Offset at which to start the search")
     sort: Optional[str] = Field(None, description="Sort by name, createdAt, or updatedAt (prefix with '-' for descending)")
@@ -111,7 +153,10 @@ class QuorumPolicyStatusParams(BaseModel):
 
 # Quorum Profiles Parameter Models
 class QuorumProfilesListParams(BaseModel):
-    """Parameters for listing quorum profiles."""
+    """Parameters for listing quorum profiles.
+    
+    Lists quorum profiles with filtering and pagination options. Supports domain-specific execution.
+    """
     limit: int = Field(10, description="Maximum number of profiles to return")
     skip: int = Field(0, description="Offset at which to start the search")
     sort: Optional[str] = Field(None, description="Sort by name, createdAt, or updatedAt (prefix with '-' for descending)")
@@ -124,7 +169,10 @@ class QuorumProfilesListParams(BaseModel):
 
 
 class QuorumProfilesGetParams(BaseModel):
-    """Parameters for getting a quorum profile."""
+    """Parameters for getting a quorum profile.
+    
+    Retrieves details of a specific quorum profile by its ID. Supports domain-specific execution.
+    """
     profile_id: str = Field(..., description="Quorum Profile ID")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to get profile from (defaults to global setting)")
@@ -132,7 +180,11 @@ class QuorumProfilesGetParams(BaseModel):
 
 
 class QuorumProfilesUpdateParams(BaseModel):
-    """Parameters for updating a quorum profile."""
+    """Parameters for updating a quorum profile.
+    
+    Updates settings of a quorum profile including approvals needed and voter groups.
+    Supports domain-specific execution.
+    """
     profile_id: str = Field(..., description="Quorum Profile ID")
     approvals: Optional[int] = Field(None, description="Number of approvals needed for quorum")
     voter_groups: Optional[str] = Field(None, description="Comma-separated list of voter groups allowed to approve")
@@ -144,8 +196,25 @@ class QuorumProfilesUpdateParams(BaseModel):
 
 # Quorum Management Tools
 class QuorumManagementTool(BaseTool):
-    name = "quorum_management"
-    description = "Quorum management operations (list, get, activate, approve, deny, revoke, delete, get_resources_list, policy_activate, policy_deactivate, policy_status, profiles_list, profiles_get, profiles_update)"
+    """Manage quorums, quorum policies, and quorum profiles in CipherTrust Manager.
+    
+    This tool provides comprehensive quorum management capabilities including:
+    - Basic quorum operations (list, get, activate, approve, deny, revoke, delete)
+    - Resource management (get resources list)
+    - Policy management (activate, deactivate, status)
+    - Profile management (list, get, update)
+    
+    All operations support domain-specific execution and include proper error handling
+    and response formatting.
+    """
+
+    @property
+    def name(self) -> str:
+        return "quorum_management"
+
+    @property
+    def description(self) -> str:
+        return "Quorum management operations (list, get, activate, approve, deny, revoke, delete, get_resources_list, policy_activate, policy_deactivate, policy_status, profiles_list, profiles_get, profiles_update)"
 
     def get_schema(self) -> dict:
         return {

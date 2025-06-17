@@ -16,7 +16,9 @@ Security Rule:
     "action": "all_ops",
     "partial_match": false,
     "resource_set_id": "LinuxResourceSet",
-    "exclude_resource_set": true
+    "exclude_resource_set": true,
+    "user_set": "US01",
+    "permissions": ["apply_key"]
   }
 ]
 
@@ -33,7 +35,7 @@ Key Rule / DataTx Rule:
   }
 ]
 
-LDT Rule:
+LDT Key Rule:
 [
   {
     "resource_set_id": "TestResourceSet",
@@ -92,7 +94,17 @@ class PolicyType(str, Enum):
 
 # Policy Parameter Models
 class CTEPolicyCreateParams(BaseModel):
-    """Parameters for creating a CTE policy."""
+    """Parameters for creating a CTE policy.
+    
+    Notes:
+    - In security_rules_json, the field 'user_set' must be the user set name (e.g., 'US01'), not the ID or URI.
+    - In LDT rules, 'resource_set_id' must be valid or omitted if not required.
+    - Example security_rules_json:
+      [
+        {"effect": "permit", "action": "all_ops", "user_set": "US01", "permissions": ["apply_key"]},
+        {"effect": "deny", "action": "all_ops", "user_set": "*"}
+      ]
+    """
     cte_policy_name: str = Field(..., description="Name of the CTE policy")
     policy_type: PolicyType = Field(..., description="Policy type: Standard, Cloud_Object_Storage, LDT, IDT, or CSI")
     description: Optional[str] = Field(None, description="Description of the policy")
@@ -150,6 +162,31 @@ class CTEPolicyCreateParams(BaseModel):
         if not has_rule:
             raise ValueError("At least one rule (Security, Key, LDT, IDT, or Signature) must be provided")
         return self
+
+    @field_validator('security_rules_json')
+    @classmethod
+    def validate_security_rules_json(cls, v: Optional[str], info) -> Optional[str]:
+        """Validate security rules JSON format."""
+        if v:
+            try:
+                import json
+                rules = json.loads(v)
+                if not isinstance(rules, list):
+                    raise ValueError("Security rules must be a list")
+                for rule in rules:
+                    if not isinstance(rule, dict):
+                        raise ValueError("Each security rule must be a dictionary")
+                    if "effect" not in rule:
+                        raise ValueError("Each security rule must have an 'effect' field")
+                    if rule["effect"] not in ["permit", "deny"]:
+                        raise ValueError("Effect must be either 'permit' or 'deny'")
+                    if "user_set" not in rule:
+                        raise ValueError("Each security rule must have a 'user_set' field")
+                    if "permissions" in rule and not isinstance(rule["permissions"], list):
+                        raise ValueError("Permissions must be a list")
+            except json.JSONDecodeError:
+                raise ValueError("Invalid JSON format for security rules")
+        return v
 
 
 class CTEPolicyListParams(BaseModel):
@@ -561,6 +598,9 @@ class CTEPolicyManagementTool(BaseTool):
         action = kwargs.get("action")
         # CTE Policy actions
         if action == "create":
+            # IMPORTANT: security_rules_json must use 'user_set' as the user set name (not ID/URI)
+            # Example: {"user_set": "US01", ...}
+            # For LDT rules, 'resource_set_id' must be valid or omitted.
             params = CTEPolicyCreateParams(**kwargs)
             # Validate that at least one rule is provided
             params.validate_rule_requirement()
