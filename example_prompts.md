@@ -7,16 +7,7 @@ This document provides example prompts you can use with AI assistants (like Curs
 ## User Management
 
 - **List all users**
-  > List all users.
-
-- **List the first 5 users**
-  > Show me the first 5 users.
-
-- **List users with pagination**
-  > List users, limit 10, skip 20.
-
-- **Find users with a specific name**
-  > Find users with the name "alice".
+  > List all users in domain "finance".
 
 - **Get details for a specific user**
   > Get details for user "bob".
@@ -29,7 +20,7 @@ This document provides example prompts you can use with AI assistants (like Curs
   > Show system information.
 
 - **Check CipherTrust Manager version**
-  > What version of CipherTrust Manager is running?
+  > What is the version of CipherTrust Manager?
 
 ---
 
@@ -78,9 +69,6 @@ This document provides example prompts you can use with AI assistants (like Curs
 - **List all users in domain "engineering"**
   > List all users in the "engineering" domain.
 
-- **Show system information for domain "test-lab"**
-  > Show system information for the domain "test-lab".
-
 ---
 
 ## CTE (CipherTrust Transparent Encryption) Operations
@@ -103,6 +91,14 @@ This document provides example prompts you can use with AI assistants (like Curs
 - **Rotate the key used by guardpoint "/data/secure"**
   > Rotate the key used by the guardpoint on "/data/secure".
 
+- **List all CTE clients"**
+  > List all CTE clients in the connected domain.
+
+- **Create a guardpoint on CTE client win-client with policy policy-name at localtion C:\SensitiveData"**
+  > Add guardpoint on CTE client win-client.
+
+- **Create an LDT CTE policy with name ldt-pol-01. Userset user-set-01 should have full access (all_ops, apply_key). Use clear_key as the current key and LDTKey01 as the transoformation key"**
+  > Create a CTE LDT policy with userset user-set-01 with full access. 
 ---
 
 ## Service and Maintenance Operations
@@ -126,8 +122,8 @@ This document provides example prompts you can use with AI assistants (like Curs
 - **Generate a key compliance report for all active keys**
   > Generate a key compliance report for all active keys.
 
-- **Show the rotation history for key "archive-key"**
-  > Show the rotation history for the key named "archive-key".
+- **Show the rotation history for key "test-key"**
+  > Show the rotation history for the key named "test-key".
 
 - **List all keys that have not been rotated in the last 90 days**
   > List all keys that have not been rotated in the last 90 days.
@@ -144,13 +140,4 @@ This document provides example prompts you can use with AI assistants (like Curs
 
 - **Enable ransomware protection for guardpoint "/shared/data"**
   > Enable ransomware protection for the guardpoint on "/shared/data".
-
-- **Export the configuration of domain "dev"**
-  > Export the configuration for the domain "dev".
-
-- **Archive all deactivated keys in domain "archive"**
-  > Archive all deactivated keys in the "archive" domain.
-
 ---
-
-**Note:** The available actions depend on the tools registered with the MCP server. If you get an error, check the server's documentation or capabilities. 
