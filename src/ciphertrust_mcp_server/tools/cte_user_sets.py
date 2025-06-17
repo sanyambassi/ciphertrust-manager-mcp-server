@@ -2,15 +2,15 @@
 
 User Set JSON Structure:
 {
-    "name": "string",
-    "description": "string",
-    "users": [
+    "name": "string",           # Required for create
+    "description": "string",    # Optional
+    "users": [                  # Optional array of users
         {
-            "uname": "string",       // Username only, no domain
-            "uid": integer,          // Optional user ID
-            "gname": "string",       // Optional group name
-            "gid": integer,          // Optional group ID
-            "os_domain": "string"    // Domain name for Windows users (e.g., "DOMAIN" or "domain.local")
+            "uname": "string",       # Username only, no domain
+            "uid": integer,          # Optional user ID
+            "gname": "string",       # Optional group name
+            "gid": integer,          # Optional group ID
+            "os_domain": "string"    # Domain name for Windows users (e.g., "DOMAIN" or "domain.local")
         }
     ]
 }
@@ -20,7 +20,7 @@ Example for Windows domain users:
 - For user@domain.local: use uname="user", os_domain="domain.local"
 """
 
-from typing import Any, Optional
+from typing import Any, Optional, Dict, List
 
 from pydantic import BaseModel, Field
 
@@ -39,8 +39,8 @@ class CTEUserSetCreateParams(BaseModel):
 
 class CTEUserSetListParams(BaseModel):
     """Parameters for listing CTE user sets."""
-    limit: int = Field(10, description="Maximum number of user sets to return")
-    skip: int = Field(0, description="Index of the first user set to return")
+    limit: Optional[int] = Field(None, description="Maximum number of user sets to return")
+    skip: Optional[int] = Field(None, description="Index of the first user set to return")
     user_set_name: Optional[str] = Field(None, description="Filter by user set name")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to list user sets from (defaults to global setting)")
@@ -104,8 +104,8 @@ class CTEUserSetUpdateUserParams(BaseModel):
 class CTEUserSetListUsersParams(BaseModel):
     """Parameters for listing users in a CTE user set."""
     user_set_identifier: str = Field(..., description="Identifier for CTE UserSet (UUID, URI or Name)")
-    limit: int = Field(10, description="Maximum number of users to return")
-    skip: int = Field(0, description="Index of the first user to return")
+    limit: Optional[int] = Field(None, description="Maximum number of users to return")
+    skip: Optional[int] = Field(None, description="Index of the first user to return")
     search: Optional[str] = Field(None, description="Filter any resource")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to list users from (defaults to global setting)")
@@ -115,8 +115,8 @@ class CTEUserSetListUsersParams(BaseModel):
 class CTEUserSetListPoliciesParams(BaseModel):
     """Parameters for listing policies associated with a CTE user set."""
     user_set_identifier: str = Field(..., description="Identifier for CTE UserSet (UUID, URI or Name)")
-    limit: int = Field(10, description="Maximum number of policies to return")
-    skip: int = Field(0, description="Index of the first policy to return")
+    limit: Optional[int] = Field(None, description="Maximum number of policies to return")
+    skip: Optional[int] = Field(None, description="Index of the first policy to return")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to list policies from (defaults to global setting)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
@@ -136,7 +136,6 @@ class CTEUserSetManagementTool(BaseTool):
 
     def get_schema(self) -> dict[str, Any]:
         return {
-            "title": "CTEUserSetManagementTool",
             "type": "object",
             "properties": {
                 "action": {
@@ -144,7 +143,50 @@ class CTEUserSetManagementTool(BaseTool):
                     "enum": ["create", "list", "get", "delete", "modify", "add_users", "delete_user", "update_user", "list_users", "list_policies"],
                     "description": "Action to perform"
                 },
-                # Merge all params from the old tool classes
+                "user_json": {
+                    "type": "string",
+                    "description": "UserSet parameters in JSON format (string)"
+                },
+                "user_json_file": {
+                    "type": "string",
+                    "description": "UserSet parameters in JSON format (file)"
+                },
+                "user_set_identifier": {
+                    "type": "string",
+                    "description": "Identifier for CTE UserSet (UUID, URI or Name)"
+                },
+                "user_set_name": {
+                    "type": "string",
+                    "description": "Filter by user set name"
+                },
+                "user_index": {
+                    "type": "string",
+                    "description": "Index of user in CTE UserSet"
+                },
+                "user_index_list": {
+                    "type": "string",
+                    "description": "Comma-separated list of user indices to delete"
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum number of resources to return"
+                },
+                "skip": {
+                    "type": "integer",
+                    "description": "Index of the first resource to return"
+                },
+                "search": {
+                    "type": "string",
+                    "description": "Filter any resource"
+                },
+                "domain": {
+                    "type": "string",
+                    "description": "Domain to operate in (defaults to global setting)"
+                },
+                "auth_domain": {
+                    "type": "string",
+                    "description": "Authentication domain (defaults to global setting)"
+                }
             },
             "required": ["action"]
         }
@@ -155,86 +197,70 @@ class CTEUserSetManagementTool(BaseTool):
             params = CTEUserSetCreateParams(**kwargs)
             if not params.user_json and not params.user_json_file:
                 raise ValueError("Either user_json or user_json_file must be specified")
-            args = ["cte", "user-sets", "create"]
+            cmd = ["cte", "user-sets", "create"]
             if params.user_json:
-                args.extend(["--user-json", params.user_json])
+                cmd.extend(["--user-json", params.user_json])
             elif params.user_json_file:
-                args.extend(["--user-json-file", params.user_json_file])
-            result = self.execute_with_domain(args, params.domain, params.auth_domain)
-            return result.get("data", result.get("stdout", ""))
+                cmd.extend(["--user-json-file", params.user_json_file])
+            return await self._execute_command(cmd, params.domain, params.auth_domain)
         elif action == "list":
             params = CTEUserSetListParams(**kwargs)
-            args = ["cte", "user-sets", "list"]
-            args.extend(["--limit", str(params.limit)])
-            args.extend(["--skip", str(params.skip)])
+            cmd = ["cte", "user-sets", "list"]
+            if params.limit is not None:
+                cmd.extend(["--limit", str(params.limit)])
+            if params.skip is not None:
+                cmd.extend(["--skip", str(params.skip)])
             if params.user_set_name:
-                args.extend(["--user-set-name", params.user_set_name])
-            result = self.execute_with_domain(args, params.domain, params.auth_domain)
-            return result.get("data", result.get("stdout", ""))
+                cmd.extend(["--user-set-name", params.user_set_name])
+            return await self._execute_command(cmd, params.domain, params.auth_domain)
         elif action == "get":
             params = CTEUserSetGetParams(**kwargs)
-            args = ["cte", "user-sets", "get"]
-            args.extend(["--user-set-identifier", params.user_set_identifier])
-            result = self.execute_with_domain(args, params.domain, params.auth_domain)
-            return result.get("data", result.get("stdout", ""))
+            cmd = ["cte", "user-sets", "get", "--user-set-identifier", params.user_set_identifier]
+            return await self._execute_command(cmd, params.domain, params.auth_domain)
         elif action == "delete":
             params = CTEUserSetDeleteParams(**kwargs)
-            args = ["cte", "user-sets", "delete"]
-            args.extend(["--user-set-identifier", params.user_set_identifier])
-            result = self.execute_with_domain(args, params.domain, params.auth_domain)
-            return result.get("data", result.get("stdout", ""))
+            cmd = ["cte", "user-sets", "delete", "--user-set-identifier", params.user_set_identifier]
+            return await self._execute_command(cmd, params.domain, params.auth_domain)
         elif action == "modify":
             params = CTEUserSetModifyParams(**kwargs)
             if not params.user_json and not params.user_json_file:
                 raise ValueError("Either user_json or user_json_file must be specified")
-            args = ["cte", "user-sets", "modify"]
-            args.extend(["--user-set-identifier", params.user_set_identifier])
+            cmd = ["cte", "user-sets", "modify", "--user-set-identifier", params.user_set_identifier]
             if params.user_json:
-                args.extend(["--user-json", params.user_json])
+                cmd.extend(["--user-json", params.user_json])
             elif params.user_json_file:
-                args.extend(["--user-json-file", params.user_json_file])
-            result = self.execute_with_domain(args, params.domain, params.auth_domain)
-            return result.get("data", result.get("stdout", ""))
+                cmd.extend(["--user-json-file", params.user_json_file])
+            return await self._execute_command(cmd, params.domain, params.auth_domain)
         elif action == "add_users":
             params = CTEUserSetAddUsersParams(**kwargs)
-            args = ["cte", "user-sets", "add-users"]
-            args.extend(["--user-set-identifier", params.user_set_identifier])
-            args.extend(["--user-json-file", params.user_json_file])
-            result = self.execute_with_domain(args, params.domain, params.auth_domain)
-            return result.get("data", result.get("stdout", ""))
+            cmd = ["cte", "user-sets", "add-users", "--user-set-identifier", params.user_set_identifier, "--user-json-file", params.user_json_file]
+            return await self._execute_command(cmd, params.domain, params.auth_domain)
         elif action == "delete_user":
             params = CTEUserSetDeleteUserParams(**kwargs)
-            args = ["cte", "user-sets", "delete-user"]
-            args.extend(["--user-set-identifier", params.user_set_identifier])
-            args.extend(["--user-index-list", params.user_index_list])
-            result = self.execute_with_domain(args, params.domain, params.auth_domain)
-            return result.get("data", result.get("stdout", ""))
+            cmd = ["cte", "user-sets", "delete-user", "--user-set-identifier", params.user_set_identifier, "--user-index-list", params.user_index_list]
+            return await self._execute_command(cmd, params.domain, params.auth_domain)
         elif action == "update_user":
             params = CTEUserSetUpdateUserParams(**kwargs)
-            args = ["cte", "user-sets", "update-user"]
-            args.extend(["--user-set-identifier", params.user_set_identifier])
-            args.extend(["--user-index", params.user_index])
-            args.extend(["--user-json-file", params.user_json_file])
-            result = self.execute_with_domain(args, params.domain, params.auth_domain)
-            return result.get("data", result.get("stdout", ""))
+            cmd = ["cte", "user-sets", "update-user", "--user-set-identifier", params.user_set_identifier, "--user-index", params.user_index, "--user-json-file", params.user_json_file]
+            return await self._execute_command(cmd, params.domain, params.auth_domain)
         elif action == "list_users":
             params = CTEUserSetListUsersParams(**kwargs)
-            args = ["cte", "user-sets", "list-users"]
-            args.extend(["--user-set-identifier", params.user_set_identifier])
-            args.extend(["--limit", str(params.limit)])
-            args.extend(["--skip", str(params.skip)])
+            cmd = ["cte", "user-sets", "list-users", "--user-set-identifier", params.user_set_identifier]
+            if params.limit is not None:
+                cmd.extend(["--limit", str(params.limit)])
+            if params.skip is not None:
+                cmd.extend(["--skip", str(params.skip)])
             if params.search:
-                args.extend(["--search", params.search])
-            result = self.execute_with_domain(args, params.domain, params.auth_domain)
-            return result.get("data", result.get("stdout", ""))
+                cmd.extend(["--search", params.search])
+            return await self._execute_command(cmd, params.domain, params.auth_domain)
         elif action == "list_policies":
             params = CTEUserSetListPoliciesParams(**kwargs)
-            args = ["cte", "user-sets", "list-policies"]
-            args.extend(["--user-set-identifier", params.user_set_identifier])
-            args.extend(["--limit", str(params.limit)])
-            args.extend(["--skip", str(params.skip)])
-            result = self.execute_with_domain(args, params.domain, params.auth_domain)
-            return result.get("data", result.get("stdout", ""))
+            cmd = ["cte", "user-sets", "list-policies", "--user-set-identifier", params.user_set_identifier]
+            if params.limit is not None:
+                cmd.extend(["--limit", str(params.limit)])
+            if params.skip is not None:
+                cmd.extend(["--skip", str(params.skip)])
+            return await self._execute_command(cmd, params.domain, params.auth_domain)
         else:
             raise ValueError(f"Unknown action: {action}")
 
