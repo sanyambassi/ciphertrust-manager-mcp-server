@@ -1,17 +1,100 @@
-"""CTE Policies management tools for CipherTrust Manager with built-in domain support."""
+"""CTE Policies management tools for CipherTrust Manager with built-in domain support.
+
+Policy Types:
+- Standard
+- Cloud_Object_Storage
+- LDT
+- IDT
+- CSI
+
+Rule JSON Structures:
+
+Security Rule:
+[
+  {
+    "effect": "permit",
+    "action": "all_ops",
+    "partial_match": false,
+    "resource_set_id": "LinuxResourceSet",
+    "exclude_resource_set": true
+  }
+]
+
+Key Rule / DataTx Rule:
+[
+  {
+    "policy_id": "",
+    "order_number": 0,
+    "key_id": "MyKey",
+    "key_type": "name",
+    "new_key_rule": true,
+    "resource_set_id": "",
+    "key_usage": ""
+  }
+]
+
+LDT Rule:
+[
+  {
+    "resource_set_id": "TestResourceSet",
+    "current_key": {
+      "key_id": "clear_key",
+      "key_type": "name",
+      "key_usage": "ONLINE"
+    },
+    "transformation_key": {
+      "key_id": "MyKey",
+      "key_type": "name",
+      "key_usage": "ONLINE"
+    }
+  }
+]
+
+IDT Rule:
+[
+  {
+    "current_key": "clear_key",
+    "current_key_type": "name",
+    "transformation_key": "MyKey",
+    "transformation_key_type": "name"
+  }
+]
+
+Signature Rule:
+[
+  {
+    "signature_set_id": "TestSignSet"
+  }
+]
+
+Restrict Update:
+{
+  "restrict_update": false
+}
+"""
 
 from typing import Any, Optional, Literal
+from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 from .base import BaseTool
+
+
+class PolicyType(str, Enum):
+    """Valid policy types."""
+    STANDARD = "Standard"
+    CLOUD_OBJECT_STORAGE = "Cloud_Object_Storage"
+    LDT = "LDT"
+    IDT = "IDT"
+    CSI = "CSI"
 
 
 # Policy Parameter Models
 class CTEPolicyCreateParams(BaseModel):
     """Parameters for creating a CTE policy."""
     cte_policy_name: str = Field(..., description="Name of the CTE policy")
-    policy_type: str = Field(..., description="Policy type: Standard, Cloud_Object_Storage, LDT, IDT, or CSI")
+    policy_type: PolicyType = Field(..., description="Policy type: Standard, Cloud_Object_Storage, LDT, IDT, or CSI")
     description: Optional[str] = Field(None, description="Description of the policy")
     never_deny: bool = Field(False, description="Flag to always permit operations in policy")
     # JSON parameters for rules
@@ -32,6 +115,37 @@ class CTEPolicyCreateParams(BaseModel):
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to create policy in (defaults to global setting)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+
+    @validator('policy_type')
+    def validate_policy_type(cls, v):
+        """Validate policy type."""
+        if v not in PolicyType:
+            raise ValueError(f"Invalid policy type: {v}. Must be one of: {', '.join(PolicyType)}")
+        return v
+
+    @validator('security_rules_json', 'key_rules_json', 'data_tx_rules_json', 'ldt_rules_json', 'idt_rules_json', 'signature_rules_json')
+    def validate_json_format(cls, v, field):
+        """Validate JSON format for rules."""
+        if v:
+            try:
+                import json
+                json.loads(v)
+            except json.JSONDecodeError:
+                raise ValueError(f"Invalid JSON format for {field.name}")
+        return v
+
+    def validate_rule_requirement(self):
+        """Validate that at least one rule is provided."""
+        has_rule = any([
+            self.security_rules_json or self.security_rules_json_file,
+            self.key_rules_json or self.key_rules_json_file,
+            self.data_tx_rules_json or self.data_tx_rules_json_file,
+            self.ldt_rules_json or self.ldt_rules_json_file,
+            self.idt_rules_json or self.idt_rules_json_file,
+            self.signature_rules_json or self.signature_rules_json_file
+        ])
+        if not has_rule:
+            raise ValueError("At least one rule (Security, Key, LDT, IDT, or Signature) must be provided")
 
 
 class CTEPolicyListParams(BaseModel):
@@ -334,10 +448,7 @@ class CTEPolicyManagementTool(BaseTool):
         return "Manage CTE policies and related operations (create, list, get, delete, modify, add/delete/modify rules, etc.)"
 
     def get_schema(self) -> dict[str, Any]:
-        # Provide a schema that includes an 'action' parameter and all possible params for each action
-        # For brevity, only a sample is shown; in the real code, merge all params
         return {
-            "title": "CTEPolicyManagementTool",
             "type": "object",
             "properties": {
                 "action": {
@@ -353,16 +464,99 @@ class CTEPolicyManagementTool(BaseTool):
                     ],
                     "description": "Action to perform"
                 },
-                # ... merge all params from the old tool classes ...
+                "cte_policy_name": {
+                    "type": "string",
+                    "description": "Name of the CTE policy"
+                },
+                "policy_type": {
+                    "type": "string",
+                    "enum": ["Standard", "Cloud_Object_Storage", "LDT", "IDT", "CSI"],
+                    "description": "Policy type"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of the policy"
+                },
+                "never_deny": {
+                    "type": "boolean",
+                    "description": "Flag to always permit operations in policy"
+                },
+                "security_rules_json": {
+                    "type": "string",
+                    "description": "SecurityRule parameters in JSON format"
+                },
+                "security_rules_json_file": {
+                    "type": "string",
+                    "description": "File containing SecurityRule parameters in JSON"
+                },
+                "key_rules_json": {
+                    "type": "string",
+                    "description": "KeyRule parameters in JSON format"
+                },
+                "key_rules_json_file": {
+                    "type": "string",
+                    "description": "File containing KeyRule parameters in JSON"
+                },
+                "data_tx_rules_json": {
+                    "type": "string",
+                    "description": "DataTxRule parameters in JSON format"
+                },
+                "data_tx_rules_json_file": {
+                    "type": "string",
+                    "description": "File containing DataTxRule parameters in JSON"
+                },
+                "ldt_rules_json": {
+                    "type": "string",
+                    "description": "LDTRule parameters in JSON format"
+                },
+                "ldt_rules_json_file": {
+                    "type": "string",
+                    "description": "File containing LDTRule parameters in JSON"
+                },
+                "idt_rules_json": {
+                    "type": "string",
+                    "description": "IDTRule parameters in JSON format"
+                },
+                "idt_rules_json_file": {
+                    "type": "string",
+                    "description": "File containing IDTRule parameters in JSON"
+                },
+                "signature_rules_json": {
+                    "type": "string",
+                    "description": "SignatureRule parameters in JSON format"
+                },
+                "signature_rules_json_file": {
+                    "type": "string",
+                    "description": "File containing SignatureRule parameters in JSON"
+                },
+                "restrict_update_json": {
+                    "type": "string",
+                    "description": "RestrictUpdate parameters in JSON format"
+                },
+                "restrict_update_json_file": {
+                    "type": "string",
+                    "description": "File containing RestrictUpdate parameters in JSON"
+                },
+                "domain": {
+                    "type": "string",
+                    "description": "Domain to operate in (defaults to global setting)"
+                },
+                "auth_domain": {
+                    "type": "string",
+                    "description": "Authentication domain (defaults to global setting)"
+                }
             },
             "required": ["action"]
         }
 
-    async def execute(self, **kwargs: Any) -> Any:
+    def execute(self, **kwargs: Any) -> Any:
         action = kwargs.get("action")
         # CTE Policy actions
         if action == "create":
             params = CTEPolicyCreateParams(**kwargs)
+            # Validate that at least one rule is provided
+            params.validate_rule_requirement()
+            
             cmd = ["cte", "policies", "create", "--cte-policy-name", params.cte_policy_name, "--policy-type", params.policy_type]
             if params.description:
                 cmd.extend(["--description", params.description])
@@ -396,7 +590,8 @@ class CTEPolicyManagementTool(BaseTool):
                 cmd.extend(["--restrict-update-json", params.restrict_update_json])
             if params.restrict_update_json_file:
                 cmd.extend(["--restrict-update-json-file", params.restrict_update_json_file])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         elif action == "list":
             params = CTEPolicyListParams(**kwargs)
             cmd = ["cte", "policies", "list", "--limit", str(params.limit), "--skip", str(params.skip)]
