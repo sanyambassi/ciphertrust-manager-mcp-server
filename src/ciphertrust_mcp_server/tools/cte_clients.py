@@ -439,403 +439,429 @@ class CTEClientManagementTool(BaseTool):
         
         if action == "create":
             params = CTEClientCreateParams(**kwargs)
-            cmd = ["cte", "client", "create", "--cte-client-name", params.cte_client_name]
+            args = ["cte", "clients", "create"]
+            if params.cte_client_name:
+                args.extend(["--cte-client-name", params.cte_client_name])
             if params.client_password:
-                cmd.extend(["--client-password", params.client_password])
+                args.extend(["--client-password", params.client_password])
             if params.password_creation_method != "GENERATE":
-                cmd.extend(["--password-creation-method", params.password_creation_method])
+                args.extend(["--password-creation-method", params.password_creation_method])
             if params.comm_enabled:
-                cmd.append("--comm-enabled")
+                args.append("--comm-enabled")
             if params.reg_allowed:
-                cmd.append("--reg-allowed")
+                args.append("--reg-allowed")
             if params.cte_client_type:
-                cmd.extend(["--cte-client-type", params.cte_client_type])
+                args.extend(["--cte-client-type", params.cte_client_type])
             if params.cte_profile_identifier:
-                cmd.extend(["--cte-profile-identifier", params.cte_profile_identifier])
+                args.extend(["--cte-profile-identifier", params.cte_profile_identifier])
             if params.description:
-                cmd.extend(["--description", params.description])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.extend(["--description", params.description])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "list":
             params = CTEClientListParams(**kwargs)
-            cmd = ["cte", "client", "list"]
-            cmd.extend(["--limit", str(params.limit)])
-            cmd.extend(["--skip", str(params.skip)])
+            args = ["cte", "clients", "list"]
+            args.extend(["--limit", str(params.limit)])
+            args.extend(["--skip", str(params.skip)])
             if params.cte_client_name:
-                cmd.extend(["--cte-client-name", params.cte_client_name])
+                args.extend(["--cte-client-name", params.cte_client_name])
             if params.cte_client_type:
-                cmd.extend(["--cte-client-type", params.cte_client_type])
+                args.extend(["--cte-client-type", params.cte_client_type])
             if params.client_os_type:
-                cmd.extend(["--client-os-type", params.client_os_type])
+                args.extend(["--client-os-type", params.client_os_type])
             if params.client_status:
-                cmd.extend(["--client-status", params.client_status])
+                args.extend(["--client-status", params.client_status])
             if params.client_version:
-                cmd.extend(["--client-version", params.client_version])
+                args.extend(["--client-version", params.client_version])
             if params.client_mfa_enabled:
-                cmd.append("--client-mfa-enabled")
+                args.append("--client-mfa-enabled")
             if params.num_errors is not None:
-                cmd.extend(["--num-errors", str(params.num_errors)])
+                args.extend(["--num-errors", str(params.num_errors)])
             if params.num_gp_errors is not None:
-                cmd.extend(["--num-gp-errors", str(params.num_gp_errors)])
+                args.extend(["--num-gp-errors", str(params.num_gp_errors)])
             if params.num_warnings is not None:
-                cmd.extend(["--num-warnings", str(params.num_warnings)])
+                args.extend(["--num-warnings", str(params.num_warnings)])
             if params.assigned_with_ldt_group_comm_service:
-                cmd.append("--assigned-with-ldt-group-comm-service")
+                args.append("--assigned-with-ldt-group-comm-service")
             if params.enable_domain_sharing:
-                cmd.append("--enable-domain-sharing")
+                args.append("--enable-domain-sharing")
             if params.fetch_current_domain_resources_only:
-                cmd.append("--fetch-current-domain-resources-only")
+                args.append("--fetch-current-domain-resources-only")
             if params.native_domain:
-                cmd.extend(["--native-domain", params.native_domain])
+                args.extend(["--native-domain", params.native_domain])
             if params.filter_protection_mode:
-                cmd.extend(["--filter-protection-mode", params.filter_protection_mode])
+                args.extend(["--filter-protection-mode", params.filter_protection_mode])
             if params.cte_namespace_name:
-                cmd.extend(["--cte-namespace-name", params.cte_namespace_name])
+                args.extend(["--cte-namespace-name", params.cte_namespace_name])
             if params.cte_node_name:
-                cmd.extend(["--cte-node-name", params.cte_node_name])
+                args.extend(["--cte-node-name", params.cte_node_name])
             if params.cte_storage_group_name:
-                cmd.extend(["--cte-storage-group-name", params.cte_storage_group_name])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.extend(["--cte-storage-group-name", params.cte_storage_group_name])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "get":
             params = CTEClientGetParams(**kwargs)
-            cmd = ["cte", "client", "get", "--cte-client-identifier", params.cte_client_identifier]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "get"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "delete":
             params = CTEClientDeleteParams(**kwargs)
-            cmd = ["cte", "client", "delete", "--cte-client-identifier", params.cte_client_identifier]
+            args = ["cte", "clients", "delete"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
             if params.del_client:
-                cmd.append("--del-client")
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.append("--del-client")
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "bulk_delete":
             params = CTEClientBulkDeleteParams(**kwargs)
-            cmd = ["cte", "client", "bulk-delete"]
+            args = ["cte", "clients", "bulk-delete"]
             if params.client_identifier_list:
-                cmd.extend(["--client-identifier-list", params.client_identifier_list])
+                args.extend(["--client-identifier-list", params.client_identifier_list])
             if params.del_client:
-                cmd.append("--del-client")
+                args.append("--del-client")
             if params.delete_stale_clients:
-                cmd.append("--delete-stale-clients")
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.append("--delete-stale-clients")
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "modify":
             params = CTEClientModifyParams(**kwargs)
-            cmd = ["cte", "client", "modify", "--cte-client-identifier", params.cte_client_identifier]
+            args = ["cte", "clients", "modify"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
             if params.client_password:
-                cmd.extend(["--client-password", params.client_password])
+                args.extend(["--client-password", params.client_password])
             if params.password_creation_method:
-                cmd.extend(["--password-creation-method", params.password_creation_method])
+                args.extend(["--password-creation-method", params.password_creation_method])
             if params.comm_enabled is not None:
-                cmd.append("--comm-enabled" if params.comm_enabled else "--no-comm-enabled")
+                args.append("--comm-enabled" if params.comm_enabled else "--no-comm-enabled")
             if params.reg_allowed is not None:
-                cmd.append("--reg-allowed" if params.reg_allowed else "--no-reg-allowed")
+                args.append("--reg-allowed" if params.reg_allowed else "--no-reg-allowed")
             if params.cte_client_locked is not None:
-                cmd.append("--cte-client-locked" if params.cte_client_locked else "--no-cte-client-locked")
+                args.append("--cte-client-locked" if params.cte_client_locked else "--no-cte-client-locked")
             if params.system_locked is not None:
-                cmd.append("--system-locked" if params.system_locked else "--no-system-locked")
+                args.append("--system-locked" if params.system_locked else "--no-system-locked")
             if params.cte_profile_identifier:
-                cmd.extend(["--cte-profile-identifier", params.cte_profile_identifier])
+                args.extend(["--cte-profile-identifier", params.cte_profile_identifier])
             if params.host_name:
-                cmd.extend(["--host-name", params.host_name])
+                args.extend(["--host-name", params.host_name])
             if params.client_mfa_enabled is not None:
-                cmd.append("--client-mfa-enabled" if params.client_mfa_enabled else "--no-client-mfa-enabled")
+                args.append("--client-mfa-enabled" if params.client_mfa_enabled else "--no-client-mfa-enabled")
             if params.lgcs_access_only is not None:
-                cmd.append("--lgcs-access-only" if params.lgcs_access_only else "--no-lgcs-access-only")
+                args.append("--lgcs-access-only" if params.lgcs_access_only else "--no-lgcs-access-only")
             if params.max_num_cache_log is not None:
-                cmd.extend(["--max-num-cache-log", str(params.max_num_cache_log)])
+                args.extend(["--max-num-cache-log", str(params.max_num_cache_log)])
             if params.max_space_cache_log is not None:
-                cmd.extend(["--max-space-cache-log", str(params.max_space_cache_log)])
+                args.extend(["--max-space-cache-log", str(params.max_space_cache_log)])
             if params.rekey_rate is not None:
-                cmd.extend(["--rekey-rate", str(params.rekey_rate)])
+                args.extend(["--rekey-rate", str(params.rekey_rate)])
             if params.protection_mode:
-                cmd.extend(["--protection-mode", params.protection_mode])
+                args.extend(["--protection-mode", params.protection_mode])
             if params.enable_domain_sharing is not None:
-                cmd.append("--enable-domain-sharing" if params.enable_domain_sharing else "--no-enable-domain-sharing")
+                args.append("--enable-domain-sharing" if params.enable_domain_sharing else "--no-enable-domain-sharing")
             if params.shared_domain_list:
-                cmd.extend(["--shared-domain-list", params.shared_domain_list])
+                args.extend(["--shared-domain-list", params.shared_domain_list])
             if params.capabilities:
-                cmd.extend(["--capabilities", params.capabilities])
+                args.extend(["--capabilities", params.capabilities])
             if params.enabled_capabilities:
-                cmd.extend(["--enabled-capabilities", params.enabled_capabilities])
+                args.extend(["--enabled-capabilities", params.enabled_capabilities])
             if params.dynamic_parameters:
-                cmd.extend(["--dynamic-parameters", params.dynamic_parameters])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.extend(["--dynamic-parameters", params.dynamic_parameters])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "enroll":
             params = CTEClientEnrollParams(**kwargs)
-            cmd = ["cte", "client", "enroll", "--cte-client-name", params.cte_client_name,
-                  "--client-reg-identifier", params.client_reg_identifier,
-                  "--host-name", params.host_name,
-                  "--client-os-type", params.client_os_type]
+            args = ["cte", "clients", "enroll"]
+            args.extend(["--cte-client-name", params.cte_client_name,
+                         "--client-reg-identifier", params.client_reg_identifier,
+                         "--host-name", params.host_name,
+                         "--client-os-type", params.client_os_type])
             if params.agent_type:
-                cmd.extend(["--agent-type", params.agent_type])
+                args.extend(["--agent-type", params.agent_type])
             if params.agent_version:
-                cmd.extend(["--agent-version", params.agent_version])
+                args.extend(["--agent-version", params.agent_version])
             if params.agent_build_identifier is not None:
-                cmd.extend(["--agent-build-identifier", str(params.agent_build_identifier)])
+                args.extend(["--agent-build-identifier", str(params.agent_build_identifier)])
             if params.comm_version_min is not None:
-                cmd.extend(["--comm-version-min", str(params.comm_version_min)])
+                args.extend(["--comm-version-min", str(params.comm_version_min)])
             if params.comm_version_max is not None:
-                cmd.extend(["--comm-version-max", str(params.comm_version_max)])
+                args.extend(["--comm-version-max", str(params.comm_version_max)])
             if params.curr_time is not None:
-                cmd.extend(["--curr-time", str(params.curr_time)])
+                args.extend(["--curr-time", str(params.curr_time)])
             if params.description:
-                cmd.extend(["--description", params.description])
+                args.extend(["--description", params.description])
             if params.enable_cloud:
-                cmd.append("--enable-cloud")
+                args.append("--enable-cloud")
             if params.enable_docker:
-                cmd.append("--enable-docker")
+                args.append("--enable-docker")
             if params.enable_es:
-                cmd.append("--enable-es")
+                args.append("--enable-es")
             if params.enable_fs:
-                cmd.append("--enable-fs")
+                args.append("--enable-fs")
             if params.enable_ldt:
-                cmd.append("--enable-ldt")
+                args.append("--enable-ldt")
             if params.enable_rwp:
-                cmd.append("--enable-rwp")
+                args.append("--enable-rwp")
             if params.features:
-                cmd.extend(["--features", params.features])
+                args.extend(["--features", params.features])
             if params.install_directory:
-                cmd.extend(["--install-directory", params.install_directory])
+                args.extend(["--install-directory", params.install_directory])
             if params.lgcs_access_only:
-                cmd.append("--lgcs-access-only")
+                args.append("--lgcs-access-only")
             if params.os_kernel:
-                cmd.extend(["--os-kernel", params.os_kernel])
+                args.extend(["--os-kernel", params.os_kernel])
             if params.os_sub_type:
-                cmd.extend(["--os-sub-type", params.os_sub_type])
+                args.extend(["--os-sub-type", params.os_sub_type])
             if params.secfs_key:
-                cmd.extend(["--secfs-key", params.secfs_key])
+                args.extend(["--secfs-key", params.secfs_key])
             if params.server_hostname:
-                cmd.extend(["--server-hostname", params.server_hostname])
+                args.extend(["--server-hostname", params.server_hostname])
             if params.silo_name:
-                cmd.extend(["--silo-name", params.silo_name])
+                args.extend(["--silo-name", params.silo_name])
             if params.client_group:
-                cmd.extend(["--client-group", params.client_group])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.extend(["--client-group", params.client_group])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "unenroll":
             params = CTEClientUnenrollParams(**kwargs)
-            cmd = ["cte", "client", "unenroll", "--cte-client-name", params.cte_client_name]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "unenroll"]
+            args.extend(["--cte-client-name", params.cte_client_name])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "create_guardpoint":
             params = CTEClientCreateGuardPointParams(**kwargs)
-            cmd = ["cte", "client", "create-guardpoint", "--cte-client-identifier", params.cte_client_identifier,
-                  "--guard-path-list", params.guard_path_list,
-                  "--guard-point-type", params.guard_point_type]
+            args = ["cte", "clients", "create-guardpoint"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier,
+                         "--guard-path-list", params.guard_path_list,
+                         "--guard-point-type", params.guard_point_type])
             if params.cte_policy_identifier:
-                cmd.extend(["--cte-policy-identifier", params.cte_policy_identifier])
+                args.extend(["--cte-policy-identifier", params.cte_policy_identifier])
             if not params.guard_enabled:
-                cmd.append("--no-guard-enabled")
+                args.append("--no-guard-enabled")
             if params.auto_mount_enabled:
-                cmd.append("--auto-mount-enabled")
+                args.append("--auto-mount-enabled")
             if params.cifs_enabled:
-                cmd.append("--cifs-enabled")
+                args.append("--cifs-enabled")
             if params.early_access:
-                cmd.append("--early-access")
+                args.append("--early-access")
             if not params.preserve_sparse_regions:
-                cmd.append("--no-preserve-sparse-regions")
+                args.append("--no-preserve-sparse-regions")
             if params.mfa_enabled:
-                cmd.append("--mfa-enabled")
+                args.append("--mfa-enabled")
             if params.intelligent_protection:
-                cmd.append("--intelligent-protection")
+                args.append("--intelligent-protection")
             if params.is_idt_capable_device:
-                cmd.append("--is-idt-capable-device")
+                args.append("--is-idt-capable-device")
             if params.network_share_credentials_identifier:
-                cmd.extend(["--network-share-credentials-identifier", params.network_share_credentials_identifier])
+                args.extend(["--network-share-credentials-identifier", params.network_share_credentials_identifier])
             if params.disk_name:
-                cmd.extend(["--disk-name", params.disk_name])
+                args.extend(["--disk-name", params.disk_name])
             if params.disk_group_name:
-                cmd.extend(["--disk-group-name", params.disk_group_name])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.extend(["--disk-group-name", params.disk_group_name])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "create_guardpoint_csv":
             params = CTEClientCreateGuardPointCSVParams(**kwargs)
-            cmd = ["cte", "client", "create-guardpoint-csv", "--cte-client-identifier", params.cte_client_identifier,
-                  "--guard-path-csv-file", params.guard_path_csv_file,
-                  "--guard-point-type", params.guard_point_type]
+            args = ["cte", "clients", "create-guardpoint-csv"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier,
+                         "--guard-path-csv-file", params.guard_path_csv_file,
+                         "--guard-point-type", params.guard_point_type])
             if params.cte_policy_identifier:
-                cmd.extend(["--cte-policy-identifier", params.cte_policy_identifier])
+                args.extend(["--cte-policy-identifier", params.cte_policy_identifier])
             if not params.guard_enabled:
-                cmd.append("--no-guard-enabled")
+                args.append("--no-guard-enabled")
             if params.auto_mount_enabled:
-                cmd.append("--auto-mount-enabled")
+                args.append("--auto-mount-enabled")
             if params.cifs_enabled:
-                cmd.append("--cifs-enabled")
+                args.append("--cifs-enabled")
             if params.early_access:
-                cmd.append("--early-access")
+                args.append("--early-access")
             if not params.preserve_sparse_regions:
-                cmd.append("--no-preserve-sparse-regions")
+                args.append("--no-preserve-sparse-regions")
             if params.is_idt_capable_device:
-                cmd.append("--is-idt-capable-device")
+                args.append("--is-idt-capable-device")
             if params.network_share_credentials_identifier:
-                cmd.extend(["--network-share-credentials-identifier", params.network_share_credentials_identifier])
+                args.extend(["--network-share-credentials-identifier", params.network_share_credentials_identifier])
             if params.disk_name:
-                cmd.extend(["--disk-name", params.disk_name])
+                args.extend(["--disk-name", params.disk_name])
             if params.disk_group_name:
-                cmd.extend(["--disk-group-name", params.disk_group_name])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.extend(["--disk-group-name", params.disk_group_name])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "list_guardpoints":
             params = CTEClientListGuardPointsParams(**kwargs)
-            cmd = ["cte", "client", "list-guardpoints", "--cte-client-identifier", params.cte_client_identifier]
-            cmd.extend(["--limit", str(params.limit)])
-            cmd.extend(["--skip", str(params.skip)])
+            args = ["cte", "clients", "list-guardpoints"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
+            args.extend(["--limit", str(params.limit)])
+            args.extend(["--skip", str(params.skip)])
             if params.guard_path:
-                cmd.extend(["--guard-path", params.guard_path])
+                args.extend(["--guard-path", params.guard_path])
             if params.guard_point_type:
-                cmd.extend(["--guard-point-type", params.guard_point_type])
+                args.extend(["--guard-point-type", params.guard_point_type])
             if params.guard_point_state:
-                cmd.extend(["--guard-point-state", params.guard_point_state])
+                args.extend(["--guard-point-state", params.guard_point_state])
             if params.guard_enabled is not None:
-                cmd.append("--guard-enabled" if params.guard_enabled else "--no-guard-enabled")
+                args.append("--guard-enabled" if params.guard_enabled else "--no-guard-enabled")
             if params.cte_policy_identifier:
-                cmd.extend(["--cte-policy-identifier", params.cte_policy_identifier])
+                args.extend(["--cte-policy-identifier", params.cte_policy_identifier])
             if params.cte_policy_name:
-                cmd.extend(["--cte-policy-name", params.cte_policy_name])
+                args.extend(["--cte-policy-name", params.cte_policy_name])
             if params.client_group_identifier:
-                cmd.extend(["--client-group-identifier", params.client_group_identifier])
+                args.extend(["--client-group-identifier", params.client_group_identifier])
             if params.client_group_name:
-                cmd.extend(["--client-group-name", params.client_group_name])
+                args.extend(["--client-group-name", params.client_group_name])
             if params.mfa_enabled is not None:
-                cmd.append("--mfa-enabled" if params.mfa_enabled else "--no-mfa-enabled")
+                args.append("--mfa-enabled" if params.mfa_enabled else "--no-mfa-enabled")
             if params.pending_operation:
-                cmd.extend(["--pending-operation", params.pending_operation])
+                args.extend(["--pending-operation", params.pending_operation])
             if params.sort:
-                cmd.extend(["--sort", params.sort])
+                args.extend(["--sort", params.sort])
             if params.fetch_current_domain_resources_only:
-                cmd.append("--fetch-current-domain-resources-only")
+                args.append("--fetch-current-domain-resources-only")
             if params.native_domain:
-                cmd.extend(["--native-domain", params.native_domain])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.extend(["--native-domain", params.native_domain])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "get_guardpoint":
             params = CTEClientGetGuardPointParams(**kwargs)
-            cmd = ["cte", "client", "get-guardpoint", "--cte-client-identifier", params.cte_client_identifier,
-                  "--guard-point-identifier", params.guard_point_identifier]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "get-guardpoint"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier,
+                         "--guard-point-identifier", params.guard_point_identifier])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "modify_guardpoint":
             params = CTEClientModifyGuardPointParams(**kwargs)
-            cmd = ["cte", "client", "modify-guardpoint", "--cte-client-identifier", params.cte_client_identifier,
-                  "--guard-point-identifier", params.guard_point_identifier]
+            args = ["cte", "clients", "modify-guardpoint"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier,
+                         "--guard-point-identifier", params.guard_point_identifier])
             if params.guard_enabled is not None:
-                cmd.append("--guard-enabled" if params.guard_enabled else "--no-guard-enabled")
+                args.append("--guard-enabled" if params.guard_enabled else "--no-guard-enabled")
             if params.mfa_enabled is not None:
-                cmd.append("--mfa-enabled" if params.mfa_enabled else "--no-mfa-enabled")
+                args.append("--mfa-enabled" if params.mfa_enabled else "--no-mfa-enabled")
             if params.network_share_credentials_identifier:
-                cmd.extend(["--network-share-credentials-identifier", params.network_share_credentials_identifier])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.extend(["--network-share-credentials-identifier", params.network_share_credentials_identifier])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "modify_early_access":
             params = CTEClientModifyEarlyAccessParams(**kwargs)
-            cmd = ["cte", "client", "modify-early-access", "--cte-client-identifier", params.cte_client_identifier,
-                  "--guard-point-identifier", params.guard_point_identifier]
-            cmd.append("--early-access" if params.early_access else "--no-early-access")
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "modify-early-access"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier,
+                         "--guard-point-identifier", params.guard_point_identifier])
+            args.append("--early-access" if params.early_access else "--no-early-access")
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "preserve_sparse_region_off":
             params = CTEClientPreserveSparseRegionOffParams(**kwargs)
-            cmd = ["cte", "client", "preserve-sparse-region-off", "--cte-client-identifier", params.cte_client_identifier,
-                  "--guard-point-identifier", params.guard_point_identifier]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "preserve-sparse-region-off"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier,
+                         "--guard-point-identifier", params.guard_point_identifier])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "unguard_guardpoint":
             params = CTEClientUnguardGuardPointParams(**kwargs)
-            cmd = ["cte", "client", "unguard-guardpoint", "--cte-client-identifier", params.cte_client_identifier,
-                  "--guard-point-identifier", params.guard_point_identifier]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "unguard-guardpoint"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier,
+                         "--guard-point-identifier", params.guard_point_identifier])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "unguard_bulk_guardpoints":
             params = CTEClientUnguardBulkGuardPointsParams(**kwargs)
-            cmd = ["cte", "client", "unguard-bulk-guardpoints", "--cte-client-identifier", params.cte_client_identifier,
-                  "--guard-point-identifier-list", params.guard_point_identifier_list]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "unguard-bulk-guardpoints"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier,
+                         "--guard-point-identifier-list", params.guard_point_identifier_list])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "check_agent_info":
             params = CTEClientAgentInfoParams(**kwargs)
-            cmd = ["cte", "client", "check-agent-info", "--cte-client-identifier", params.cte_client_identifier]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "check-agent-info"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "clear_agent_info":
             params = CTEClientClearAgentInfoParams(**kwargs)
-            cmd = ["cte", "client", "clear-agent-info"]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "clear-agent-info"]
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "download_agent_info":
             params = CTEClientAgentInfoParams(**kwargs)
-            cmd = ["cte", "client", "download-agent-info", "--cte-client-identifier", params.cte_client_identifier]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "download-agent-info"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "get_agent_info":
             params = CTEClientAgentInfoParams(**kwargs)
-            cmd = ["cte", "client", "get-agent-info", "--cte-client-identifier", params.cte_client_identifier]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "get-agent-info"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "get_client_groups":
             params = CTEClientGetClientGroupsParams(**kwargs)
-            cmd = ["cte", "client", "get-client-groups", "--cte-client-identifier", params.cte_client_identifier]
-            cmd.extend(["--limit", str(params.limit)])
-            cmd.extend(["--skip", str(params.skip)])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "get-client-groups"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
+            args.extend(["--limit", str(params.limit)])
+            args.extend(["--skip", str(params.skip)])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "modify_password":
             params = CTEClientModifyPasswordParams(**kwargs)
-            cmd = ["cte", "client", "modify-password", "--cte-client-identifier", params.cte_client_identifier,
-                  "--client-password", params.client_password]
+            args = ["cte", "clients", "modify-password"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier,
+                         "--client-password", params.client_password])
             if params.password_creation_method != "MANUAL":
-                cmd.extend(["--password-creation-method", params.password_creation_method])
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.extend(["--password-creation-method", params.password_creation_method])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "modify_auth_binaries":
             params = CTEClientModifyAuthBinariesParams(**kwargs)
-            cmd = ["cte", "client", "modify-auth-binaries", "--cte-client-identifier", params.cte_client_identifier]
+            args = ["cte", "clients", "modify-auth-binaries"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
             if params.auth_bin_json:
-                cmd.extend(["--auth-bin-json", params.auth_bin_json])
+                args.extend(["--auth-bin-json", params.auth_bin_json])
             if params.auth_bin_json_file:
-                cmd.extend(["--auth-bin-json-file", params.auth_bin_json_file])
+                args.extend(["--auth-bin-json-file", params.auth_bin_json_file])
             if params.re_sign:
-                cmd.append("--re-sign")
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+                args.append("--re-sign")
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "send_ldt_pause":
             params = CTEClientSendLDTPauseParams(**kwargs)
-            cmd = ["cte", "client", "send-ldt-pause", "--cte-client-identifier", params.cte_client_identifier]
-            cmd.append("--ldt-pause" if params.ldt_pause else "--no-ldt-pause")
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "send-ldt-pause"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
+            args.append("--ldt-pause" if params.ldt_pause else "--no-ldt-pause")
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "query_capabilities":
             params = CTEClientQueryCapabilitiesParams(**kwargs)
-            cmd = ["cte", "client", "query-capabilities"]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "query-capabilities"]
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "query_status_update":
             params = CTEClientQueryStatusUpdateParams(**kwargs)
-            cmd = ["cte", "client", "query-status-update", "--cte-client-identifier", params.cte_client_identifier]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "query-status-update"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "get_challenge_response":
             params = CTEClientGetChallengeResponseParams(**kwargs)
-            cmd = ["cte", "client", "get-challenge-response", "--cte-client-identifier", params.cte_client_identifier,
-                  "--challenge", params.challenge]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "get-challenge-response"]
+            args.extend(["--cte-client-identifier", params.cte_client_identifier,
+                         "--challenge", params.challenge])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "get_compatibility_matrix":
             params = CTEClientGetCompatibilityMatrixParams(**kwargs)
-            cmd = ["cte", "client", "get-compatibility-matrix"]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "get-compatibility-matrix"]
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "upload_compatibility_matrix":
             params = CTEClientUploadCompatibilityMatrixParams(**kwargs)
-            cmd = ["cte", "client", "upload-compatibility-matrix", "--kernel-json-file", params.kernel_json_file]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "upload-compatibility-matrix"]
+            args.extend(["--kernel-json-file", params.kernel_json_file])
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         elif action == "delete_compatibility_matrix":
             params = CTEClientDeleteCompatibilityMatrixParams(**kwargs)
-            cmd = ["cte", "client", "delete-compatibility-matrix"]
-            return self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            args = ["cte", "clients", "delete-compatibility-matrix"]
+            return self.execute_with_domain(args, params.domain, params.auth_domain)
             
         else:
             raise ValueError(f"Unknown action: {action}")
