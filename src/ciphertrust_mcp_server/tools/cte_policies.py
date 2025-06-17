@@ -363,7 +363,7 @@ class CTEPolicyManagementTool(BaseTool):
         # CTE Policy actions
         if action == "create":
             params = CTEPolicyCreateParams(**kwargs)
-            cmd = ["cte", "policy", "create", "--cte-policy-name", params.cte_policy_name, "--policy-type", params.policy_type]
+            cmd = ["cte", "policies", "create", "--cte-policy-name", params.cte_policy_name, "--policy-type", params.policy_type]
             if params.description:
                 cmd.extend(["--description", params.description])
             if params.never_deny:
@@ -399,7 +399,7 @@ class CTEPolicyManagementTool(BaseTool):
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "list":
             params = CTEPolicyListParams(**kwargs)
-            cmd = ["cte", "policy", "list", "--limit", str(params.limit), "--skip", str(params.skip)]
+            cmd = ["cte", "policies", "list", "--limit", str(params.limit), "--skip", str(params.skip)]
             if params.cte_policy_name:
                 cmd.extend(["--cte-policy-name", params.cte_policy_name])
             if params.policy_type:
@@ -407,15 +407,15 @@ class CTEPolicyManagementTool(BaseTool):
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "get":
             params = CTEPolicyGetParams(**kwargs)
-            cmd = ["cte", "policy", "get", "--cte-policy-identifier", params.cte_policy_identifier]
+            cmd = ["cte", "policies", "get", "--cte-policy-identifier", params.cte_policy_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "delete":
             params = CTEPolicyDeleteParams(**kwargs)
-            cmd = ["cte", "policy", "delete", "--cte-policy-identifier", params.cte_policy_identifier]
+            cmd = ["cte", "policies", "delete", "--cte-policy-identifier", params.cte_policy_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "modify":
             params = CTEPolicyModifyParams(**kwargs)
-            cmd = ["cte", "policy", "modify", "--cte-policy-identifier", params.cte_policy_identifier]
+            cmd = ["cte", "policies", "modify", "--cte-policy-identifier", params.cte_policy_identifier]
             if params.description:
                 cmd.extend(["--description", params.description])
             if params.never_deny is not None:
@@ -430,7 +430,7 @@ class CTEPolicyManagementTool(BaseTool):
         # Security Rule actions
         elif action == "add_security_rule":
             params = CTEPolicyAddSecurityRuleParams(**kwargs)
-            cmd = ["cte", "policy", "add-security-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--effect", params.effect]
+            cmd = ["cte", "policies", "add-security-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--effect", params.effect]
             if params.action:
                 cmd.extend(["--action", params.action])
             if params.user_set_identifier:
@@ -448,21 +448,21 @@ class CTEPolicyManagementTool(BaseTool):
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "delete_security_rule":
             params = CTEPolicySecurityRuleParams(**kwargs)
-            cmd = ["cte", "policy", "delete-security-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--security-rule-identifier", params.security_rule_identifier]
+            cmd = ["cte", "policies", "delete-security-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--security-rule-identifier", params.security_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "get_security_rule":
             params = CTEPolicySecurityRuleParams(**kwargs)
-            cmd = ["cte", "policy", "get-security-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--security-rule-identifier", params.security_rule_identifier]
+            cmd = ["cte", "policies", "get-security-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--security-rule-identifier", params.security_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "list_security_rules":
             params = CTEPolicyListSecurityRulesParams(**kwargs)
-            cmd = ["cte", "policy", "list-security-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--limit", str(params.limit), "--skip", str(params.skip)]
+            cmd = ["cte", "policies", "list-security-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--limit", str(params.limit), "--skip", str(params.skip)]
             if params.action:
                 cmd.extend(["--action", params.action])
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "modify_security_rule":
             params = CTEPolicyModifySecurityRuleParams(**kwargs)
-            cmd = ["cte", "policy", "modify-security-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--security-rule-identifier", params.security_rule_identifier]
+            cmd = ["cte", "policies", "modify-security-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--security-rule-identifier", params.security_rule_identifier]
             if params.effect:
                 cmd.extend(["--effect", params.effect])
             if params.action:
@@ -485,7 +485,7 @@ class CTEPolicyManagementTool(BaseTool):
         # Key Rule actions
         elif action == "add_key_rule":
             params = CTEPolicyAddKeyRuleParams(**kwargs)
-            cmd = ["cte", "policy", "add-key-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--key-identifier", params.key_identifier]
+            cmd = ["cte", "policies", "add-key-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--key-identifier", params.key_identifier]
             if params.key_type:
                 cmd.extend(["--key-type", params.key_type])
             if params.resource_set_identifier:
@@ -493,19 +493,19 @@ class CTEPolicyManagementTool(BaseTool):
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "delete_key_rule":
             params = CTEPolicyKeyRuleParams(**kwargs)
-            cmd = ["cte", "policy", "delete-key-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--key-rule-identifier", params.key_rule_identifier]
+            cmd = ["cte", "policies", "delete-key-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--key-rule-identifier", params.key_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "get_key_rule":
             params = CTEPolicyKeyRuleParams(**kwargs)
-            cmd = ["cte", "policy", "get-key-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--key-rule-identifier", params.key_rule_identifier]
+            cmd = ["cte", "policies", "get-key-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--key-rule-identifier", params.key_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "list_key_rules":
             params = CTEPolicyListKeyRulesParams(**kwargs)
-            cmd = ["cte", "policy", "list-key-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--limit", str(params.limit), "--skip", str(params.skip)]
+            cmd = ["cte", "policies", "list-key-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--limit", str(params.limit), "--skip", str(params.skip)]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "modify_key_rule":
             params = CTEPolicyModifyKeyRuleParams(**kwargs)
-            cmd = ["cte", "policy", "modify-key-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--key-rule-identifier", params.key_rule_identifier]
+            cmd = ["cte", "policies", "modify-key-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--key-rule-identifier", params.key_rule_identifier]
             if params.key_identifier:
                 cmd.extend(["--key-identifier", params.key_identifier])
             if params.key_type:
@@ -518,7 +518,7 @@ class CTEPolicyManagementTool(BaseTool):
         # Data Tx Rule actions
         elif action == "add_data_tx_rule":
             params = CTEPolicyAddDataTxRuleParams(**kwargs)
-            cmd = ["cte", "policy", "add-data-tx-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--key-identifier", params.key_identifier]
+            cmd = ["cte", "policies", "add-data-tx-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--key-identifier", params.key_identifier]
             if params.key_type:
                 cmd.extend(["--key-type", params.key_type])
             if params.resource_set_identifier:
@@ -526,19 +526,19 @@ class CTEPolicyManagementTool(BaseTool):
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "delete_data_tx_rule":
             params = CTEPolicyDataTxRuleParams(**kwargs)
-            cmd = ["cte", "policy", "delete-data-tx-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--data-tx-rule-identifier", params.data_tx_rule_identifier]
+            cmd = ["cte", "policies", "delete-data-tx-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--data-tx-rule-identifier", params.data_tx_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "get_data_tx_rule":
             params = CTEPolicyDataTxRuleParams(**kwargs)
-            cmd = ["cte", "policy", "get-data-tx-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--data-tx-rule-identifier", params.data_tx_rule_identifier]
+            cmd = ["cte", "policies", "get-data-tx-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--data-tx-rule-identifier", params.data_tx_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "list_data_tx_rules":
             params = CTEPolicyListDataTxRulesParams(**kwargs)
-            cmd = ["cte", "policy", "list-data-tx-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--limit", str(params.limit), "--skip", str(params.skip)]
+            cmd = ["cte", "policies", "list-data-tx-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--limit", str(params.limit), "--skip", str(params.skip)]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "modify_data_tx_rule":
             params = CTEPolicyModifyDataTxRuleParams(**kwargs)
-            cmd = ["cte", "policy", "modify-data-tx-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--data-tx-rule-identifier", params.data_tx_rule_identifier]
+            cmd = ["cte", "policies", "modify-data-tx-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--data-tx-rule-identifier", params.data_tx_rule_identifier]
             if params.key_identifier:
                 cmd.extend(["--key-identifier", params.key_identifier])
             if params.key_type:
@@ -551,7 +551,7 @@ class CTEPolicyManagementTool(BaseTool):
         # LDT Rule actions
         elif action == "add_ldt_rule":
             params = CTEPolicyAddLDTRuleParams(**kwargs)
-            cmd = ["cte", "policy", "add-ldt-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--current-key-json-file", params.current_key_json_file, "--transform-key-json-file", params.transform_key_json_file]
+            cmd = ["cte", "policies", "add-ldt-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--current-key-json-file", params.current_key_json_file, "--transform-key-json-file", params.transform_key_json_file]
             if params.resource_set_identifier:
                 cmd.extend(["--resource-set-identifier", params.resource_set_identifier])
             if params.is_exclusion_rule:
@@ -559,19 +559,19 @@ class CTEPolicyManagementTool(BaseTool):
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "delete_ldt_rule":
             params = CTEPolicyLDTRuleParams(**kwargs)
-            cmd = ["cte", "policy", "delete-ldt-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--ldt-rule-identifier", params.ldt_rule_identifier]
+            cmd = ["cte", "policies", "delete-ldt-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--ldt-rule-identifier", params.ldt_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "get_ldt_rule":
             params = CTEPolicyLDTRuleParams(**kwargs)
-            cmd = ["cte", "policy", "get-ldt-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--ldt-rule-identifier", params.ldt_rule_identifier]
+            cmd = ["cte", "policies", "get-ldt-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--ldt-rule-identifier", params.ldt_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "list_ldt_rules":
             params = CTEPolicyListLDTRulesParams(**kwargs)
-            cmd = ["cte", "policy", "list-ldt-rules", "--cte-policy-identifier", params.cte_policy_identifier]
+            cmd = ["cte", "policies", "list-ldt-rules", "--cte-policy-identifier", params.cte_policy_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "modify_ldt_rule":
             params = CTEPolicyModifyLDTRuleParams(**kwargs)
-            cmd = ["cte", "policy", "modify-ldt-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--ldt-rule-identifier", params.ldt_rule_identifier]
+            cmd = ["cte", "policies", "modify-ldt-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--ldt-rule-identifier", params.ldt_rule_identifier]
             if params.current_key_json_file:
                 cmd.extend(["--current-key-json-file", params.current_key_json_file])
             if params.transform_key_json_file:
@@ -586,15 +586,15 @@ class CTEPolicyManagementTool(BaseTool):
         # IDT Rule actions
         elif action == "get_idt_rule":
             params = CTEPolicyIDTRuleParams(**kwargs)
-            cmd = ["cte", "policy", "get-idt-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--idt-rule-identifier", params.idt_rule_identifier]
+            cmd = ["cte", "policies", "get-idt-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--idt-rule-identifier", params.idt_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "list_idt_rules":
             params = CTEPolicyListIDTRulesParams(**kwargs)
-            cmd = ["cte", "policy", "list-idt-rules", "--cte-policy-identifier", params.cte_policy_identifier]
+            cmd = ["cte", "policies", "list-idt-rules", "--cte-policy-identifier", params.cte_policy_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "modify_idt_rule":
             params = CTEPolicyModifyIDTRuleParams(**kwargs)
-            cmd = ["cte", "policy", "modify-idt-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--idt-rule-identifier", params.idt_rule_identifier]
+            cmd = ["cte", "policies", "modify-idt-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--idt-rule-identifier", params.idt_rule_identifier]
             if params.idt_current_key:
                 cmd.extend(["--idt-current-key", params.idt_current_key])
             if params.idt_current_key_type:
@@ -607,19 +607,19 @@ class CTEPolicyManagementTool(BaseTool):
         # Signature Rule actions
         elif action == "add_signature_rule":
             params = CTEPolicyAddSignatureRuleParams(**kwargs)
-            cmd = ["cte", "policy", "add-signature-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--signature-set-id-list", params.signature_set_id_list]
+            cmd = ["cte", "policies", "add-signature-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--signature-set-id-list", params.signature_set_id_list]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "delete_signature_rule":
             params = CTEPolicySignatureRuleParams(**kwargs)
-            cmd = ["cte", "policy", "delete-signature-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--signature-rule-identifier", params.signature_rule_identifier]
+            cmd = ["cte", "policies", "delete-signature-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--signature-rule-identifier", params.signature_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "get_signature_rule":
             params = CTEPolicySignatureRuleParams(**kwargs)
-            cmd = ["cte", "policy", "get-signature-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--signature-rule-identifier", params.signature_rule_identifier]
+            cmd = ["cte", "policies", "get-signature-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--signature-rule-identifier", params.signature_rule_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "list_signature_rules":
             params = CTEPolicyListSignatureRulesParams(**kwargs)
-            cmd = ["cte", "policy", "list-signature-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--limit", str(params.limit), "--skip", str(params.skip)]
+            cmd = ["cte", "policies", "list-signature-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--limit", str(params.limit), "--skip", str(params.skip)]
             if params.signature_set_identifier:
                 cmd.extend(["--signature-set-identifier", params.signature_set_identifier])
             if params.signature_set_name:
@@ -627,7 +627,7 @@ class CTEPolicyManagementTool(BaseTool):
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         elif action == "modify_signature_rule":
             params = CTEPolicyModifySignatureRuleParams(**kwargs)
-            cmd = ["cte", "policy", "modify-signature-rule", "--cte-policy-identifier", params.cte_policy_identifier, "--signature-rule-identifier", params.signature_rule_identifier, "--signature-set-identifier", params.signature_set_identifier]
+            cmd = ["cte", "policies", "modify-signature-rules", "--cte-policy-identifier", params.cte_policy_identifier, "--signature-rule-identifier", params.signature_rule_identifier, "--signature-set-identifier", params.signature_set_identifier]
             return self.execute_with_domain(cmd, params.domain, params.auth_domain)
         else:
             raise ValueError(f"Unknown action: {action}")
