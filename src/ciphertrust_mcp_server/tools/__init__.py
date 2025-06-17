@@ -55,6 +55,12 @@ from .cte_process_sets import CTE_PROCESS_SET_TOOLS     # CTE process set manage
 from .cte_user_sets import CTE_USER_SET_TOOLS           # CTE user set management (with domain support)
 from .cte_resource_sets import CTE_RESOURCE_SET_TOOLS   # CTE resource set management (with domain support)
 
+# Import cluster management tool
+from .cluster_management import CLUSTER_MANAGEMENT_TOOLS
+from .clientmgmt import CLIENTMGMT_TOOLS
+from .banner_management import BANNER_MANAGEMENT_TOOLS
+from .interfaces_management import INTERFACES_MANAGEMENT_TOOLS
+from .ddc_management import DDC_MANAGEMENT_TOOLS
 
 # Collect all available tools
 ALL_TOOLS: list[Type[BaseTool]] = [
@@ -98,47 +104,11 @@ ALL_TOOLS: list[Type[BaseTool]] = [
     *CTE_PROCESS_SET_TOOLS,
     *CTE_USER_SET_TOOLS,
     *CTE_RESOURCE_SET_TOOLS,
+    *CLUSTER_MANAGEMENT_TOOLS,
+    *CLIENTMGMT_TOOLS,
+    *BANNER_MANAGEMENT_TOOLS,
+    *INTERFACES_MANAGEMENT_TOOLS,
+    *DDC_MANAGEMENT_TOOLS,
 ]
 
 all = ["BaseTool", "ALL_TOOLS"]
-
-# Total tool count: 292 tools
-# - System: 2 (system-wide operations)
-# - Services: 3 (system-wide operations)
-# - Tokens: 5 (with domain support)
-# - Users: 10 (with domain support + password policies)
-# - Groups: 8 (with domain support)
-# - GroupMaps: 5 (with domain support)
-# - Keys: 18 (with domain support)
-# - Key Policies: 5 (with domain support)
-# - Secrets: 9 (with domain support)
-# - SCP: 2 (with domain support)
-# - Templates: 5 (with domain support)
-# - Akeyless: 7 (with domain support)
-# - Backup: 11 (with domain support)
-# - Backup Keys: 8 (with domain support)
-# - Licensing: 10 (system-wide operations)
-# - RoTKeys: 4 (system-wide operations)
-# - Records: 7 (system-wide operations)
-# - Metrics: 5 (system-wide operations)
-# - Master KEKs: 3 (system-wide operations)
-# - Network: 5 (system-wide operations)
-# - NTP: 5 (system-wide operations)
-# - Properties: 4 (system-wide operations)
-# - Proxy: 11 (system-wide operations)
-# - Quorum: 14 (with domain support)
-# - Domains: 13 (administrative)
-# - Connection Management: 11 (from connection_management module)
-# - Connection LDAP: 6 (with domain support)
-# - Connection OIDC: 6 (with domain support)
-# - Connection Users: 2 (with domain support)
-# - Crypto: 7 (with domain support)
-# - CTE Client Groups: 18 (with domain support)
-# - CTE Clients: 31 (with domain support)
-# - CTE CSI Storage groups: 14 (with domain support)
-# - CTE Policies: 33 (with domain support)
-# - CTE Profiles: 6 (with domain support)
-# - CTE Process Sets: 10 (with domain support)
-# - CTE User Sets: 10 (with domain support)
-# - CTE Resource Sets: 10 (with domain support)
-# = 292 total tools
