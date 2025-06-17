@@ -202,7 +202,8 @@ class CTEUserSetManagementTool(BaseTool):
                 cmd.extend(["--user-json", params.user_json])
             elif params.user_json_file:
                 cmd.extend(["--user-json-file", params.user_json_file])
-            return await self._execute_command(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         elif action == "list":
             params = CTEUserSetListParams(**kwargs)
             cmd = ["cte", "user-sets", "list"]
@@ -212,15 +213,18 @@ class CTEUserSetManagementTool(BaseTool):
                 cmd.extend(["--skip", str(params.skip)])
             if params.user_set_name:
                 cmd.extend(["--user-set-name", params.user_set_name])
-            return await self._execute_command(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         elif action == "get":
             params = CTEUserSetGetParams(**kwargs)
             cmd = ["cte", "user-sets", "get", "--user-set-identifier", params.user_set_identifier]
-            return await self._execute_command(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         elif action == "delete":
             params = CTEUserSetDeleteParams(**kwargs)
             cmd = ["cte", "user-sets", "delete", "--user-set-identifier", params.user_set_identifier]
-            return await self._execute_command(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         elif action == "modify":
             params = CTEUserSetModifyParams(**kwargs)
             if not params.user_json and not params.user_json_file:
@@ -230,19 +234,23 @@ class CTEUserSetManagementTool(BaseTool):
                 cmd.extend(["--user-json", params.user_json])
             elif params.user_json_file:
                 cmd.extend(["--user-json-file", params.user_json_file])
-            return await self._execute_command(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         elif action == "add_users":
             params = CTEUserSetAddUsersParams(**kwargs)
             cmd = ["cte", "user-sets", "add-users", "--user-set-identifier", params.user_set_identifier, "--user-json-file", params.user_json_file]
-            return await self._execute_command(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         elif action == "delete_user":
             params = CTEUserSetDeleteUserParams(**kwargs)
             cmd = ["cte", "user-sets", "delete-user", "--user-set-identifier", params.user_set_identifier, "--user-index-list", params.user_index_list]
-            return await self._execute_command(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         elif action == "update_user":
             params = CTEUserSetUpdateUserParams(**kwargs)
             cmd = ["cte", "user-sets", "update-user", "--user-set-identifier", params.user_set_identifier, "--user-index", params.user_index, "--user-json-file", params.user_json_file]
-            return await self._execute_command(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         elif action == "list_users":
             params = CTEUserSetListUsersParams(**kwargs)
             cmd = ["cte", "user-sets", "list-users", "--user-set-identifier", params.user_set_identifier]
@@ -252,7 +260,8 @@ class CTEUserSetManagementTool(BaseTool):
                 cmd.extend(["--skip", str(params.skip)])
             if params.search:
                 cmd.extend(["--search", params.search])
-            return await self._execute_command(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         elif action == "list_policies":
             params = CTEUserSetListPoliciesParams(**kwargs)
             cmd = ["cte", "user-sets", "list-policies", "--user-set-identifier", params.user_set_identifier]
@@ -260,7 +269,8 @@ class CTEUserSetManagementTool(BaseTool):
                 cmd.extend(["--limit", str(params.limit)])
             if params.skip is not None:
                 cmd.extend(["--skip", str(params.skip)])
-            return await self._execute_command(cmd, params.domain, params.auth_domain)
+            result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
+            return result.get("data", result.get("stdout", ""))
         else:
             raise ValueError(f"Unknown action: {action}")
 
