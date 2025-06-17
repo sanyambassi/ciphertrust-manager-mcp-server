@@ -60,6 +60,8 @@ from .clientmgmt import CLIENTMGMT_TOOLS
 from .banner_management import BANNER_MANAGEMENT_TOOLS
 from .interfaces_management import INTERFACES_MANAGEMENT_TOOLS
 from .ddc_management import DDC_MANAGEMENT_TOOLS
+from .cckm_management import CCKM_TOOLS
+from .data_protection import DATA_PROTECTION_TOOLS
 
 # Collect all available tools
 ALL_TOOLS: list[Type[BaseTool]] = [
@@ -114,11 +116,13 @@ ALL_TOOLS: list[Type[BaseTool]] = [
     *CTE_RESOURCE_SET_TOOLS,      # 10 tools - CTE resource set management (with domain support)
 
     # Additional management tools
-    *CLUSTER_MANAGEMENT_TOOLS,
-    *CLIENTMGMT_TOOLS,
-    *BANNER_MANAGEMENT_TOOLS,
-    *INTERFACES_MANAGEMENT_TOOLS,
-    *DDC_MANAGEMENT_TOOLS,
+    *CLUSTER_MANAGEMENT_TOOLS,    # Cluster management tools
+    *CLIENTMGMT_TOOLS,            # Client management tools
+    *BANNER_MANAGEMENT_TOOLS,     # Banner management tools
+    *INTERFACES_MANAGEMENT_TOOLS, # Interface management tools
+    *DDC_MANAGEMENT_TOOLS,        # DDC management tools
+    *CCKM_TOOLS,                  # Cloud Key Management tools
+    *DATA_PROTECTION_TOOLS,       # Data Protection tools
 ]
 
 all = ["BaseTool", "ALL_TOOLS"]
