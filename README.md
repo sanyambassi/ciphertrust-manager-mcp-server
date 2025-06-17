@@ -49,7 +49,7 @@ If you don't have Git installed on Windows, follow these steps:
    winget install --id Git.Git -e --source winget
    ```
 
-3. **Verify installation:**
+3. **Verify installation - Open PowerShell and execute:**
    ```powershell
    git --version
    ```
@@ -178,13 +178,9 @@ Set these in your shell or in a `.env` file in the project root:
 | CIPHERTRUST_TIMEOUT      | Timeout for CipherTrust requests (seconds)          | `30`             |
 | CIPHERTRUST_DOMAIN       | Default CipherTrust domain                          | `root`           |
 | CIPHERTRUST_AUTH_DOMAIN  | Authentication domain                               | `root`           |
-| KSCTL_DOWNLOAD_URL       | Custom ksctl download URL                           | auto-generated   |
 | KSCTL_PATH               | Path to ksctl binary                                | `~/.ciphertrust-mcp/ksctl` |
 | KSCTL_CONFIG_PATH        | Path to ksctl config file                           | `~/.ksctl/config.yaml` |
-| MCP_SERVER_NAME          | Name for the MCP server                             | `ciphertrust-manager` |
-| MCP_SERVER_VERSION       | Version string                                      | `0.1.0`          |
-| LOG_LEVEL                | Logging level (`DEBUG`, `INFO`, etc.)               | `INFO`           |
-| DEBUG_MODE               | Enable debug mode (`true`/`false`)                  | `false`          |
+| LOG_LEVEL                | Logging level (`DEBUG`, `INFO`)               		 | `INFO`           |
 
 ---
 
@@ -198,13 +194,9 @@ CIPHERTRUST_NOSSLVERIFY=false
 CIPHERTRUST_TIMEOUT=30
 CIPHERTRUST_DOMAIN=root
 CIPHERTRUST_AUTH_DOMAIN=root
-KSCTL_DOWNLOAD_URL=
 KSCTL_PATH=
 KSCTL_CONFIG_PATH=
-MCP_SERVER_NAME=ciphertrust-manager
-MCP_SERVER_VERSION=0.1.0
 LOG_LEVEL=INFO
-DEBUG_MODE=false
 ```
 
 ---
@@ -269,8 +261,7 @@ To use this server with Claude Desktop:
 
 1. **Locate or create the Claude Desktop config file:**
    - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-   - **Linux:** `~/.config/Claude/claude_desktop_config.json`
+   - **Windows:** `%APPDATA%\Roaming\Claude\claude_desktop_config.json`
 
 2. **Add or update the MCP server configuration:**
    - **macOS/Linux Example:**
