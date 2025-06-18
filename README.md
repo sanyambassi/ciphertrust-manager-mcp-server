@@ -384,22 +384,23 @@ If you encounter issues, ensure all dependencies are installed and up-to-date.
 
 ```
 ciphertrust-manager-mcp-server/
-├── ciphertrust_mcp_server/     # Main server code
-├── tests/                      # Testing configuration and unit tests
+├── src
+|	├── ciphertrust_mcp_server/     # Main server code
+├── tests/                      	# Testing configuration and unit tests
 │   ├── mcp_inspector_config.json
 │   ├── test_scenarios.json
 │   ├── test_server.py
 │   └── test_integration_simple.py
-├── scripts/                    # Testing and utility scripts
+├── scripts/                    	# Testing and utility scripts
 │   ├── test_with_inspector.bat
 │   ├── test_with_inspector.sh
 │   └── run_tests.py
-├── docs/                       # Additional documentation
-├── TESTING.md                  # Comprehensive testing guide
-├── EXAMPLE_PROMPTS.md          # Example prompts for AI assistants
-├── README.md                   # This file
-├── pyproject.toml             # Python dependencies
-└── package.json               # Node.js dependencies for testing
+├── docs/                      		# Additional documentation
+├── TESTING.md                  	# Comprehensive testing guide
+├── EXAMPLE_PROMPTS.md          	# Example prompts for AI assistants
+├── README.md                   	# This file
+├── pyproject.toml             		# Python dependencies
+└── package.json               		# Node.js dependencies for testing
 ```
 
 ## Contributing
