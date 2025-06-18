@@ -186,7 +186,7 @@ npx @modelcontextprotocol/inspector uv run ciphertrust-mcp-server
 # Quick CLI testing
 # Get tools
 npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/list
-$ Get system information
+# Get system information
 npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name system_information --tool-arg action=get
 # Get 2 keys
 npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name key_management --tool-arg action=list --tool-arg limit=2
