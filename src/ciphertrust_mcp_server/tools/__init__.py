@@ -44,15 +44,8 @@ from .connections_users import CONNECTION_USERS_TOOLS    # Connection users mana
 # Import cryptographic operation tools
 from .crypto import CRYPTO_TOOLS         # Cryptographic operations (with domain support)
 
-# Import CTE management tools
-from .cte_clientgroups import CTE_CLIENTGROUP_TOOLS     # CTE client group management (with domain support)
-from .cte_clients import CTE_CLIENT_TOOLS                # CTE client management (with domain support)
-from .cte_csi_storagegroups import CTE_CSI_STORAGEGROUP_TOOLS  # CTE CSI StorageGroup management (with domain support)
-from .cte_policies import CTE_POLICY_TOOLS               # CTE policy management (with domain support)
-from .cte_profiles import CTE_PROFILE_TOOLS             # CTE profile management (with domain support)
-from .cte_process_sets import CTE_PROCESS_SET_TOOLS     # CTE process set management (with domain support)
-from .cte_user_sets import CTE_USER_SET_TOOLS           # CTE user set management (with domain support)
-from .cte_resource_sets import CTE_RESOURCE_SET_TOOLS   # CTE resource set management (with domain support)
+# Import grouped CTE management tool (replaces all individual CTE tools)
+from .cte_management import CTE_TOOLS    # Comprehensive CTE management (with domain support)
 
 # Import cluster management tools
 from .cluster_management import CLUSTER_MANAGEMENT_TOOLS
@@ -105,15 +98,8 @@ ALL_TOOLS: list[Type[BaseTool]] = [
     # Cryptographic operations
     *CRYPTO_TOOLS,            # 7 tools - Encryption, signing, FPE operations (with domain support)
 
-    # CTE (CipherTrust Transparent Encryption) management
-    *CTE_CLIENTGROUP_TOOLS,   # 18 tools - CTE client group management (with domain support)
-    *CTE_CLIENT_TOOLS,            # 31 tools - CTE client management (with domain support)
-    *CTE_CSI_STORAGEGROUP_TOOLS,  # 14 tools - CTE CSI StorageGroup management (with domain support)
-    *CTE_POLICY_TOOLS,            # 33 tools - CTE policy management (with domain support)
-    *CTE_PROFILE_TOOLS,           # 6 tools - CTE profile management (with domain support)
-    *CTE_PROCESS_SET_TOOLS,       # 10 tools - CTE process set management (with domain support)
-    *CTE_USER_SET_TOOLS,          # 10 tools - CTE user set management (with domain support)
-    *CTE_RESOURCE_SET_TOOLS,      # 10 tools - CTE resource set management (with domain support)
+    # CTE (CipherTrust Transparent Encryption) management - GROUPED TOOL
+    *CTE_TOOLS,               # 1 comprehensive tool - replaces 132+ individual CTE tools
 
     # Additional management tools
     *CLUSTER_MANAGEMENT_TOOLS,    # Cluster management tools
