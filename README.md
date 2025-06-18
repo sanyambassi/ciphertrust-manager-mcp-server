@@ -385,7 +385,7 @@ If you encounter issues, ensure all dependencies are installed and up-to-date.
 ```
 ciphertrust-manager-mcp-server/
 ├── src
-|	├── ciphertrust_mcp_server/     # Main server code
+│   ├── ciphertrust_mcp_server/     # Main server code
 ├── tests/                      	# Testing configuration and unit tests
 │   ├── mcp_inspector_config.json
 │   ├── test_scenarios.json
