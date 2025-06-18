@@ -35,7 +35,7 @@ This document lists all grouped tools available in the CipherTrust MCP Server, w
 
 ---
 
-## Other Major Tool Groups
+## Other Tool Groups
 - **akeyless_management**: Akeyless management operations (config_get, config_modify, config_status, customer_fragment_create, customer_fragment_delete, customer_fragment_list, token_create).
 - **groupmap_management**: Group mapping management operations (list, create, get, delete, modify).
 - **key_policy_management**: Key policy management operations (list, create, get, update, delete).

@@ -152,6 +152,8 @@ If you don't have Git installed on Windows, follow these steps:
 
 You have two main ways to run the CipherTrust MCP Server:
 
+**⚠️ Important:** Before starting, either the environment variable or .env should contain a valid CipherTrust Manager URL:
+
 ### 1. Using the CLI Script (Recommended)
 ```bash
 uv run ciphertrust-mcp-server
@@ -194,22 +196,22 @@ You can test the MCP server directly by sending JSON-RPC commands to it via stdi
    {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2024-11-05", "clientInfo": {"name": "test-client", "version": "1.0.0"}, "capabilities": {"tools": {}}}}
    ```
 
-   ### 2. Initialized notification
+   ### 2. Send Initialized notification (Server does not respond)
    ```json
    {"jsonrpc": "2.0", "method": "notifications/initialized"}
    ```
 
-   ### 3. List tools (should show your ~45 tools)
+   ### 3. List tools
    ```json
    {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}}
    ```
 
-   ### 4. Test a tool (your key management tool)
+   ### 4. Test a tool (key management tool in this example)
    ```json
    {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "key_management", "arguments": {"action": "list", "limit": 5}}}
    ```
 
-   ### 5. Test system info
+   ### 5. Test another tool (system information in this example)
    ```json
    {"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": {"name": "system_information", "arguments": {"action": "get"}}}
    ```
