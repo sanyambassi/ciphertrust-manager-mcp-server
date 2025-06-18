@@ -582,6 +582,135 @@ class CTEPolicyManagementTool(BaseTool):
                     "type": "string",
                     "description": "File containing RestrictUpdate parameters in JSON"
                 },
+                "force_restrict_update": {
+                    "type": "boolean",
+                    "description": "Flag to remove restriction of policy for modification"
+                },
+                # Security rule parameters
+                "effect": {
+                    "type": "string",
+                    "description": "Effect: permit, deny, audit, applykey (comma-separated for multiple)"
+                },
+                "action": {
+                    "type": "string",
+                    "description": "Action: read, write, all_ops, key_op"
+                },
+                "user_set_identifier": {
+                    "type": "string",
+                    "description": "Identifier for CTE UserSet"
+                },
+                "process_set_identifier": {
+                    "type": "string",
+                    "description": "Identifier for CTE ProcessSet"
+                },
+                "resource_set_identifier": {
+                    "type": "string",
+                    "description": "Identifier for CTE ResourceSet"
+                },
+                "exclude_user_set": {
+                    "type": "boolean",
+                    "description": "Exclude the user set from the policy"
+                },
+                "exclude_process_set": {
+                    "type": "boolean",
+                    "description": "Exclude the process set from the policy"
+                },
+                "exclude_resource_set": {
+                    "type": "boolean",
+                    "description": "Exclude the resource set from the policy"
+                },
+                "security_rule_identifier": {
+                    "type": "string",
+                    "description": "Identifier for CTE SecurityRule"
+                },
+                "order_number": {
+                    "type": "integer",
+                    "description": "Order number on CTE Client"
+                },
+                # Key rule parameters
+                "key_identifier": {
+                    "type": "string",
+                    "description": "Key identifier (name, id, slug, alias, uri, uuid, muid, key_id, or 'clear_key')"
+                },
+                "key_type": {
+                    "type": "string",
+                    "description": "Key type: name, id, slug, alias, uri, uuid, muid, or key_id"
+                },
+                "key_rule_identifier": {
+                    "type": "string",
+                    "description": "Identifier for CTE KeyRule"
+                },
+                # Data Tx rule parameters
+                "data_tx_rule_identifier": {
+                    "type": "string",
+                    "description": "Identifier for CTE DataTxRule"
+                },
+                # LDT rule parameters
+                "current_key_json_file": {
+                    "type": "string",
+                    "description": "CurrentKey parameters JSON file"
+                },
+                "transform_key_json_file": {
+                    "type": "string",
+                    "description": "Transformation Key parameters JSON file"
+                },
+                "is_exclusion_rule": {
+                    "type": "boolean",
+                    "description": "Whether LDT rule is exclusion rule"
+                },
+                "ldt_rule_identifier": {
+                    "type": "string",
+                    "description": "Identifier for CTE LDT Rule"
+                },
+                # IDT rule parameters
+                "idt_rule_identifier": {
+                    "type": "string",
+                    "description": "Identifier for CTE IDT KeyRule"
+                },
+                "idt_current_key": {
+                    "type": "string",
+                    "description": "CurrentKey parameters"
+                },
+                "idt_current_key_type": {
+                    "type": "string",
+                    "description": "Current key type"
+                },
+                "idt_transform_key": {
+                    "type": "string",
+                    "description": "Transformation Key parameters"
+                },
+                "idt_transform_key_type": {
+                    "type": "string",
+                    "description": "Transformation key type"
+                },
+                # Signature rule parameters
+                "signature_set_id_list": {
+                    "type": "string",
+                    "description": "Comma-separated list of signature set identifiers"
+                },
+                "signature_rule_identifier": {
+                    "type": "string",
+                    "description": "Identifier for CTE SignatureRule"
+                },
+                "signature_set_identifier": {
+                    "type": "string",
+                    "description": "Filter by signature set identifier"
+                },
+                "signature_set_name": {
+                    "type": "string",
+                    "description": "Filter by signature set name"
+                },
+                # Common parameters
+                "limit": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "Maximum number of resources to return"
+                },
+                "skip": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Index of the first resource to return"
+                },
                 "domain": {
                     "type": "string",
                     "description": "Domain to operate in (defaults to global setting)"
@@ -594,7 +723,7 @@ class CTEPolicyManagementTool(BaseTool):
             "required": ["action"]
         }
 
-    def execute(self, **kwargs: Any) -> Any:
+    async def execute(self, **kwargs: Any) -> Any:
         action = kwargs.get("action")
         # CTE Policy actions
         if action == "create":
@@ -602,10 +731,9 @@ class CTEPolicyManagementTool(BaseTool):
             # Example: {"user_set": "US01", ...}
             # For LDT rules, 'resource_set_id' must be valid or omitted.
             params = CTEPolicyCreateParams(**kwargs)
-            # Validate that at least one rule is provided
-            params.validate_rule_requirement()
+            # Validation happens automatically via @model_validator - no need to call manually
             
-            cmd = ["cte", "policies", "create", "--cte-policy-name", params.cte_policy_name, "--policy-type", params.policy_type]
+            cmd = ["cte", "policies", "create", "--cte-policy-name", params.cte_policy_name, "--policy-type", params.policy_type.value]
             if params.description:
                 cmd.extend(["--description", params.description])
             if params.never_deny:
@@ -726,12 +854,13 @@ class CTEPolicyManagementTool(BaseTool):
                 cmd.extend(["--process-set-identifier", params.process_set_identifier])
             if params.resource_set_identifier:
                 cmd.extend(["--resource-set-identifier", params.resource_set_identifier])
-            if params.exclude_user_set:
-                cmd.append("--exclude-user-set")
-            if params.exclude_process_set:
-                cmd.append("--exclude-process-set")
-            if params.exclude_resource_set:
-                cmd.append("--exclude-resource-set")
+            # Fixed boolean flag handling - check for is not None and provide both flags
+            if params.exclude_user_set is not None:
+                cmd.append("--exclude-user-set" if params.exclude_user_set else "--no-exclude-user-set")
+            if params.exclude_process_set is not None:
+                cmd.append("--exclude-process-set" if params.exclude_process_set else "--no-exclude-process-set")
+            if params.exclude_resource_set is not None:
+                cmd.append("--exclude-resource-set" if params.exclude_resource_set else "--no-exclude-resource-set")
             result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
             return result.get("data", result.get("stdout", ""))
         # Key Rule actions
