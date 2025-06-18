@@ -61,7 +61,7 @@ Use the configured MCP server and perform the following actions:
 Use the configured MCP server and perform the following actions:
 
 1. Is the CipherTrust manager clustered?
-2. Create a cluster on this CipherTrust manager. The local IP is `10.160.0.100`.
+2. Create a cluster on this CipherTrust manager. The public address is same as the local host IP which is `10.160.0.100`.
 3. After creating the new cluster, add a new node, using fulljoin, to the cluster. Here are the details:
 
    - **Member node** (existing cluster node): `10.160.0.100`
@@ -93,9 +93,11 @@ Use the configured MCP server and perform the following actions:
 
 1. Create a CTE userset called `US01`. Add the user `Administrator` (uname) and `thales.com` (os_domain) to this user set.
 2. Create a new key called `cte_key` to be used with a CTE LDT policy.
-3. Create a new LDT policy called `ldtpolicy01`. In the policy, allow full access to `US01` userset with apply_key permissions. Everybody else should be denied by default. For key rules/transformation rules, use `clear_key` as the current key and `cte_key` as the transformation key.
-4. Set a guardpoint on `C:\Data` on the only registered CTE client on the CipherTrust manager using the LDT policy created above.
-
+3. Create a new LDT policy called `ldtpolicy01`. In the policy, `US01` userset should have permit and apply_key permissions along with all_ops action. Everybody else should be denied by default. For key rules/transformation rules, use `clear_key` as the current key and `cte_key` as the transformation key.
+4. Set a guardpoint on `C:\Data` on win-cte-client CTE client on the CipherTrust manager using the LDT policy created above.
+```
+These actions can also be performed inside a domain.
+```
 ---
 
 ## Crypto Operations
