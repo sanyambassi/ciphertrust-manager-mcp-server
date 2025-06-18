@@ -165,6 +165,68 @@ uv run python -m ciphertrust_mcp_server.__main__
 
 ---
 
+## 🧪 Manual Testing via Terminal
+
+You can test the MCP server directly by sending JSON-RPC commands to it via stdin. This is useful for debugging and development.
+
+### Prerequisites for Terminal Testing
+- Server must be running (see "How to Start the Server" above)
+- Required environment variables must be set (CIPHERTRUST_URL, credentials, etc.)
+
+### Testing Steps
+
+1. **Start the server in one terminal:**
+   ```bash
+   uv run ciphertrust-mcp-server
+   ```
+   You should see output like:
+   ```
+   2025-06-17 17:37:19,394 - ciphertrust_mcp_server.server - INFO - Successfully connected to CipherTrust Manager
+   2025-06-17 17:37:19,396 - ciphertrust_mcp_server.server - INFO - MCP server ready and waiting for JSON-RPC messages on stdin...
+   ```
+
+2. **Send commands to the server** (in the same terminal where the server is running)
+
+   **⚠️ Important:** Each JSON command must be on a single line and end with Enter. Copy and paste these commands **one by one**:
+
+   ### 1. Initialize (with clientInfo)
+   ```json
+   {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2024-11-05", "clientInfo": {"name": "test-client", "version": "1.0.0"}, "capabilities": {"tools": {}}}}
+   ```
+
+   ### 2. Initialized notification
+   ```json
+   {"jsonrpc": "2.0", "method": "notifications/initialized"}
+   ```
+
+   ### 3. List tools (should show your ~45 tools)
+   ```json
+   {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}}
+   ```
+
+   ### 4. Test a tool (your key management tool)
+   ```json
+   {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "key_management", "arguments": {"action": "list", "limit": 5}}}
+   ```
+
+   ### 5. Test system info
+   ```json
+   {"jsonrpc": "2.0", "id": 4, "method": "tools/call", "params": {"name": "system_information", "arguments": {"action": "get"}}}
+   ```
+
+### Expected Response Format
+Each command (except notifications) should return a JSON-RPC response:
+```json
+{"jsonrpc": "2.0", "id": 1, "result": {...}}
+```
+
+### Common Issues
+- **No response after initialize:** Check that all required environment variables are set
+- **"Method not found" error:** Ensure you send the initialize command first
+- **Tool call failures:** Verify connectivity to your CipherTrust Manager instance
+
+---
+
 ## 🛠️ Environment Variables
 
 Set these in your shell or in a `.env` file in the project root:
@@ -240,7 +302,7 @@ To use this server with Cursor:
      {
        "mcpServers": {
          "ciphertrust": {
-           "command": "C:\\path\\to\\ciphertrust-manager-mcp-server\\.venv\\Scripts\\ciphertrust-mcp-server.exe",
+           "command": "C:\\path\\to\\ciphertrust-manager-mcp-server\\.venv\\Scripts\\ciphertrust-mcp-server",
            "args": [],
            "env": {
              "CIPHERTRUST_URL": "https://your-ciphertrust.example.com",
@@ -284,7 +346,7 @@ To use this server with Claude Desktop:
      {
        "mcpServers": {
          "ciphertrust": {
-           "command": "C:\\absolute\\path\\to\\ciphertrust-manager-mcp-server\\.venv\\Scripts\\ciphertrust-mcp-server.exe",
+           "command": "C:\\absolute\\path\\to\\ciphertrust-manager-mcp-server\\.venv\\Scripts\\ciphertrust-mcp-server",
            "env": {
              "CIPHERTRUST_URL": "https://your-ciphertrust.example.com",
              "CIPHERTRUST_USER": "admin",
