@@ -1,17 +1,167 @@
 """Complete Optimized CTE Management Tool for CipherTrust Manager with AI Assistant Optimization."""
 
-from typing import Any, Optional
+from typing import Any, Optional, Dict, List
 from pydantic import BaseModel, Field
 from .base import BaseTool
 
+# JSON Structure Documentation
+JSON_EXAMPLES = {
+    "user_set": {
+        "description": "User set structure for defining users and groups",
+        "example": {
+            "name": "AdminUsers",
+            "description": "Administrative users set",
+            "users": [
+                {
+                    "uname": "admin",
+                    "uid": 1000,
+                    "gname": "admingroup",
+                    "gid": 1000,
+                    "os_domain": "CORPORATE"  # For Windows domain users
+                },
+                {
+                    "uname": "user1",
+                    "uid": 1001,
+                    "gname": "users",
+                    "gid": 100
+                }
+            ]
+        }
+    },
+    "process_set": {
+        "description": "Process set structure for defining allowed processes",
+        "example": {
+            "name": "TrustedProcesses",
+            "description": "Trusted application processes",
+            "processes": [
+                {
+                    "signature": "AppSignatureSet",
+                    "directory": "/usr/bin",
+                    "file": "app.exe"
+                },
+                {
+                    "signature": "SystemSignatureSet",
+                    "directory": "/bin",
+                    "file": "*"  # All files in directory
+                }
+            ]
+        }
+    },
+    "resource_set": {
+        "description": "Resource set structure for defining protected resources",
+        "example": {
+            "name": "SensitiveData",
+            "description": "Sensitive data directories",
+            "resources": [
+                {
+                    "directory": "/data/sensitive",
+                    "file": "*",
+                    "include_subfolders": True,
+                    "hdfs": False
+                },
+                {
+                    "directory": "/data/reports",
+                    "file": "*.pdf",
+                    "include_subfolders": False,
+                    "hdfs": False
+                }
+            ]
+        }
+    },
+    "security_rules": {
+        "description": "Security rules for policy",
+        "example": [
+            {
+                "effect": "permit,audit",  # Multiple effects comma-separated
+                "action": "read",
+                "partial_match": False,
+                "user_set_id": "AdminUsers",
+                "process_set_id": "TrustedProcesses",
+                "resource_set_id": "SensitiveData",
+                "exclude_user_set": False,
+                "exclude_process_set": False,
+                "exclude_resource_set": False
+            }
+        ]
+    },
+    "key_rules": {
+        "description": "Key rules for encryption/decryption",
+        "example": [
+            {
+                "key_id": "DataEncryptionKey",
+                "key_type": "name",
+                "resource_set_id": "SensitiveData"
+            }
+        ]
+    },
+    "ldt_rules": {
+        "description": "LDT (Live Data Transformation) rules",
+        "example": [
+            {
+                "resource_set_id": "DataToTransform",
+                "current_key": {
+                    "key_id": "clear_key",
+                    "key_type": "name",
+                    "key_usage": "ONLINE"
+                },
+                "transformation_key": {
+                    "key_id": "NewEncryptionKey",
+                    "key_type": "name",
+                    "key_usage": "ONLINE"
+                }
+            }
+        ]
+    },
+    "cache_settings": {
+        "description": "Cache configuration for CTE profile",
+        "example": {
+            "max_files": 1000,
+            "max_space": 500000  # in KB
+        }
+    },
+    "logger_settings": {
+        "description": "Logger configuration (applies to all logger types)",
+        "example": {
+            "duplicates": "SUPPRESS",  # ALLOW or SUPPRESS
+            "threshold": "INFO",  # DEBUG, INFO, WARN, ERROR, FATAL
+            "file_enabled": True,
+            "syslog_enabled": False,
+            "upload_enabled": True
+        }
+    },
+    "syslog_settings": {
+        "description": "Syslog configuration for CTE profile",
+        "example": {
+            "local": False,
+            "servers": [
+                {
+                    "message_format": "RFC5424",  # CEF, LEEF, RFC5424, PLAIN
+                    "name": "syslog.company.com",
+                    "protocol": "TCP"  # TCP or UDP
+                }
+            ],
+            "syslog_threshold": "WARN"
+        }
+    }
+}
 
 class CTEManagementTool(BaseTool):
     """Optimized CTE Management Tool with improved AI assistant usability.
     
-    This tool combines all CTE operations into a single interface while maintaining
-    clear parameter requirements and examples for each action.
-    """
+    This tool combines all CTE (CipherTrust Transparent Encryption) operations into a single 
+    interface while maintaining clear parameter requirements and examples for each action.
     
+    Key Features:
+    - Unified interface for all CTE operations
+    - Comprehensive JSON examples for complex structures
+    - Clear parameter documentation
+    - Support for policies, user/process/resource sets, clients, profiles, and more
+    
+    Common Workflows:
+    1. Create sets (users, processes, resources) → Create policy with rules → Create client → Apply guardpoints
+    2. Create profile → Create client with profile → Create policy → Apply guardpoints
+    3. Create client group → Add clients → Create group guardpoints (applies to all clients)
+    """
     @property
     def name(self) -> str:
         return "cte_management"
@@ -26,7 +176,7 @@ class CTEManagementTool(BaseTool):
 
     def get_schema(self) -> dict[str, Any]:
         """Optimized schema with action-specific parameter guidance."""
-        return {
+        schema = {
             "type": "object",
             "properties": {
                 "action": {
@@ -431,7 +581,7 @@ class CTEManagementTool(BaseTool):
                     "description": "User set configuration in JSON format"
                 },
                 "user_json_file": {
-                    "type": "string", 
+                    "type": "string",
                     "description": "Path to JSON file containing user set configuration"
                 },
                 "process_json": {
@@ -572,11 +722,11 @@ class CTEManagementTool(BaseTool):
                     }
                 },
                 "user_set_create": {
-                    "required": ["user_json_file"],
-                    "optional": ["user_json", "domain", "auth_domain"],
+                    "required": [],
+                    "optional": ["user_json", "user_json_file", "domain", "auth_domain"],
                     "example": {
                         "action": "user_set_create",
-                        "user_json_file": "/path/to/users.json"
+                        "user_json": "{\"name\": \"USet01\", \"description\": \"User set for Administrator in thales.com domain\", \"users\": [{\"uname\": \"Administrator\", \"os_domain\": \"thales.com\"}]}"
                     }
                 },
                 "client_create": {
@@ -602,20 +752,25 @@ class CTEManagementTool(BaseTool):
                 }
             }
         }
+        return schema
 
     async def execute(self, action: str, **kwargs: Any) -> Any:
         """Execute CTE operation with enhanced validation and guidance."""
-        
         # Validate action-specific requirements
         if not self._validate_action_params(action, kwargs):
             schema = self.get_schema()
             requirements = schema.get("action_requirements", {}).get(action, {})
             required_params = requirements.get("required", [])
             example = requirements.get("example", {})
-            return {
-                "error": f"Missing required parameters for action '{action}'. Required: {required_params}",
+            json_structure = requirements.get("json_structure")
+            error_info = {
+                "error": f"Missing required parameters for action '{action}'",
+                "required": required_params,
                 "example": example
             }
+            if json_structure:
+                error_info["json_structure"] = json_structure
+            return error_info
         
         # Route to appropriate operation with clear error handling
         try:
@@ -646,7 +801,13 @@ class CTEManagementTool(BaseTool):
         schema = self.get_schema()
         requirements = schema.get("action_requirements", {}).get(action, {})
         required_params = requirements.get("required", [])
-        
+
+        # Special case for user_set_create: allow either user_json or user_json_file
+        if action == "user_set_create":
+            if not (params.get("user_json") or params.get("user_json_file")):
+                return False
+            return True
+
         for param in required_params:
             if param not in params or params[param] is None:
                 return False

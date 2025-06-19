@@ -44,8 +44,9 @@ from .connections_users import CONNECTION_USERS_TOOLS    # Connection users mana
 # Import cryptographic operation tools
 from .crypto import CRYPTO_TOOLS         # Cryptographic operations (with domain support)
 
-# Import grouped CTE management tool (replaces all individual CTE tools)
-from .cte_management import CTE_TOOLS    # Comprehensive CTE management (with domain support)
+# Import unified CTE management tool (replaces monolithic CTE tool)
+#from .cte_management_unified import CTE_TOOLS    # Unified CTE management (with domain support)
+from .cte_management import CTE_TOOLS    # Unified CTE management (with domain support)
 
 # Import cluster management tools
 from .cluster_management import CLUSTER_MANAGEMENT_TOOLS
@@ -98,8 +99,8 @@ ALL_TOOLS: list[Type[BaseTool]] = [
     # Cryptographic operations
     *CRYPTO_TOOLS,            # 7 tools - Encryption, signing, FPE operations (with domain support)
 
-    # CTE (CipherTrust Transparent Encryption) management - GROUPED TOOL
-    *CTE_TOOLS,               # 1 comprehensive tool - replaces 132+ individual CTE tools
+    # CTE (CipherTrust Transparent Encryption) management - UNIFIED TOOL
+    *CTE_TOOLS,               # 1 unified tool - modular CTE management with domain support
 
     # Additional management tools
     *CLUSTER_MANAGEMENT_TOOLS,    # Cluster management tools
