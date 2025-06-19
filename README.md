@@ -1,4 +1,4 @@
-# CipherTrust Manager MCP Server (Unofficial)
+# CipherTrust Manager MCP Server
 
 > **⚠️ Disclaimer: This is an unofficial, independently-developed project that is not affiliated with, endorsed by, or supported by Thales Group or any of its subsidiaries. This project uses publicly available APIs and interfaces to interact with CipherTrust Manager.**
 
@@ -27,7 +27,7 @@ This is an **independent, open-source project**. Please note:
 
 - ⚠️ **Not officially supported** by Thales or CipherTrust
 - ✅ **Uses public APIs** and documented interfaces
-- 🔧 **Independently maintained** - 
+- 🔧 **Independently maintained** 
 - 📝 **Use at your own risk** - test thoroughly in your environment
 - 💼 **No warranty** - see license for full terms
 
