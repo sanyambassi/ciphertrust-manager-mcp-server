@@ -11,9 +11,7 @@ This document provides comprehensive testing instructions for the CipherTrust Ma
 - [Configuration](#configuration)
 - [Test Scenarios](#test-scenarios)
 - [Automation](#automation)
-- [CI/CD Integration](#cicd-integration)
 - [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
 
 ## Overview
 
@@ -346,7 +344,7 @@ uv run ciphertrust-mcp-server
 # 2. Initialize (copy-paste each line one by one)
 {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2024-11-05", "clientInfo": {"name": "manual-test", "version": "1.0.0"}, "capabilities": {"tools": {}}}}
 
-# 3. Send initialized notification
+# 3. Send initialized notification (No response from serrver for this notification)
 {"jsonrpc": "2.0", "method": "notifications/initialized"}
 
 # 4. List tools to verify server is working
@@ -403,7 +401,7 @@ uv run ciphertrust-mcp-server
    npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name invalid_tool
    ```
 
-### Advanced Test Scenarios
+### More Test Scenarios
 
 1. **Key Management Workflow**
    - List existing keys
@@ -413,7 +411,7 @@ uv run ciphertrust-mcp-server
 
 2. **CTE Client Management**
    - List CTE clients
-   - Create client configuration
+   - Create new clients
    - Test client operations
 
 3. **Connection Management**
@@ -507,15 +505,6 @@ npx @modelcontextprotocol/inspector --cli \
 - [MCP Inspector Documentation](https://github.com/modelcontextprotocol/inspector)
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/)
 - [Python pytest Documentation](https://docs.pytest.org/)
-- [Node.js Testing Best Practices](https://nodejs.org/en/docs/guides/testing/)
-
-## Support
-
-For testing-related issues:
-
-1. Check this documentation first
-2. Review the [main README](README.md) for setup issues
-3. Check existing [GitHub Issues](https://github.com/sanyambassi/ciphertrust-manager-mcp-server/issues)
-4. Create a new issue with testing logs and environment details
+- [Node.js](https://nodejs.org/en)
 
 ---

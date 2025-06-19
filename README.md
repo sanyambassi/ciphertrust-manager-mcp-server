@@ -1,9 +1,12 @@
-# CipherTrust Manager MCP Server
+# CipherTrust Manager MCP Server (Unofficial)
 
-This project implements a CipherTrust MCP (Model Context Protocol) server that allows AI Assistants like Claude or Cursor to interact with CipherTrust Manager resources using the ksctl CLI.
+> **⚠️ Disclaimer: This is an unofficial, independently-developed project that is not affiliated with, endorsed by, or supported by Thales Group or any of its subsidiaries. This project uses publicly available APIs and interfaces to interact with CipherTrust Manager.**
+
+This project implements an independently-developed CipherTrust MCP (Model Context Protocol) server that allows AI Assistants like Claude or Cursor to interact with CipherTrust Manager resources using the ksctl CLI.
 
 ## Table of Contents
 
+- [Important Notice](#important-notice)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
@@ -15,7 +18,20 @@ This project implements a CipherTrust MCP (Model Context Protocol) server that a
 - [Troubleshooting](#troubleshooting)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
+- [Legal](#legal)
 - [License](#license)
+
+## Important Notice
+
+This is an **independent, open-source project**. Please note:
+
+- ⚠️ **Not officially supported** by Thales or CipherTrust
+- ✅ **Uses public APIs** and documented interfaces
+- 🔧 **Independently maintained** - 
+- 📝 **Use at your own risk** - test thoroughly in your environment
+- 💼 **No warranty** - see license for full terms
+
+For official CipherTrust Manager support, please contact Thales directly.
 
 ## Features
 
@@ -220,10 +236,7 @@ npm run test:full           # Run complete test suite
 The testing guide covers:
 - Complete setup and configuration
 - Advanced testing scenarios
-- CI/CD integration
-- Troubleshooting and debugging
-- Performance and security testing
-- Contributing test cases
+
 
 The example prompts include:
 - Key management operations
@@ -405,8 +418,23 @@ ciphertrust-manager-mcp-server/
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. While this started as a personal project, contributions help make it better for everyone.
+
+## Legal
+
+### Trademark Notice
+CipherTrust® and related trademarks are the property of Thales Group and its subsidiaries. This project is not affiliated with, endorsed by, or sponsored by Thales Group.
+
+### No Warranty
+This software is provided "as is" without warranty of any kind. Use at your own risk.
+
+### Support
+This is an independent project. For official CipherTrust Manager support, please contact Thales directly. For issues with this unofficial MCP server, please use the GitHub issue tracker.
 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+**Built with ❤️ for the developer community**
