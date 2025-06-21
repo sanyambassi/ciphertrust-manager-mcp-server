@@ -10,7 +10,7 @@ Key Features:
 - Domain and authentication domain support for multi-tenant environments
 - Individual parameter support for easy key attribute specification
 - JSON-based key_attributes for advanced configurations
-- Automatic template ID lookup by name for user-friendly operations
+- Direct template name usage with ksctl --id parameter for get/delete/modify operations
 - Comprehensive error handling and validation
 - Support for all CipherTrust Manager template types (AES, RSA, EC, etc.)
 
@@ -25,18 +25,16 @@ The tool supports all CipherTrust Manager key attributes including:
 - Flags: undeletable, unexportable, xts
 - Metadata: meta (with ownerId), description (for generated keys)
 
-Smart Template Modification:
-The tool automatically handles template identification for modify operations:
-- Users can specify 'id' for direct template identification (fastest)
-- Users can specify 'template_name' for name-based identification (user-friendly)
-- The tool automatically performs ID lookup when template name is provided
+Simplified Template Operations:
+- get/delete/modify operations use ksctl --id parameter directly (accepts template names)
+- No additional name-to-ID resolution needed as ksctl handles this natively
+- Works with current ksctl behavior where --id accepts template names
 
 All operations support domain-specific execution, making it suitable for enterprise
 multi-tenant CipherTrust Manager deployments.
 """
 
 import json
-import re
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field
@@ -112,11 +110,11 @@ class TemplateCreateParams(BaseModel):
 class TemplateGetParams(BaseModel):
     """Parameters for getting a template.
     
-    Retrieves detailed information about a specific template by name or ID.
-    Automatically determines if the identifier is an ID (UUID format) or name.
+    Retrieves detailed information about a specific template by name.
+    Uses ksctl --id parameter which accepts template names directly.
     Supports domain-specific execution for multi-tenant environments.
     """
-    identifier: str = Field(..., description="Template name or ID (UUID format will be treated as ID)")
+    id: str = Field(..., description="Template name or ID (ksctl --id parameter accepts template names)")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to get template from (defaults to global setting)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
@@ -125,11 +123,11 @@ class TemplateGetParams(BaseModel):
 class TemplateDeleteParams(BaseModel):
     """Parameters for deleting a template.
     
-    Deletes a template by name or ID. Automatically determines if the identifier
-    is an ID (UUID format) or name, and performs ID lookup if needed.
+    Deletes a template by name using ksctl --id parameter.
+    The --id parameter accepts template names directly in ksctl.
     Includes safety checks and domain-specific execution for secure template management.
     """
-    identifier: str = Field(..., description="Template name or ID (UUID format will be treated as ID)")
+    id: str = Field(..., description="Template name or ID (ksctl --id parameter accepts template names)")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to delete template from (defaults to global setting)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
@@ -139,15 +137,13 @@ class TemplateModifyParams(BaseModel):
     """Parameters for modifying a template.
     
     Updates template properties including name, description, key attributes, and metadata.
-    Supports both direct ID specification and automatic ID lookup by template name.
-    Template identification can be done via either 'id' (direct) or 'template_name' (lookup).
+    Uses ksctl --id parameter which accepts template names directly.
     All operations support domain-specific execution.
     
     Important: 'desc' is the template description, while 'key_description' 
     is the description that will be associated with keys generated from this template.
     """
-    id: Optional[str] = Field(None, description="Template ID for modification (if known)")
-    template_name: Optional[str] = Field(None, description="Template name to identify which template to modify")
+    id: str = Field(..., description="Template name or ID (ksctl --id parameter accepts template names)")
     name: Optional[str] = Field(None, description="New name for the template")
     desc: Optional[str] = Field(None, description="Template description (describes the template itself)")
     labels: Optional[str] = Field(None, description="Comma-separated key=value labels")
@@ -189,8 +185,18 @@ class TemplateManagementTool(BaseTool):
     This tool provides comprehensive template management capabilities including:
     - Basic template operations (list, create, get, delete, modify)
     - Key attribute management with individual parameters or JSON specification
-    - Automatic template ID lookup by name for user-friendly operations
+    - Direct template name usage with ksctl --id parameter
     - Domain and authentication domain support for multi-tenant environments
+    - Smart key attribute merging for template modifications
+    
+    **Important: Template Key Attribute Merging**
+    When modifying templates with individual key attribute parameters, the tool automatically:
+    1. Retrieves the existing template's key attributes
+    2. Merges the new attributes with existing ones
+    3. Sends the complete merged key attributes to preserve all settings
+    
+    This ensures that modifying one key attribute (e.g., size) doesn't accidentally
+    remove other existing attributes (e.g., algorithm, usageMask, etc.).
     
     All operations support domain-specific execution and include proper error handling
     and response formatting.
@@ -211,10 +217,8 @@ class TemplateManagementTool(BaseTool):
                 "action": {"type": "string", "enum": ["list", "create", "get", "delete", "modify"]},
                 **TemplateListParams.model_json_schema()["properties"],
                 **TemplateCreateParams.model_json_schema()["properties"],
-                # Updated get/delete parameter names
-                "identifier": {"type": "string", "description": "Template name or ID"},
-                **{k: v for k, v in TemplateGetParams.model_json_schema()["properties"].items() if k != "identifier"},
-                **{k: v for k, v in TemplateDeleteParams.model_json_schema()["properties"].items() if k != "identifier"},
+                **TemplateGetParams.model_json_schema()["properties"],
+                **TemplateDeleteParams.model_json_schema()["properties"],
                 **TemplateModifyParams.model_json_schema()["properties"],
             },
             "required": ["action"],
@@ -224,37 +228,11 @@ class TemplateManagementTool(BaseTool):
                     "then": {"required": ["action", "name"]}
                 },
                 {
-                    "if": {"properties": {"action": {"enum": ["get", "delete"]}}},
-                    "then": {"required": ["action", "identifier"]}
-                },
-                {
-                    "if": {"properties": {"action": {"enum": ["modify"]}}},
-                    "then": {
-                        "anyOf": [
-                            {"required": ["action", "id"]},
-                            {"required": ["action", "template_name"]}
-                        ]
-                    }
+                    "if": {"properties": {"action": {"enum": ["get", "delete", "modify"]}}},
+                    "then": {"required": ["action", "id"]}
                 }
             ]
         }
-
-    def _is_uuid_format(self, identifier: str) -> bool:
-        """
-        Check if the identifier is in UUID format.
-        
-        Args:
-            identifier: String to check
-            
-        Returns:
-            True if the identifier appears to be a UUID, False otherwise
-        """
-        # UUID pattern: 8-4-4-4-12 hexadecimal digits
-        uuid_pattern = re.compile(
-            r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
-            re.IGNORECASE
-        )
-        return bool(uuid_pattern.match(identifier))
 
     def _build_key_attributes_from_params(self, **kwargs) -> Optional[str]:
         """
@@ -344,93 +322,6 @@ class TemplateManagementTool(BaseTool):
                 raise ValueError(f"Invalid key_meta value: {kwargs['key_meta']}. Must be valid JSON with ownerId.")
             
         return json.dumps(key_attrs) if key_attrs else None
-
-    async def _find_template_id_by_name(self, template_name: str, domain: Optional[str] = None, auth_domain: Optional[str] = None) -> str:
-        """
-        Find template ID by name using template list operation.
-        
-        Args:
-            template_name: Name of the template to find
-            domain: Domain to search in
-            auth_domain: Authentication domain
-            
-        Returns:
-            Template ID if found
-            
-        Raises:
-            ValueError: If template not found or multiple templates found
-        """
-        try:
-            # Search for template by name
-            args = ["templates", "list", "--name", template_name]
-            result = self.execute_with_domain(args, domain, auth_domain)
-            
-            # Parse the result to extract template data
-            data = result.get("data", result.get("stdout", ""))
-            if isinstance(data, str):
-                try:
-                    import json
-                    data = json.loads(data)
-                except (json.JSONDecodeError, ValueError):
-                    raise ValueError(f"Failed to parse template list response")
-            
-            # Handle different response formats
-            templates = []
-            if isinstance(data, list):
-                templates = data
-            elif isinstance(data, dict):
-                if "templates" in data:
-                    templates = data["templates"]
-                elif "data" in data:
-                    templates = data["data"]
-                else:
-                    # Single template response
-                    templates = [data]
-            
-            if not templates:
-                raise ValueError(f"Template '{template_name}' not found")
-                
-            # Filter templates by exact name match
-            matching_templates = [t for t in templates if t.get("name") == template_name]
-            
-            if not matching_templates:
-                raise ValueError(f"Template '{template_name}' not found")
-            elif len(matching_templates) > 1:
-                raise ValueError(f"Multiple templates found with name '{template_name}'. Please use template ID instead.")
-            
-            template_id = matching_templates[0].get("id")
-            if not template_id:
-                raise ValueError(f"Template '{template_name}' found but has no ID")
-                
-            return template_id
-            
-        except Exception as e:
-            if "not found" in str(e) or "Multiple templates" in str(e):
-                raise e
-            else:
-                raise ValueError(f"Failed to find template '{template_name}': {str(e)}")
-
-    async def _resolve_template_id(self, identifier: str, domain: Optional[str] = None, auth_domain: Optional[str] = None) -> str:
-        """
-        Resolve a template identifier to its ID.
-        
-        Args:
-            identifier: Template name or ID
-            domain: Domain to search in
-            auth_domain: Authentication domain
-            
-        Returns:
-            Template ID
-            
-        Raises:
-            ValueError: If template not found
-        """
-        # If it looks like a UUID, assume it's an ID
-        if self._is_uuid_format(identifier):
-            return identifier
-        else:
-            # Look up the ID by name
-            return await self._find_template_id_by_name(identifier, domain, auth_domain)
 
     async def _get_existing_template(self, template_id: str, domain: Optional[str] = None, auth_domain: Optional[str] = None) -> dict:
         """
@@ -557,7 +448,7 @@ class TemplateManagementTool(BaseTool):
                 # Use provided key_attributes or build from individual parameters
                 key_attributes = params.key_attributes
                 if not key_attributes:
-                    # FIXED: Pass params dict instead of original kwargs
+                    # Build from individual parameters
                     key_attributes = self._build_key_attributes_from_params(**params.dict())
                 
                 if key_attributes:
@@ -572,11 +463,8 @@ class TemplateManagementTool(BaseTool):
             elif action == "get":
                 params = TemplateGetParams(**kwargs)
                 
-                # Resolve identifier to template ID
-                template_id = await self._resolve_template_id(params.identifier, params.domain, params.auth_domain)
-                
-                # Use ID for the get operation
-                args = ["templates", "get", "--id", template_id]
+                # Use --id parameter directly (ksctl accepts template names)
+                args = ["templates", "get", "--id", params.id]
                     
                 result = self.execute_with_domain(args, params.domain, params.auth_domain)
                 return result.get("data", result.get("stdout", ""))
@@ -584,11 +472,8 @@ class TemplateManagementTool(BaseTool):
             elif action == "delete":
                 params = TemplateDeleteParams(**kwargs)
                 
-                # Resolve identifier to template ID
-                template_id = await self._resolve_template_id(params.identifier, params.domain, params.auth_domain)
-                
-                # Use ID for the delete operation
-                args = ["templates", "delete", "--id", template_id]
+                # Use --id parameter directly (ksctl accepts template names)
+                args = ["templates", "delete", "--id", params.id]
                     
                 result = self.execute_with_domain(args, params.domain, params.auth_domain)
                 return result.get("data", result.get("stdout", ""))
@@ -596,20 +481,8 @@ class TemplateManagementTool(BaseTool):
             elif action == "modify":
                 params = TemplateModifyParams(**kwargs)
                 
-                # Determine template ID - either provided directly or lookup by name
-                template_id = params.id
-                if not template_id and params.template_name:
-                    # Look up template ID by name
-                    template_id = await self._find_template_id_by_name(
-                        params.template_name, 
-                        params.domain, 
-                        params.auth_domain
-                    )
-                elif not template_id and not params.template_name:
-                    raise ValueError("Either 'id' or 'template_name' must be provided for template modification")
-                
-                # Use 'update' command and require ID for identification
-                args = ["templates", "update", "--id", template_id]
+                # Use --id parameter directly (ksctl accepts template names)
+                args = ["templates", "update", "--id", params.id]
                 
                 # Optional parameters to update the template
                 if params.name:
@@ -627,7 +500,7 @@ class TemplateManagementTool(BaseTool):
                     # Check if any individual key attribute parameters are being modified
                     if self._has_key_attribute_changes(**params.dict()):
                         # Get existing template to merge key attributes
-                        existing_template = await self._get_existing_template(template_id, params.domain, params.auth_domain)
+                        existing_template = await self._get_existing_template(params.id, params.domain, params.auth_domain)
                         existing_key_attrs = existing_template.get("key_attributes", {})
                         
                         # Build new key attributes from individual parameters
@@ -837,46 +710,41 @@ def get_template_examples():
             "limit": 10
         },
         "get_template_by_name": {
-            "description": "Retrieve a specific template by name (will auto-resolve to ID)",
+            "description": "Retrieve a specific template by name using --id parameter",
             "action": "get",
-            "identifier": "aes_256_template"
+            "id": "aes_256_template"  # Template name directly
         },
         "get_template_by_id": {
-            "description": "Retrieve a specific template by ID",
+            "description": "Retrieve a specific template by ID using --id parameter",
             "action": "get",
-            "identifier": "ece51cf0-bbf9-47ad-9d28-f2d82707cccc"
+            "id": "ece51cf0-bbf9-47ad-9d28-f2d82707cccc"  # UUID directly
         },
         "update_template_name": {
-            "description": "Update template name using ID",
+            "description": "Update template name using template name",
             "action": "modify",
-            "id": "ece51cf0-bbf9-47ad-9d28-f2d82707cccc",
-            "name": "newname"
+            "id": "old_template_name",  # Template name
+            "name": "new_template_name"
         },
         "update_template_description": {
-            "description": "Update template description using ID",
+            "description": "Update template description using template name",
             "action": "modify",
-            "id": "ece51cf0-bbf9-47ad-9d28-f2d82707cccc",
+            "id": "aes_256_template",  # Template name
             "desc": "Updated template description"  # Template description
         },
-        "update_template_by_name": {
-            "description": "Update template description using template name (tool will auto-lookup ID)",
-            "action": "modify",
-            "template_name": "temp_aes",
-            "desc": "Updated description via template name"  # Template description
-        },
         "update_template_key_attributes": {
-            "description": "Update template key attributes to change key descriptions",
+            "description": "Update template key attributes (automatically merges with existing attributes)",
             "action": "modify",
-            "template_name": "temp_aes",
+            "id": "temp_aes",  # Template name
             "algorithm": "AES",
             "size": 128,  # Changed from 256 to 128
             "key_description": "Updated key description for generated keys",  # Key description
             "state": "Pre-Active"
+            # Note: Tool automatically preserves other existing key attributes
         },
         "update_template_comprehensive": {
-            "description": "Comprehensive template update with multiple key attributes",
+            "description": "Comprehensive template update with multiple key attributes (preserves existing attributes)",
             "action": "modify",
-            "id": "ece51cf0-bbf9-47ad-9d28-f2d82707cccc",
+            "id": "comprehensive_template",  # Template name
             "desc": "Updated comprehensive template",  # Template description
             "algorithm": "AES",
             "size": 256,
@@ -886,16 +754,17 @@ def get_template_examples():
             "state": "Active",
             "undeletable": True,
             "key_meta": '{"ownerId": "updated_owner"}'
+            # Important: Tool automatically merges these with existing key attributes
         },
         "delete_template_by_name": {
-            "description": "Delete a template by name (will auto-resolve to ID)",
+            "description": "Delete a template by name using --id parameter",
             "action": "delete",
-            "identifier": "aes_256_template"
+            "id": "aes_256_template"  # Template name directly
         },
         "delete_template_by_id": {
-            "description": "Delete a template by ID",
+            "description": "Delete a template by ID using --id parameter",
             "action": "delete",
-            "identifier": "ece51cf0-bbf9-47ad-9d28-f2d82707cccc"
+            "id": "ece51cf0-bbf9-47ad-9d28-f2d82707cccc"  # UUID directly
         }
     }
 

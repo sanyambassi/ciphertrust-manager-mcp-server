@@ -33,7 +33,8 @@ class KeyListParams(BaseModel):
 
 
 class KeyCreateParams(BaseModel):
-    """Parameters for creating a key."""
+    """Parameters for creating a key with all advanced options."""
+    # Basic key parameters
     name: Optional[str] = Field(None, description="Key name (use autoname for automatic naming)")
     autoname: bool = Field(False, description="Generate automatic name for key")
     algorithm: str = Field("AES", description="Key algorithm (AES, RSA, EC, etc.)")
@@ -43,29 +44,94 @@ class KeyCreateParams(BaseModel):
     description: Optional[str] = Field(None, description="Key description")
     labels: Optional[str] = Field(None, description="Comma-separated key=value labels")
     aliases: Optional[str] = Field(None, description="Comma-separated list of aliases")
+    
+    # Key material and format
     material: Optional[str] = Field(None, description="Key material (hex or base64)")
     format: Optional[str] = Field(None, description="Key format (pkcs1, pkcs8, base64, etc.)")
     encoding: Optional[str] = Field(None, description="Encoding for material (hex, base64)")
+    include_material: bool = Field(False, description="Include key material in response")
+    empty_material: bool = Field(False, description="Create key without material")
+    
+    # Key properties
     xts: bool = Field(False, description="Create XTS/CBC-CS1 key (AES only)")
     undeletable: bool = Field(False, description="Key cannot be deleted")
     unexportable: bool = Field(False, description="Key cannot be exported")
-    include_material: bool = Field(False, description="Include key material in response")
-    empty_material: bool = Field(False, description="Create key without material")
+    
+    # Object and certificate types
     object_type: Optional[str] = Field(None, description="Object type (Symmetric Key, Certificate, etc.)")
     cert_type: Optional[str] = Field(None, description="Certificate type (x509-pem, x509-der)")
     cert_filename: Optional[str] = Field(None, description="Certificate file name")
+    
+    # JSON configuration
     jsonfile: Optional[str] = Field(None, description="JSON file with key parameters")
+    
+    # Wrapping and encryption
     wrap_key_name: Optional[str] = Field(None, description="Wrap key name for encryption")
     wrap_public_key: Optional[str] = Field(None, description="Public key for wrapping")
+    
+    # Rotation
     rotation_frequency_days: Optional[str] = Field(None, description="Auto-rotation frequency in days")
+    
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to create key in (defaults to global setting)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    
     # CTE-specific parameters
     cte_key_type: Optional[str] = Field(None, description="CTE key type: 'standard', 'ldt', or 'xts'")
     cte_persistent_on_client: Optional[bool] = Field(None, description="Make key persistent on CTE client")
     cte_permissions_groups: Optional[str] = Field(None, description="Comma-separated groups for permissions (default: 'CTE Clients')")
     cte_encryption_mode: Optional[str] = Field(None, description="CTE encryption mode: CBC, CBC_CS1, or XTS (default: CBC)")
+    
+    # ===== NEWLY ADDED PARAMETERS =====
+    
+    # Critical missing parameters
+    ret: bool = Field(False, description="Return existing key with same name if it exists")
+    template_id: Optional[str] = Field(None, description="Template ID for creating key using template")
+    owner_id: Optional[str] = Field(None, description="The user's ID (owner of the key)")
+    id: Optional[str] = Field(None, description="Specific key identifier")
+    uuid: Optional[str] = Field(None, description="UUID identifier (32 hex digits with 4 dashes)")
+    muid: Optional[str] = Field(None, description="Additional identifier (MUID)")
+    key_id: Optional[str] = Field(None, description="Additional key identifier")
+    
+    # Advanced wrapping parameters
+    hkdf: Optional[str] = Field(None, description="HKDF parameters in JSON format")
+    hkdf_jsonfile: Optional[str] = Field(None, description="HKDF parameters via JSON file")
+    wrap_pbe: Optional[str] = Field(None, description="PBE wrap parameters in JSON format")
+    wrap_pbe_jsonfile: Optional[str] = Field(None, description="PBE wrap parameters via JSON file")
+    wrap_hkdf: Optional[str] = Field(None, description="HKDF wrap parameters in JSON format")
+    wrap_hkdf_jsonfile: Optional[str] = Field(None, description="HKDF wrap parameters via JSON file")
+    wrap_rsa_aes: Optional[str] = Field(None, description="RSA AES KWP parameters in JSON format")
+    wrap_rsa_aes_jsonfile: Optional[str] = Field(None, description="RSA AES KWP parameters via JSON file")
+    
+    # Wrapping method configuration
+    wrapping_method: Optional[str] = Field(None, description="Wrapping method: encrypt, mac/sign")
+    wrapping_encryption_algo: Optional[str] = Field(None, description="Encryption algorithm for wrapping (Algorithm/Mode/Padding)")
+    wrapping_hashing_algo: Optional[str] = Field(None, description="Hashing algorithm for mac/sign wrapping")
+    
+    # MAC/Signature generation
+    macsign_key_id: Optional[str] = Field(None, description="Key ID for MAC/signature generation")
+    macsign_key_id_type: Optional[str] = Field(None, description="MAC/sign key ID type (name, id, alias)")
+    signing_algo: Optional[str] = Field(None, description="Signing algorithm (RSA, RSA-PSS)")
+    
+    # PKCS12 support
+    passwordkey: Optional[str] = Field(None, description="Password key for PKCS12 format (ID or name of Secret Data)")
+    secretdatalink: Optional[str] = Field(None, description="Base64 encoded password for PKCS12 format")
+    secretdataencoding: Optional[str] = Field(None, description="Encoding method for secretDataLink material")
+    
+    # File-based parameters
+    public_key_jsonfile: Optional[str] = Field(None, description="Public key parameters via JSON file")
+    wrap_public_key_file: Optional[str] = Field(None, description="File containing base64 public key for wrapping")
+    
+    # Additional wrapping options
+    padded: bool = Field(False, description="Use RFC-5649 padding for wrap-key-name (symmetric keys only)")
+    wrapkey_id_type: Optional[str] = Field(None, description="Wrap key ID type (name, id, alias)")
+    
+    # Size and ID configuration
+    id_size: Optional[int] = Field(None, description="Size of ID for the key")
+    
+    # Deprecated but supported
+    defaultiv: Optional[str] = Field(None, description="Deprecated: Default IV (hex encoded)")
+    usage: Optional[str] = Field(None, description="Deprecated: Key usage (use usage_mask instead)")
 
 
 class KeyGetParams(BaseModel):
@@ -315,7 +381,44 @@ class KeyListTool(BaseTool):
 
 
 class KeyCreateTool(BaseTool):
-    """Create a cryptographic key."""
+    """
+    Create a cryptographic key with comprehensive configuration options.
+    
+    **Advanced Features:**
+    
+    **Template-based Creation:**
+    - Use --template_id to create keys from predefined templates (accepts template names directly)
+    - When using templates, algorithm and size are automatically taken from the template
+    - Template parameters can be overridden by request parameters (for privileged users)
+    - Restricted users have limited override capabilities
+    - Direct template name usage with ksctl --templateId parameter
+    
+    **Enterprise Identity Management:**
+    - Set --owner-id to specify key ownership
+    - Configure --id, --uuid, --muid, --key-id for specific identifier requirements
+    - Use --ret to return existing keys with same name instead of failing
+    
+    **Advanced Wrapping and Security:**
+    - HKDF parameters via --hkdf or --hkdf-jsonfile
+    - PBE wrapping via --wrap-pbe or --wrap-pbe-jsonfile  
+    - RSA AES KWP via --wrap-rsa-aes or --wrap-rsa-aes-jsonfile
+    - MAC/Signature generation via --macsign-key-id and --signing-algo
+    - Custom wrapping methods via --wrapping-method, --wrapping-encryption-algo
+    
+    **PKCS12 Support:**
+    - Password management via --passwordkey or --secretdatalink
+    - Encoding control via --secretdataencoding
+    
+    **File-based Configuration:**
+    - Public key parameters via --public-key-jsonfile
+    - Wrap public key from file via --wrap-public-key-file
+    
+    **CTE Integration:**
+    - Full CTE key support with --cte-key-type (standard, ldt, xts)
+    - Encryption modes: CBC, CBC_CS1, XTS via --cte-encryption-mode
+    - Client persistence via --cte-persistent-on-client
+    - Permission groups via --cte-permissions-groups
+    """
 
     @property
     def name(self) -> str:
@@ -323,16 +426,16 @@ class KeyCreateTool(BaseTool):
 
     @property
     def description(self) -> str:
-        return "Create a cryptographic key with extensive configuration options"
+        return "Create a cryptographic key with comprehensive configuration options including templates, advanced wrapping, and CTE support"
 
     def get_schema(self) -> dict[str, Any]:
         return KeyCreateParams.model_json_schema()
 
     async def execute(self, **kwargs: Any) -> Any:
-        """Execute key create command."""
+        """Execute key create command with full parameter support."""
         params = KeyCreateParams(**kwargs)
         
-        # Handle CTE key creation
+        # Handle CTE key creation (existing logic preserved)
         if params.cte_key_type:
             # Build the full key JSON structure
             key_json = {
@@ -349,15 +452,20 @@ class KeyCreateTool(BaseTool):
                 # Let the system generate a name
                 pass
             
+            # Add owner_id if provided
+            if params.owner_id:
+                key_json["meta"] = key_json.get("meta", {})
+                key_json["meta"]["ownerId"] = params.owner_id
+            
             # Build meta object for CTE keys
             permissions_groups = params.cte_permissions_groups.split(",") if params.cte_permissions_groups else ["CTE Clients"]
-            key_json["meta"] = {
-                "permissions": {
-                    "ExportKey": permissions_groups,
-                    "ReadKey": permissions_groups
-                },
-                "cte": {}
+            if "meta" not in key_json:
+                key_json["meta"] = {}
+            key_json["meta"]["permissions"] = {
+                "ExportKey": permissions_groups,
+                "ReadKey": permissions_groups
             }
+            key_json["meta"]["cte"] = {}
             
             # Determine encryption mode
             encryption_mode = params.cte_encryption_mode or "CBC"  # Default to CBC
@@ -409,6 +517,8 @@ class KeyCreateTool(BaseTool):
                 args = ["keys", "create", "--jsonfile", temp_file]
                 if params.include_material:
                     args.append("--include-material")
+                if params.ret:
+                    args.append("--ret")
                 
                 result = self.execute_with_domain(args, params.domain, params.auth_domain)
                 return result.get("data", result.get("stdout", ""))
@@ -419,13 +529,19 @@ class KeyCreateTool(BaseTool):
         # Original implementation for non-CTE keys
         args = ["keys", "create"]
         
+        # Basic parameters
         if params.name:
             args.extend(["--name", params.name])
         if params.autoname:
             args.append("--autoname")
-        args.extend(["--alg", params.algorithm])
-        if params.size:
-            args.extend(["--size", str(params.size)])
+        
+        # Only add algorithm and size if NOT using a template
+        # Templates define these attributes and adding them would override the template
+        if not params.template_id:
+            args.extend(["--alg", params.algorithm])
+            if params.size:
+                args.extend(["--size", str(params.size)])
+        
         if params.curve_id:
             args.extend(["--curve-id", params.curve_id])
         if params.usage_mask is not None:
@@ -436,6 +552,8 @@ class KeyCreateTool(BaseTool):
             args.extend(["--labels", params.labels])
         if params.aliases:
             args.extend(["--aliases", params.aliases])
+        
+        # Material and format
         if params.material:
             args.extend(["--material", params.material])
         if params.format:
@@ -452,20 +570,111 @@ class KeyCreateTool(BaseTool):
             args.append("--include-material")
         if params.empty_material:
             args.append("--empty-material")
+        
+        # Object and certificate types
         if params.object_type:
             args.extend(["--object-type", params.object_type])
         if params.cert_type:
             args.extend(["--cert-type", params.cert_type])
         if params.cert_filename:
             args.extend(["--cert-filename", params.cert_filename])
+        
+        # JSON configuration
         if params.jsonfile:
             args.extend(["--jsonfile", params.jsonfile])
+        
+        # Wrapping parameters
         if params.wrap_key_name:
             args.extend(["--wrap-key-name", params.wrap_key_name])
         if params.wrap_public_key:
             args.extend(["--wrap-public-key", params.wrap_public_key])
+        
+        # Rotation
         if params.rotation_frequency_days:
             args.extend(["--rotation-frequency-days", params.rotation_frequency_days])
+        
+        # ===== NEW PARAMETERS =====
+        
+        # Critical missing parameters
+        if params.ret:
+            args.append("--ret")
+        if params.template_id:
+            # Use template name directly with ksctl --templateId
+            args.extend(["--templateId", params.template_id])
+        if params.owner_id:
+            args.extend(["--ownerid", params.owner_id])
+        if params.id:
+            args.extend(["--id", params.id])
+        if params.uuid:
+            args.extend(["--uuid", params.uuid])
+        if params.muid:
+            args.extend(["--muid", params.muid])
+        if params.key_id:
+            args.extend(["--key-id", params.key_id])
+        
+        # Advanced wrapping parameters
+        if params.hkdf:
+            args.extend(["--hkdf", params.hkdf])
+        if params.hkdf_jsonfile:
+            args.extend(["--hkdf-jsonfile", params.hkdf_jsonfile])
+        if params.wrap_pbe:
+            args.extend(["--wrap-pbe", params.wrap_pbe])
+        if params.wrap_pbe_jsonfile:
+            args.extend(["--wrap-pbe-jsonfile", params.wrap_pbe_jsonfile])
+        if params.wrap_hkdf:
+            args.extend(["--wrap-hkdf", params.wrap_hkdf])
+        if params.wrap_hkdf_jsonfile:
+            args.extend(["--wrap-hkdf-jsonfile", params.wrap_hkdf_jsonfile])
+        if params.wrap_rsa_aes:
+            args.extend(["--wrap-rsa-aes", params.wrap_rsa_aes])
+        if params.wrap_rsa_aes_jsonfile:
+            args.extend(["--wrap-rsa-aes-jsonfile", params.wrap_rsa_aes_jsonfile])
+        
+        # Wrapping method configuration
+        if params.wrapping_method:
+            args.extend(["--wrapping-method", params.wrapping_method])
+        if params.wrapping_encryption_algo:
+            args.extend(["--wrapping-encryption-algo", params.wrapping_encryption_algo])
+        if params.wrapping_hashing_algo:
+            args.extend(["--wrapping-hashing-algo", params.wrapping_hashing_algo])
+        
+        # MAC/Signature generation
+        if params.macsign_key_id:
+            args.extend(["--macsign-key-id", params.macsign_key_id])
+        if params.macsign_key_id_type:
+            args.extend(["--macsign-key-id-type", params.macsign_key_id_type])
+        if params.signing_algo:
+            args.extend(["--signing-algo", params.signing_algo])
+        
+        # PKCS12 support
+        if params.passwordkey:
+            args.extend(["--passwordkey", params.passwordkey])
+        if params.secretdatalink:
+            args.extend(["--secretdatalink", params.secretdatalink])
+        if params.secretdataencoding:
+            args.extend(["--secretdataencoding", params.secretdataencoding])
+        
+        # File-based parameters
+        if params.public_key_jsonfile:
+            args.extend(["--public-key-jsonfile", params.public_key_jsonfile])
+        if params.wrap_public_key_file:
+            args.extend(["--wrap-public-key-file", params.wrap_public_key_file])
+        
+        # Additional wrapping options
+        if params.padded:
+            args.append("--padded")
+        if params.wrapkey_id_type:
+            args.extend(["--wrapkey-id-type", params.wrapkey_id_type])
+        
+        # Size and ID configuration
+        if params.id_size:
+            args.extend(["--id-size", str(params.id_size)])
+        
+        # Deprecated but supported
+        if params.defaultiv:
+            args.extend(["--defaultiv", params.defaultiv])
+        if params.usage:
+            args.extend(["--usage", params.usage])
         
         result = self.execute_with_domain(args, params.domain, params.auth_domain)
         return result.get("data", result.get("stdout", ""))
@@ -997,7 +1206,7 @@ KEY_TOOLS = [
 
 class KeyManagementTool(BaseTool):
     name = "key_management"
-    description = "Key management operations (list, create, get, delete, modify, archive, recover, revoke, reactivate, destroy, export, clone, generate_kcv, alias_add, alias_delete, alias_modify, query, list_labels)"
+    description = "Comprehensive key management operations with advanced features including templates, enterprise identity management, advanced wrapping, CTE integration, and PKCS12 support"
 
     def get_schema(self) -> dict:
         return {
@@ -1072,7 +1281,58 @@ class KeyManagementTool(BaseTool):
                 # Label parameters
                 "label": {"type": "string"},
                 # Modify parameters
-                "remove_labels": {"type": "string"}
+                "remove_labels": {"type": "string"},
+                
+                # ===== NEW PARAMETERS =====
+                
+                # Critical missing parameters
+                "ret": {"type": "boolean", "default": False, "description": "Return existing key with same name if it exists"},
+                "template_id": {"type": "string", "description": "Template ID for creating key using template"},
+                "owner_id": {"type": "string", "description": "The user's ID (owner of the key)"},
+                "id": {"type": "string", "description": "Specific key identifier"},
+                "uuid": {"type": "string", "description": "UUID identifier (32 hex digits with 4 dashes)"},
+                "muid": {"type": "string", "description": "Additional identifier (MUID)"},
+                "key_id": {"type": "string", "description": "Additional key identifier"},
+                
+                # Advanced wrapping parameters
+                "hkdf": {"type": "string", "description": "HKDF parameters in JSON format"},
+                "hkdf_jsonfile": {"type": "string", "description": "HKDF parameters via JSON file"},
+                "wrap_pbe": {"type": "string", "description": "PBE wrap parameters in JSON format"},
+                "wrap_pbe_jsonfile": {"type": "string", "description": "PBE wrap parameters via JSON file"},
+                "wrap_hkdf": {"type": "string", "description": "HKDF wrap parameters in JSON format"},
+                "wrap_hkdf_jsonfile": {"type": "string", "description": "HKDF wrap parameters via JSON file"},
+                "wrap_rsa_aes": {"type": "string", "description": "RSA AES KWP parameters in JSON format"},
+                "wrap_rsa_aes_jsonfile": {"type": "string", "description": "RSA AES KWP parameters via JSON file"},
+                
+                # Wrapping method configuration
+                "wrapping_method": {"type": "string", "description": "Wrapping method: encrypt, mac/sign"},
+                "wrapping_encryption_algo": {"type": "string", "description": "Encryption algorithm for wrapping (Algorithm/Mode/Padding)"},
+                "wrapping_hashing_algo": {"type": "string", "description": "Hashing algorithm for mac/sign wrapping"},
+                
+                # MAC/Signature generation
+                "macsign_key_id": {"type": "string", "description": "Key ID for MAC/signature generation"},
+                "macsign_key_id_type": {"type": "string", "description": "MAC/sign key ID type (name, id, alias)"},
+                "signing_algo": {"type": "string", "description": "Signing algorithm (RSA, RSA-PSS)"},
+                
+                # PKCS12 support
+                "passwordkey": {"type": "string", "description": "Password key for PKCS12 format (ID or name of Secret Data)"},
+                "secretdatalink": {"type": "string", "description": "Base64 encoded password for PKCS12 format"},
+                "secretdataencoding": {"type": "string", "description": "Encoding method for secretDataLink material"},
+                
+                # File-based parameters
+                "public_key_jsonfile": {"type": "string", "description": "Public key parameters via JSON file"},
+                "wrap_public_key_file": {"type": "string", "description": "File containing base64 public key for wrapping"},
+                
+                # Additional wrapping options
+                "padded": {"type": "boolean", "default": False, "description": "Use RFC-5649 padding for wrap-key-name (symmetric keys only)"},
+                "wrapkey_id_type": {"type": "string", "description": "Wrap key ID type (name, id, alias)"},
+                
+                # Size and ID configuration
+                "id_size": {"type": "integer", "description": "Size of ID for the key"},
+                
+                # Deprecated but supported
+                "defaultiv": {"type": "string", "description": "Deprecated: Default IV (hex encoded)"},
+                "usage": {"type": "string", "description": "Deprecated: Key usage (use usage_mask instead)"}
             },
             "required": ["action"]
         }
@@ -1127,15 +1387,20 @@ class KeyManagementTool(BaseTool):
                     # Let the system generate a name
                     pass
                 
+                # Add owner_id if provided
+                if params.owner_id:
+                    key_json["meta"] = key_json.get("meta", {})
+                    key_json["meta"]["ownerId"] = params.owner_id
+                
                 # Build meta object for CTE keys
                 permissions_groups = params.cte_permissions_groups.split(",") if params.cte_permissions_groups else ["CTE Clients"]
-                key_json["meta"] = {
-                    "permissions": {
-                        "ExportKey": permissions_groups,
-                        "ReadKey": permissions_groups
-                    },
-                    "cte": {}
+                if "meta" not in key_json:
+                    key_json["meta"] = {}
+                key_json["meta"]["permissions"] = {
+                    "ExportKey": permissions_groups,
+                    "ReadKey": permissions_groups
                 }
+                key_json["meta"]["cte"] = {}
                 
                 # Determine encryption mode
                 encryption_mode = params.cte_encryption_mode or "CBC"
@@ -1187,20 +1452,29 @@ class KeyManagementTool(BaseTool):
                     args = ["keys", "create", "--jsonfile", temp_file]
                     if params.include_material:
                         args.append("--include-material")
+                    if params.ret:
+                        args.append("--ret")
                     
                     result = self.execute_with_domain(args, params.domain, params.auth_domain)
                     return result.get("data", result.get("stdout", ""))
                 finally:
                     # Clean up temp file
                     os.unlink(temp_file)
+            
+            # Standard key creation with all parameters
             args = ["keys", "create"]
             if params.name:
                 args.extend(["--name", params.name])
             if params.autoname:
                 args.append("--autoname")
-            args.extend(["--alg", params.algorithm])
-            if params.size:
-                args.extend(["--size", str(params.size)])
+            
+            # Only add algorithm and size if NOT using a template
+            # Templates define these attributes and adding them would override the template
+            if not params.template_id:
+                args.extend(["--alg", params.algorithm])
+                if params.size:
+                    args.extend(["--size", str(params.size)])
+            
             if params.curve_id:
                 args.extend(["--curve-id", params.curve_id])
             if params.usage_mask is not None:
@@ -1241,6 +1515,72 @@ class KeyManagementTool(BaseTool):
                 args.extend(["--wrap-public-key", params.wrap_public_key])
             if params.rotation_frequency_days:
                 args.extend(["--rotation-frequency-days", params.rotation_frequency_days])
+            
+            # Add all new parameters
+            if params.ret:
+                args.append("--ret")
+            if params.template_id:
+                # Use template name directly with ksctl --templateId
+                args.extend(["--templateId", params.template_id])
+            if params.owner_id:
+                args.extend(["--ownerid", params.owner_id])
+            if params.id:
+                args.extend(["--id", params.id])
+            if params.uuid:
+                args.extend(["--uuid", params.uuid])
+            if params.muid:
+                args.extend(["--muid", params.muid])
+            if params.key_id:
+                args.extend(["--key-id", params.key_id])
+            if params.hkdf:
+                args.extend(["--hkdf", params.hkdf])
+            if params.hkdf_jsonfile:
+                args.extend(["--hkdf-jsonfile", params.hkdf_jsonfile])
+            if params.wrap_pbe:
+                args.extend(["--wrap-pbe", params.wrap_pbe])
+            if params.wrap_pbe_jsonfile:
+                args.extend(["--wrap-pbe-jsonfile", params.wrap_pbe_jsonfile])
+            if params.wrap_hkdf:
+                args.extend(["--wrap-hkdf", params.wrap_hkdf])
+            if params.wrap_hkdf_jsonfile:
+                args.extend(["--wrap-hkdf-jsonfile", params.wrap_hkdf_jsonfile])
+            if params.wrap_rsa_aes:
+                args.extend(["--wrap-rsa-aes", params.wrap_rsa_aes])
+            if params.wrap_rsa_aes_jsonfile:
+                args.extend(["--wrap-rsa-aes-jsonfile", params.wrap_rsa_aes_jsonfile])
+            if params.wrapping_method:
+                args.extend(["--wrapping-method", params.wrapping_method])
+            if params.wrapping_encryption_algo:
+                args.extend(["--wrapping-encryption-algo", params.wrapping_encryption_algo])
+            if params.wrapping_hashing_algo:
+                args.extend(["--wrapping-hashing-algo", params.wrapping_hashing_algo])
+            if params.macsign_key_id:
+                args.extend(["--macsign-key-id", params.macsign_key_id])
+            if params.macsign_key_id_type:
+                args.extend(["--macsign-key-id-type", params.macsign_key_id_type])
+            if params.signing_algo:
+                args.extend(["--signing-algo", params.signing_algo])
+            if params.passwordkey:
+                args.extend(["--passwordkey", params.passwordkey])
+            if params.secretdatalink:
+                args.extend(["--secretdatalink", params.secretdatalink])
+            if params.secretdataencoding:
+                args.extend(["--secretdataencoding", params.secretdataencoding])
+            if params.public_key_jsonfile:
+                args.extend(["--public-key-jsonfile", params.public_key_jsonfile])
+            if params.wrap_public_key_file:
+                args.extend(["--wrap-public-key-file", params.wrap_public_key_file])
+            if params.padded:
+                args.append("--padded")
+            if params.wrapkey_id_type:
+                args.extend(["--wrapkey-id-type", params.wrapkey_id_type])
+            if params.id_size:
+                args.extend(["--id-size", str(params.id_size)])
+            if params.defaultiv:
+                args.extend(["--defaultiv", params.defaultiv])
+            if params.usage:
+                args.extend(["--usage", params.usage])
+            
             result = self.execute_with_domain(args, params.domain, params.auth_domain)
             return result.get("data", result.get("stdout", ""))
         elif action == "get":
