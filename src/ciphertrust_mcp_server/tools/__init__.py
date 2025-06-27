@@ -32,6 +32,7 @@ from .system import SYSTEM_TOOLS         # System-wide operations
 from .templates import TEMPLATE_TOOLS    # Template management (with domain support)
 from .tokens import TOKEN_TOOLS          # Updated with domain support
 from .users import USER_TOOLS            # Updated with domain support + password policies
+from .vkeys import VKEYS_TOOLS           # Versioned keys management (with domain support)
 
 # Import connection management tools
 from .connection_management import CONNECTION_TOOLS
@@ -71,6 +72,7 @@ ALL_TOOLS: list[Type[BaseTool]] = [
     *SECRET_TOOLS,          # 9 tools - secrets management (with domain support)
     *SCP_TOOLS,             # 2 tools - SCP public key management (with domain support)
     *TEMPLATE_TOOLS,        # 5 tools - template management (with domain support)
+    *VKEYS_TOOLS,           # 1 tool - versioned keys management (with domain support)
     *AKEYLESS_TOOLS,        # 7 tools - Akeyless Gateway integration (with domain support)
     *BACKUP_TOOLS,          # 11 tools - backup management (with domain support)
     *BACKUPKEY_TOOLS,       # 8 tools - backup key management (with domain support)

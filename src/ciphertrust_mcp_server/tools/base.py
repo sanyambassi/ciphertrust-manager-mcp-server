@@ -1,5 +1,6 @@
-"""Base classes for CipherTrust MCP tools with comprehensive domain support."""
+"""Base classes for CipherTrust MCP tools with comprehensive domain support and universal client compatibility."""
 
+import json
 from abc import ABC, abstractmethod
 from typing import Any, TypeVar, Optional
 
@@ -115,14 +116,12 @@ class BaseTool(ABC):
         """Get standard domain and auth-domain parameters."""
         return {
             "domain": {
-                "type": "string",
                 "anyOf": [{"type": "string"}, {"type": "null"}],
                 "default": None,
                 "description": "The CipherTrust Manager Domain that the command will operate in",
                 "title": "Domain"
             },
             "auth_domain": {
-                "type": "string", 
                 "anyOf": [{"type": "string"}, {"type": "null"}],
                 "default": None,
                 "description": "The CipherTrust Manager Domain where the user is created",
@@ -156,10 +155,61 @@ class BaseTool(ABC):
         except Exception as e:
             return f"Error executing command: {str(e)}"
 
+    def _ensure_schema_compatibility(self, schema: dict[str, Any]) -> dict[str, Any]:
+        """Ensure JSON schema compatibility across all MCP clients.
+        
+        This method fixes common JSON Schema issues that can cause problems
+        with strict validators in various MCP clients (Claude Desktop, Cursor AI, 
+        Gemini CLI, VS Code, etc.).
+        
+        Fixes:
+        1. Removes conflicting 'type' when 'anyOf' or 'oneOf' is present
+        2. Converts array types (["string", "null"]) to proper anyOf format
+        3. Ensures consistent schema structure for all clients
+        """
+        # Create a deep copy to avoid modifying the original
+        schema = json.loads(json.dumps(schema))
+        
+        def fix_node(node: Any) -> None:
+            if not isinstance(node, dict):
+                return
+            
+            # Fix 1: Remove 'type' when 'anyOf' or 'oneOf' is present (conflicting definitions)
+            if ('anyOf' in node or 'oneOf' in node) and 'type' in node:
+                del node['type']
+            
+            # Fix 2: Convert array types (["string", "null"]) to proper anyOf format
+            if 'type' in node and isinstance(node['type'], list) and len(node['type']) > 1:
+                node['anyOf'] = [{'type': t} for t in node['type']]
+                del node['type']
+            
+            # Recursively fix nested schemas
+            if 'properties' in node and isinstance(node['properties'], dict):
+                for prop in node['properties'].values():
+                    fix_node(prop)
+            
+            if 'items' in node:
+                fix_node(node['items'])
+            
+            # Fix nested anyOf/oneOf/allOf schemas
+            for key in ['anyOf', 'oneOf', 'allOf']:
+                if key in node and isinstance(node[key], list):
+                    for item in node[key]:
+                        fix_node(item)
+        
+        fix_node(schema)
+        return schema
+
     def to_mcp_tool(self) -> Tool:
-        """Convert to MCP Tool definition."""
+        """Convert to MCP Tool definition with universal compatibility."""
+        # Get the original schema
+        schema = self.get_schema()
+        
+        # Ensure compatibility with all MCP clients
+        compatible_schema = self._ensure_schema_compatibility(schema)
+        
         return Tool(
             name=self.name,
             description=self.description,
-            inputSchema=self.get_schema(),
+            inputSchema=compatible_schema,
         )
