@@ -25,7 +25,7 @@ This project implements an independently-developed CipherTrust MCP (Model Contex
 
 This is an **independent, open-source project**. Please note:
 
-- ⚠️ **Not officially supported** by Thales or CipherTrust
+- ⚠️ **Not officially supported** by Thales
 - ✅ **Uses public APIs** and documented interfaces
 - 🔧 **Independently maintained** 
 - 📝 **Use at your own risk** - test thoroughly in your environment
