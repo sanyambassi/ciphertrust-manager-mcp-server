@@ -97,13 +97,9 @@ class CCKMTool(BaseTool):
             cmd.extend(["--limit", str(params["limit"])])
         if "skip" in params:
             cmd.extend(["--skip", str(params["skip"])])
-        if "domain" in params:
-            cmd.extend(["--domain", params["domain"]])
-        if "auth_domain" in params:
-            cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _get_aws_key(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get details of a specific AWS key"""
@@ -111,13 +107,9 @@ class CCKMTool(BaseTool):
             raise ValueError("Key ID is required for get operation")
 
         cmd = ["cckm", "aws", "keys", "get", "--id", params["id"]]
-        if "domain" in params:
-            cmd.extend(["--domain", params["domain"]])
-        if "auth_domain" in params:
-            cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _create_aws_key(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new AWS key"""
@@ -137,13 +129,9 @@ class CCKMTool(BaseTool):
             cmd.extend(["--enabled", "yes" if params["enabled"] else "no"])
         if "tags" in params:
             cmd.extend(["--tags", str(params["tags"])])
-        if "domain" in params:
-            cmd.extend(["--domain", params["domain"]])
-        if "auth_domain" in params:
-            cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _update_aws_key(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Update an existing AWS key"""
@@ -160,13 +148,9 @@ class CCKMTool(BaseTool):
             cmd.extend(["--enabled", "yes" if params["enabled"] else "no"])
         if "tags" in params:
             cmd.extend(["--tags", str(params["tags"])])
-        if "domain" in params:
-            cmd.extend(["--domain", params["domain"]])
-        if "auth_domain" in params:
-            cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _delete_aws_key(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete an AWS key"""
@@ -174,13 +158,9 @@ class CCKMTool(BaseTool):
             raise ValueError("Key ID is required for delete operation")
 
         cmd = ["cckm", "aws", "keys", "delete", "--id", params["id"]]
-        if "domain" in params:
-            cmd.extend(["--domain", params["domain"]])
-        if "auth_domain" in params:
-            cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _handle_azure(self, action: str, params: Dict[str, Any]) -> Any:
         """Handle Azure key operations"""

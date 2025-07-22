@@ -1,11 +1,83 @@
-"""Data Protection tools for managing protection policies, clients and client groups."""
+"""Data Protection tools for managing protection policies, clients and client groups.
+
+This module provides a comprehensive interface to CipherTrust Manager's data protection
+functionality through the ksctl CLI. It supports all major data protection operations
+including:
+
+Resource Types:
+- access_policies: Manage access policies for data protection
+- bdt_policies: Execute BDT (Business Data Transformation) policies
+- character_sets: Manage character sets for data formatting
+- client_profiles: Manage client profiles for data protection clients
+- clients: Manage data protection clients
+- containers: Manage data containers for protection operations
+- data_sources: Manage data sources for protection operations
+- dpg_policies: Execute DPG (Data Protection Gateway) policies
+- masking_formats: Manage masking formats for data obfuscation
+- protection_policies: Manage protection policies
+- protection_profiles: Manage protection profiles
+- user_sets: Manage user sets for access control
+
+Actions:
+- list: List resources with optional filtering
+- get: Get details of a specific resource
+- create: Create a new resource
+- update/modify: Update an existing resource
+- delete: Delete a resource
+- count: Get count of resources (for clients and client profiles)
+- clean: Clean error clients (for client profiles)
+- add_user_set: Add user set to access policy
+- remove_user_set: Remove user set from access policy
+- update_user_set: Update user set in access policy
+- error_replacement_value_null: Set error replacement value to null
+- error_replacement_value_null_user_set: Set error replacement value to null for user set
+- list_users: List users in a user set
+
+Common Parameters:
+- id: Resource ID for get/delete operations
+- name: Resource name for create/update operations
+- description: Description for the resource
+- limit: Maximum number of results to return
+- skip: Number of results to skip
+- domain: Domain for the operation
+- auth_domain: Authentication domain for the operation
+- jsonfile: JSON file containing resource details
+
+Usage Examples:
+    # List all clients
+    {"action": "list", "resource_type": "clients"}
+    
+    # Create a new access policy
+    {"action": "create", "resource_type": "access_policies", 
+     "params": {"name": "my_policy", "description": "My access policy"}}
+    
+    # Get a specific client
+    {"action": "get", "resource_type": "clients", 
+     "params": {"id": "client_id"}}
+    
+    # Create a protection policy
+    {"action": "create", "resource_type": "protection_policies",
+     "params": {"name": "my_protection", "algorithm": "AES", "key": "my_key"}}
+"""
 
 from typing import Any, Dict, List, Optional, Type
 
 from .base import BaseTool
 
 class DataProtectionTool(BaseTool):
-    """Base class for Data Protection management tools."""
+    """Base class for Data Protection management tools.
+    
+    This tool provides a unified interface to all CipherTrust Manager data protection
+    operations. It routes requests to appropriate handlers based on the resource type
+    and action specified.
+    
+    The tool supports all major data protection resource types and operations as
+    documented in the ksctl data-protection command documentation.
+    
+    Attributes:
+        name (str): The tool name ("data_protection")
+        description (str): Tool description for MCP clients
+    """
     
     @property
     def name(self):
@@ -13,7 +85,7 @@ class DataProtectionTool(BaseTool):
 
     @property
     def description(self):
-        return "Manage data protection policies, clients, profiles, and related resources."
+        return "Manage data protection policies, clients, profiles, and related resources. Supports access policies, BDT policies, character sets, client profiles, clients, containers, data sources, DPG policies, masking formats, protection policies, protection profiles, and user sets."
 
     def __init__(self) -> None:
         super().__init__()
@@ -24,7 +96,17 @@ class DataProtectionTool(BaseTool):
             "properties": {
                 "action": {
                     "type": "string",
-                    "enum": ["list", "get", "create", "update", "delete", "list_users", "add_user_set", "remove_user_set", "update_user_set", "error_replacement_value_null", "error_replacement_value_null_user_set"],
+                    "enum": [
+                        # Common actions
+                        "list", "get", "create", "update", "delete", "modify",
+                        # Access Policies specific actions
+                        "add_user_set", "remove_user_set", "update_user_set", 
+                        "error_replacement_value_null", "error_replacement_value_null_user_set",
+                        # Client Profiles specific actions
+                        "count", "clean",
+                        # User Sets specific actions
+                        "list_users"
+                    ],
                     "description": "The action to perform"
                 },
                 "resource_type": {
@@ -36,6 +118,7 @@ class DataProtectionTool(BaseTool):
                         "client_profiles",
                         "clients",
                         "containers",
+                        "data_sources",
                         "dpg_policies",
                         "masking_formats",
                         "protection_policies",
@@ -47,14 +130,26 @@ class DataProtectionTool(BaseTool):
                 "params": {
                     "type": "object",
                     "properties": {
+                        # Common parameters
                         "id": {"type": "string", "description": "Resource ID for get/delete operations"},
                         "name": {"type": "string", "description": "Resource name for create/update operations"},
                         "description": {"type": "string", "description": "Description for the resource"},
+                        "limit": {"type": "integer", "description": "Maximum number of results to return"},
+                        "skip": {"type": "integer", "description": "Number of results to skip"},
+                        "domain": {"type": "string", "description": "Domain for the operation"},
+                        "auth_domain": {"type": "string", "description": "Authentication domain for the operation"},
+                        "jsonfile": {"type": "string", "description": "JSON file containing resource details"},
+                        
+                        # Access Policies specific parameters
                         "default_masking_format_id": {"type": "string", "description": "Default masking format ID for access policies"},
                         "default_error_replacement_value": {"type": "string", "description": "Default error replacement value for access policies"},
                         "default_reveal_type": {"type": "string", "description": "Default reveal type for access policies (Error Replacement Value, Masked Value, Ciphertext, Plaintext)"},
-                        "jsonfile": {"type": "string", "description": "JSON file containing user set policy details"},
                         "user_set_id": {"type": "string", "description": "User set ID for user set operations"},
+                        "error_replacement_value": {"type": "string", "description": "Value to be revealed if the type is 'Error Replacement Value'"},
+                        "masking_format_id": {"type": "string", "description": "Masking format used to reveal if the type is 'Masked Value'"},
+                        "reveal_type": {"type": "string", "description": "Value using which data should be revealed"},
+                        
+                        # Clients specific parameters
                         "app_connector_type": {"type": "string", "description": "Connector type for client registration"},
                         "app_connector_version": {"type": "string", "description": "Version of the app connector"},
                         "client_host_name": {"type": "string", "description": "Client host name"},
@@ -62,10 +157,82 @@ class DataProtectionTool(BaseTool):
                         "registration_token": {"type": "string", "description": "Registration token for client registration"},
                         "client_profile_id": {"type": "string", "description": "Client profile ID"},
                         "connectivity_status": {"type": "string", "description": "Client connectivity status"},
-                        "limit": {"type": "integer", "description": "Maximum number of results to return"},
-                        "skip": {"type": "integer", "description": "Number of results to skip"},
-                        "domain": {"type": "string", "description": "Domain for the operation"},
-                        "auth_domain": {"type": "string", "description": "Authentication domain for the operation"},
+                        
+                        # Character Sets specific parameters
+                        "range": {"type": "string", "description": "Character range for character sets"},
+                        "encoding": {"type": "string", "description": "Encoding for character sets"},
+                        
+                        # Client Profiles specific parameters
+                        "ca_id": {"type": "string", "description": "CA ID for client profiles"},
+                        "cert_duration": {"type": "integer", "description": "Certificate duration for client profiles"},
+                        "configurations": {"type": "string", "description": "Configurations for client profiles"},
+                        "csr_parameters": {"type": "string", "description": "CSR parameters for client profiles"},
+                        "enable_client_autorenewal": {"type": "boolean", "description": "Enable client auto-renewal"},
+                        "groups": {"type": "array", "items": {"type": "string"}, "description": "Groups for client profiles"},
+                        "heartbeat_threshold": {"type": "integer", "description": "Heartbeat threshold for client profiles"},
+                        "jwt_verification_key": {"type": "string", "description": "JWT verification key for client profiles"},
+                        "nae_iface_port": {"type": "integer", "description": "NAE interface port for client profiles"},
+                        "policy_id": {"type": "string", "description": "Policy ID for client profiles"},
+                        
+                        # Containers specific parameters
+                        "type": {"type": "string", "description": "Container type"},
+                        "username": {"type": "string", "description": "Username for containers"},
+                        "password": {"type": "string", "description": "Password for containers"},
+                        "driverclass": {"type": "string", "description": "Driver class for containers"},
+                        "connection_url": {"type": "string", "description": "Connection URL for containers"},
+                        "column_count": {"type": "integer", "description": "Column count for containers"},
+                        "column_position_info": {"type": "string", "description": "Column position info for containers"},
+                        "delimiter": {"type": "string", "description": "Delimiter for containers"},
+                        "filepath": {"type": "string", "description": "File path for containers"},
+                        "has_header_row": {"type": "string", "description": "Has header row for containers"},
+                        "line_separator": {"type": "string", "description": "Line separator for containers"},
+                        "qualifier": {"type": "string", "description": "Qualifier for containers"},
+                        "record_length": {"type": "integer", "description": "Record length for containers"},
+                        "unescape_input": {"type": "string", "description": "Unescape input for containers"},
+                        
+                        # Masking Formats specific parameters
+                        "ending_characters": {"type": "integer", "description": "Ending characters for masking formats"},
+                        "mask_char": {"type": "string", "description": "Mask character for masking formats"},
+                        "show": {"type": "boolean", "description": "Show for masking formats"},
+                        "starting_characters": {"type": "integer", "description": "Starting characters for masking formats"},
+                        "static": {"type": "boolean", "description": "Static for masking formats"},
+                        
+                        # Protection Policies specific parameters
+                        "access_policy_name": {"type": "string", "description": "Access policy name for protection policies"},
+                        "algorithm": {"type": "string", "description": "Algorithm for protection policies"},
+                        "character_set_id": {"type": "string", "description": "Character set ID for protection policies"},
+                        "data_format": {"type": "string", "description": "Data format for protection policies"},
+                        "disable_versioning": {"type": "boolean", "description": "Disable versioning for protection policies"},
+                        "iv": {"type": "string", "description": "IV for protection policies"},
+                        "key": {"type": "string", "description": "Key for protection policies"},
+                        "nonce": {"type": "string", "description": "Nonce for protection policies"},
+                        "prefix": {"type": "string", "description": "Prefix for protection policies"},
+                        "tweak": {"type": "string", "description": "Tweak for protection policies"},
+                        "tweak_algorithm": {"type": "string", "description": "Tweak algorithm for protection policies"},
+                        "use_external_versioning": {"type": "boolean", "description": "Use external versioning for protection policies"},
+                        "aad": {"type": "string", "description": "Additional authenticated data"},
+                        "allow_small_input": {"type": "boolean", "description": "Allow small input in protection policy"},
+                        "random_nonce": {"type": "string", "description": "Random nonce string"},
+                        "tag_length": {"type": "integer", "description": "Length of the tag"},
+                        
+                        # Protection Profiles specific parameters
+                        "allow_single_char_input": {"type": "string", "description": "Allow single char input for protection profiles"},
+                        "auth_tag_length": {"type": "string", "description": "Auth tag length for protection profiles"},
+                        "ca_list": {"type": "string", "description": "CA list for protection profiles"},
+                        "copy_runt_data": {"type": "string", "description": "Copy runt data for protection profiles"},
+                        "format": {"type": "string", "description": "Format for protection profiles"},
+                        "keep_left": {"type": "integer", "description": "Keep left for protection profiles"},
+                        "keep_right": {"type": "integer", "description": "Keep right for protection profiles"},
+                        "key_id": {"type": "string", "description": "Key ID for protection profiles"},
+                        "luhn_check": {"type": "string", "description": "Luhn check for protection profiles"},
+                        "md_name": {"type": "string", "description": "MD name for protection profiles"},
+                        "mgf_name": {"type": "string", "description": "MGF name for protection profiles"},
+                        "p_src": {"type": "string", "description": "P source for protection profiles"},
+                        "salt_length": {"type": "integer", "description": "Salt length for protection profiles"},
+                        "save_exceptions": {"type": "string", "description": "Save exceptions for protection profiles"},
+                        "suffix": {"type": "string", "description": "Suffix for protection profiles"},
+                        
+                        # User Sets specific parameters
                         "user": {"type": "string", "description": "User to filter by in list_users operation"}
                     }
                 }
@@ -74,6 +241,31 @@ class DataProtectionTool(BaseTool):
         }
 
     async def execute(self, **kwargs: Any) -> Any:
+        """Execute data protection operations.
+        
+        This method routes requests to appropriate handlers based on the resource type
+        and action specified. It validates required parameters and delegates to the
+        appropriate resource-specific handler.
+        
+        Args:
+            **kwargs: Keyword arguments containing:
+                - action (str): The action to perform (list, get, create, update, delete, etc.)
+                - resource_type (str): The type of resource to manage
+                - params (dict): Parameters specific to the operation
+                
+        Returns:
+            Any: The result of the operation, typically a dict or list
+            
+        Raises:
+            ValueError: If required parameters are missing or resource type is unsupported
+            
+        Example:
+            >>> await tool.execute(
+            ...     action="list",
+            ...     resource_type="clients",
+            ...     params={"limit": 10}
+            ... )
+        """
         action = kwargs.get("action")
         resource_type = kwargs.get("resource_type")
         params = kwargs.get("params", {})
@@ -89,7 +281,26 @@ class DataProtectionTool(BaseTool):
         return await handler(action, params)
 
     async def _handle_clients(self, action: str, params: Dict[str, Any]) -> Any:
-        """Handle client operations"""
+        """Handle client operations.
+        
+        Supports the following actions for data protection clients:
+        - list: List all clients with optional filtering
+        - get: Get details of a specific client by ID
+        - create: Create a new client with registration token
+        - update: Update an existing client
+        - delete: Delete a client by ID
+        - count: Get count of clients with different statuses
+        
+        Args:
+            action (str): The action to perform
+            params (dict): Parameters for the operation
+            
+        Returns:
+            Any: Operation result
+            
+        Raises:
+            ValueError: If action is not supported
+        """
         if action == "list":
             return await self._list_clients(params)
         elif action == "get":
@@ -100,6 +311,8 @@ class DataProtectionTool(BaseTool):
             return await self._update_client(params)
         elif action == "delete":
             return await self._delete_client(params)
+        elif action == "count":
+            return await self._count_clients(params)
         else:
             raise ValueError(f"Unsupported action for clients: {action}")
 
@@ -121,13 +334,9 @@ class DataProtectionTool(BaseTool):
             cmd.extend(["--limit", str(params["limit"])])
         if "skip" in params:
             cmd.extend(["--skip", str(params["skip"])])
-        if "domain" in params:
-            cmd.extend(["--domain", params["domain"]])
-        if "auth_domain" in params:
-            cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _get_client(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get details of a specific client"""
@@ -135,13 +344,9 @@ class DataProtectionTool(BaseTool):
             raise ValueError("Client ID is required for get operation")
 
         cmd = ["data-protection", "clients", "get", "--id", params["id"]]
-        if "domain" in params:
-            cmd.extend(["--domain", params["domain"]])
-        if "auth_domain" in params:
-            cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _create_client(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new client"""
@@ -166,8 +371,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _update_client(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Update an existing client"""
@@ -191,8 +396,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _delete_client(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a client"""
@@ -205,11 +410,46 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
+
+    async def _count_clients(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Get count of clients with different statuses"""
+        cmd = ["data-protection", "clients", "count"]
+        
+        if "domain" in params:
+            cmd.extend(["--domain", params["domain"]])
+        if "auth_domain" in params:
+            cmd.extend(["--auth-domain", params["auth_domain"]])
+
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _handle_access_policies(self, action: str, params: Dict[str, Any]) -> Any:
-        """Handle access policy operations"""
+        """Handle access policy operations.
+        
+        Supports the following actions for access policies:
+        - list: List all access policies with optional filtering
+        - get: Get details of a specific access policy by ID
+        - create: Create a new access policy
+        - update: Update an existing access policy
+        - delete: Delete an access policy by ID
+        - add_user_set: Add a user set to an access policy
+        - remove_user_set: Remove a user set from an access policy
+        - update_user_set: Update a user set in an access policy
+        - error_replacement_value_null: Set error replacement value to null for policy
+        - error_replacement_value_null_user_set: Set error replacement value to null for user set
+        
+        Args:
+            action (str): The action to perform
+            params (dict): Parameters for the operation
+            
+        Returns:
+            Any: Operation result
+            
+        Raises:
+            ValueError: If action is not supported
+        """
         if action == "list":
             return await self._list_access_policies(params)
         elif action == "get":
@@ -246,8 +486,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _get_access_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get details of a specific access policy"""
@@ -260,8 +500,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _create_access_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new access policy"""
@@ -285,8 +525,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _update_access_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Update an existing access policy"""
@@ -312,8 +552,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _delete_access_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete an access policy"""
@@ -326,8 +566,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _add_user_set_to_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Add a user set to an access policy"""
@@ -342,8 +582,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _remove_user_set_from_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Remove a user set from an access policy"""
@@ -358,8 +598,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _update_user_set_in_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Update a user set in an access policy"""
@@ -376,8 +616,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _set_error_replacement_value_null(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Set error replacement value to null for an access policy"""
@@ -390,8 +630,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _set_error_replacement_value_null_for_user_set(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Set error replacement value to null for a user set in an access policy"""
@@ -406,8 +646,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _handle_bdt_policies(self, action: str, params: Dict[str, Any]) -> Any:
         """Handle BDT policy operations"""
@@ -437,8 +677,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _get_bdt_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get details of a specific BDT policy"""
@@ -451,8 +691,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _create_bdt_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new BDT policy"""
@@ -465,8 +705,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _modify_bdt_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Modify an existing BDT policy"""
@@ -481,8 +721,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _delete_bdt_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a BDT policy"""
@@ -495,8 +735,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _handle_character_sets(self, action: str, params: Dict[str, Any]) -> Any:
         """Handle character set operations"""
@@ -526,8 +766,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _get_character_set(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get details of a specific character set"""
@@ -540,8 +780,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _create_character_set(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new character set"""
@@ -562,8 +802,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _update_character_set(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Update an existing character set"""
@@ -585,8 +825,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _delete_character_set(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a character set"""
@@ -599,8 +839,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _handle_client_profiles(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Handle client profiles operations."""
@@ -634,7 +874,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _get_client_profile(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get a client profile by ID."""
@@ -648,7 +888,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _create_client_profile(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new client profile."""
@@ -685,7 +925,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _update_client_profile(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Update a client profile."""
@@ -724,7 +964,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _delete_client_profile(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a client profile."""
@@ -738,7 +978,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _count_client_profiles(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get count of client profiles with different statuses."""
@@ -749,7 +989,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _clean_client_profile(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Clean all error clients associated with a client profile."""
@@ -763,7 +1003,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _handle_containers(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Handle container operations."""
@@ -793,7 +1033,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _get_container(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get a container by ID."""
@@ -807,7 +1047,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _create_container(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new container."""
@@ -853,7 +1093,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _modify_container(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Modify a container."""
@@ -903,7 +1143,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _delete_container(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a container."""
@@ -917,7 +1157,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _handle_dpg_policies(self, action: str, params: Dict[str, Any]) -> Any:
         """Handle DPG policy operations."""
@@ -947,7 +1187,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _get_dpg_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get a DPG policy by ID."""
@@ -961,7 +1201,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _create_dpg_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new DPG policy."""
@@ -975,7 +1215,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _modify_dpg_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Modify a DPG policy."""
@@ -989,7 +1229,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _delete_dpg_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a DPG policy."""
@@ -1003,7 +1243,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _handle_masking_formats(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Handle masking format operations."""
@@ -1033,7 +1273,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _get_masking_format(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get a masking format by ID."""
@@ -1047,7 +1287,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _create_masking_format(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new masking format."""
@@ -1073,7 +1313,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _update_masking_format(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Update a masking format."""
@@ -1101,7 +1341,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _delete_masking_format(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a masking format."""
@@ -1115,7 +1355,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _handle_protection_policies(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Handle protection policy operations."""
@@ -1145,7 +1385,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _get_protection_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get a protection policy by name."""
@@ -1159,7 +1399,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _create_protection_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new protection policy."""
@@ -1196,12 +1436,20 @@ class DataProtectionTool(BaseTool):
             cmd.extend(["--tweak-algorithm", params["tweak_algorithm"]])
         if "use_external_versioning" in params:
             cmd.extend(["--use-external-versioning"])
+        if "aad" in params:
+            cmd.extend(["--aad", params["aad"]])
+        if "allow_small_input" in params:
+            cmd.extend(["--allow-small-input"])
+        if "random_nonce" in params:
+            cmd.extend(["--random-nonce", params["random_nonce"]])
+        if "tag_length" in params:
+            cmd.extend(["--tag-length", str(params["tag_length"])])
         if "domain" in params:
             cmd.extend(["--domain", params["domain"]])
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _update_protection_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Update a protection policy."""
@@ -1238,12 +1486,20 @@ class DataProtectionTool(BaseTool):
             cmd.extend(["--tweak-algorithm", params["tweak_algorithm"]])
         if "use_external_versioning" in params:
             cmd.extend(["--use-external-versioning"])
+        if "aad" in params:
+            cmd.extend(["--aad", params["aad"]])
+        if "allow_small_input" in params:
+            cmd.extend(["--allow-small-input"])
+        if "random_nonce" in params:
+            cmd.extend(["--random-nonce", params["random_nonce"]])
+        if "tag_length" in params:
+            cmd.extend(["--tag-length", str(params["tag_length"])])
         if "domain" in params:
             cmd.extend(["--domain", params["domain"]])
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _delete_protection_policy(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a protection policy."""
@@ -1257,7 +1513,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _handle_protection_profiles(self, action: str, params: Dict[str, Any]) -> Dict[str, Any]:
         """Handle protection profile operations."""
@@ -1287,7 +1543,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _get_protection_profile(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get a protection profile by ID."""
@@ -1301,7 +1557,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _create_protection_profile(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new protection profile."""
@@ -1365,7 +1621,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _modify_protection_profile(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Modify a protection profile."""
@@ -1431,7 +1687,7 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
 
     async def _delete_protection_profile(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a protection profile."""
@@ -1445,7 +1701,110 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        return await self._execute_command(cmd)
+        return self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+
+    async def _handle_data_sources(self, action: str, params: Dict[str, Any]) -> Any:
+        """Handle data source operations"""
+        if action == "list":
+            return await self._list_data_sources(params)
+        elif action == "get":
+            return await self._get_data_source(params)
+        elif action == "create":
+            return await self._create_data_source(params)
+        elif action == "update":
+            return await self._update_data_source(params)
+        elif action == "delete":
+            return await self._delete_data_source(params)
+        else:
+            raise ValueError(f"Unsupported action for data sources: {action}")
+
+    async def _list_data_sources(self, params: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """List data sources with optional filtering"""
+        cmd = ["data-protection", "data-sources", "list"]
+
+        if "limit" in params:
+            cmd.extend(["--limit", str(params["limit"])])
+        if "skip" in params:
+            cmd.extend(["--skip", str(params["skip"])])
+        if "domain" in params:
+            cmd.extend(["--domain", params["domain"]])
+        if "auth_domain" in params:
+            cmd.extend(["--auth-domain", params["auth_domain"]])
+
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
+
+    async def _get_data_source(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Get details of a specific data source"""
+        if "id" not in params:
+            raise ValueError("Data source ID is required for get operation")
+
+        cmd = ["data-protection", "data-sources", "get", "--id", params["id"]]
+        if "domain" in params:
+            cmd.extend(["--domain", params["domain"]])
+        if "auth_domain" in params:
+            cmd.extend(["--auth-domain", params["auth_domain"]])
+
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
+
+    async def _create_data_source(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new data source"""
+        if "jsonfile" in params:
+            cmd = ["data-protection", "data-sources", "create", "--jsonfile", params["jsonfile"]]
+        else:
+            if "name" not in params:
+                raise ValueError("Name is required for create operation when not using jsonfile")
+
+            cmd = ["data-protection", "data-sources", "create", "--name", params["name"]]
+
+            if "type" in params:
+                cmd.extend(["--type", params["type"]])
+            if "description" in params:
+                cmd.extend(["--description", params["description"]])
+
+        if "domain" in params:
+            cmd.extend(["--domain", params["domain"]])
+        if "auth_domain" in params:
+            cmd.extend(["--auth-domain", params["auth_domain"]])
+
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
+
+    async def _update_data_source(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Update an existing data source"""
+        if "id" not in params:
+            raise ValueError("Data source ID is required for update operation")
+
+        cmd = ["data-protection", "data-sources", "update", "--id", params["id"]]
+
+        if "name" in params:
+            cmd.extend(["--name", params["name"]])
+        if "type" in params:
+            cmd.extend(["--type", params["type"]])
+        if "description" in params:
+            cmd.extend(["--description", params["description"]])
+        if "domain" in params:
+            cmd.extend(["--domain", params["domain"]])
+        if "auth_domain" in params:
+            cmd.extend(["--auth-domain", params["auth_domain"]])
+
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
+
+    async def _delete_data_source(self, params: Dict[str, Any]) -> Dict[str, Any]:
+        """Delete a data source"""
+        if "id" not in params:
+            raise ValueError("Data source ID is required for delete operation")
+
+        cmd = ["data-protection", "data-sources", "delete", "--id", params["id"]]
+        if "domain" in params:
+            cmd.extend(["--domain", params["domain"]])
+        if "auth_domain" in params:
+            cmd.extend(["--auth-domain", params["auth_domain"]])
+
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _handle_user_sets(self, action: str, params: Dict[str, Any]) -> Any:
         """Handle user set operations"""
@@ -1479,8 +1838,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _get_user_set(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Get details of a specific user set"""
@@ -1493,8 +1852,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _create_user_set(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new user set"""
@@ -1507,8 +1866,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _update_user_set(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Update an existing user set"""
@@ -1523,8 +1882,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _delete_user_set(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a user set"""
@@ -1537,8 +1896,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
     async def _list_user_set_users(self, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         """List users in a user set"""
@@ -1557,8 +1916,8 @@ class DataProtectionTool(BaseTool):
         if "auth_domain" in params:
             cmd.extend(["--auth-domain", params["auth_domain"]])
 
-        result = await self._execute_command(cmd)
-        return self._parse_json_response(result)
+        result = self.execute_with_domain(cmd, params.get("domain"), params.get("auth_domain"))
+        return result.get("data", result.get("stdout", ""))
 
 # Export the tool
 DATA_PROTECTION_TOOLS = [DataProtectionTool] 
