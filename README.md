@@ -228,9 +228,9 @@ npm run test:full           # Run complete test suite
 
 ### Comprehensive Testing Guide
 
-📖 **For detailed testing instructions, see [docs/TESTING.md](docs/TESTING.md)**
+📖 **For detailed testing instructions, see [TESTING.md](docs/TESTING.md)**
 
-🔧 **For example AI assistant prompts, see [docs/EXAMPLE_PROMPTS.md](docs/EXAMPLE_PROMPTS.md)**
+🔧 **For example AI assistant prompts, see [EXAMPLE_PROMPTS.md](docs/EXAMPLE_PROMPTS.md)**
 
 The testing guide covers:
 - Complete setup and configuration
