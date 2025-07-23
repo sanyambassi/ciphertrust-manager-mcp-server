@@ -53,7 +53,6 @@ The MCP server exposes a set of tools and endpoints for clients (such as Claude 
 - **Python 3.11 or higher**
 - **uv** for dependency management
 - **Access to a CipherTrust Manager instance**
-- **Valid CipherTrust Manager credentials**
 
 ### Installing Git (Windows)
 
