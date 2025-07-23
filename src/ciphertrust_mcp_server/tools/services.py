@@ -83,7 +83,9 @@ class ServiceManagementTool(BaseTool):
                     "WARNING: This operation will perform a full reset of CipherTrust Manager "
                     "and WIPE ALL DATA. This action cannot be undone."
                 )
-                args = ["services", "reset", "--yes"]
+                args = ["services", "reset"]
+                if p.yes:
+                    args.append("--yes")
                 args.extend(["--delay", str(p.delay)])
                 result = self.ksctl.execute(args)
                 if isinstance(result, dict):
