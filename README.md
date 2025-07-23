@@ -1,7 +1,5 @@
 # CipherTrust Manager MCP Server
 
-> **⚠️ Disclaimer: This is an unofficial, independently-developed project that is not affiliated with, endorsed by, or supported by Thales Group or any of its subsidiaries. This project uses publicly available APIs and interfaces to interact with CipherTrust Manager.**
-
 This project implements an independently-developed CipherTrust MCP (Model Context Protocol) server that allows AI Assistants like Claude or Cursor to interact with CipherTrust Manager resources using the ksctl CLI.
 
 ## Table of Contents
@@ -166,6 +164,7 @@ You can also set these as environment variables directly instead of using a `.en
 CIPHERTRUST_URL=https://your-ciphertrust-manager.example.com
 CIPHERTRUST_USER=admin
 CIPHERTRUST_PASSWORD=your-password-here
+CIPHERTRUST_NOSSLVERIFY=true
 ```
 
 ## Usage
@@ -229,9 +228,9 @@ npm run test:full           # Run complete test suite
 
 ### Comprehensive Testing Guide
 
-📖 **For detailed testing instructions, see [TESTING.md](TESTING.md)**
+📖 **For detailed testing instructions, see [docs/TESTING.md](docs/TESTING.md)**
 
-🔧 **For example AI assistant prompts, see [EXAMPLE_PROMPTS.md](EXAMPLE_PROMPTS.md)**
+🔧 **For example AI assistant prompts, see [docs/EXAMPLE_PROMPTS.md](docs/EXAMPLE_PROMPTS.md)**
 
 The testing guide covers:
 - Complete setup and configuration
@@ -409,8 +408,9 @@ ciphertrust-manager-mcp-server/
 │   ├── test_with_inspector.sh
 │   └── run_tests.py
 ├── docs/                      		# Additional documentation
-├── TESTING.md                  	# Comprehensive testing guide
-├── EXAMPLE_PROMPTS.md          	# Example prompts for AI assistants
+│   ├── TESTING.md
+│   ├── EXAMPLE_PROMPTS.md
+│   └── TOOLS.md
 ├── README.md                   	# This file
 ├── pyproject.toml             		# Python dependencies
 └── package.json               		# Node.js dependencies for testing
@@ -436,5 +436,3 @@ This is an independent project. For official CipherTrust Manager support, please
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
-
-**Built with ❤️ for the developer community**

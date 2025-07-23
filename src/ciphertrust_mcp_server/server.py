@@ -26,10 +26,24 @@ class CipherTrustMCPServer:
 
     def _setup_tools(self) -> None:
         """Initialize all available tools."""
+        logger.info(f"Starting tool registration. Total tools to register: {len(ALL_TOOLS)}")
+        
+        # Log each tool class before instantiation
         for tool_class in ALL_TOOLS:
-            tool = tool_class()
-            self.tools[tool.name] = tool
-            logger.info(f"Registered tool: {tool.name}")
+            logger.info(f"Found tool class: {tool_class.__name__}")
+        
+        # Initialize tools
+        for tool_class in ALL_TOOLS:
+            try:
+                logger.info(f"Initializing tool: {tool_class.__name__}")
+                tool = tool_class()
+                self.tools[tool.name] = tool
+                logger.info(f"Successfully registered tool: {tool.name}")
+            except Exception as e:
+                logger.error(f"Failed to register tool {tool_class.__name__}: {str(e)}", exc_info=True)
+        
+        logger.info(f"Tool registration complete. Registered {len(self.tools)} tools")
+        logger.info(f"Available tools: {list(self.tools.keys())}")
 
     def _setup_handlers(self) -> None:
         """Set up MCP server handlers."""

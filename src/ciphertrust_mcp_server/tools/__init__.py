@@ -50,13 +50,13 @@ from .crypto import CRYPTO_TOOLS         # Cryptographic operations (with domain
 from .cte_management import CTE_TOOLS    # Unified CTE management (with domain support)
 
 # Import cluster management tools
-from .cluster_management import CLUSTER_MANAGEMENT_TOOLS
-from .clientmgmt import CLIENTMGMT_TOOLS
-from .banner_management import BANNER_MANAGEMENT_TOOLS
-from .interfaces_management import INTERFACES_MANAGEMENT_TOOLS
-from .ddc_management import DDC_MANAGEMENT_TOOLS
-from .cckm_management import CCKM_TOOLS
-from .data_protection import DATA_PROTECTION_TOOLS
+from .cluster_management import CLUSTER_MANAGEMENT_TOOLS        # Cluster management tools
+from .clientmgmt import CLIENTMGMT_TOOLS                        # Client management tools
+from .banner_management import BANNER_MANAGEMENT_TOOLS          # Banner management tools
+from .interfaces_management import INTERFACES_MANAGEMENT_TOOLS  # Interface management tools
+from .ddc_management import DDC_MANAGEMENT_TOOLS                # DDC management tools
+from .cckm_management import CCKM_TOOLS                         # CCKM Management tools
+from .data_protection import DATA_PROTECTION_TOOLS              # Application Data Protection tools
 
 # Collect all available tools
 ALL_TOOLS: list[Type[BaseTool]] = [
@@ -72,7 +72,7 @@ ALL_TOOLS: list[Type[BaseTool]] = [
     *SECRET_TOOLS,          # 9 tools - secrets management (with domain support)
     *SCP_TOOLS,             # 2 tools - SCP public key management (with domain support)
     *TEMPLATE_TOOLS,        # 5 tools - template management (with domain support)
-    *VKEYS_TOOLS,           # 1 tool - versioned keys management (with domain support)
+    *VKEYS_TOOLS,           # 4 tools - versioned keys management (with domain support)
     *AKEYLESS_TOOLS,        # 7 tools - Akeyless Gateway integration (with domain support)
     *BACKUP_TOOLS,          # 11 tools - backup management (with domain support)
     *BACKUPKEY_TOOLS,       # 8 tools - backup key management (with domain support)
@@ -88,7 +88,7 @@ ALL_TOOLS: list[Type[BaseTool]] = [
     *QUORUM_TOOLS,          # 14 tools - quorum management (with domain support)
 
     # Domain management (administrative domain operations)
-    *DOMAIN_TOOLS,          # 13 tools - domain admin, KEKs, log redirection
+    *DOMAIN_TOOLS,          # 16 tools - domain admin, KEKs, log redirection
 
     # Connection management
     *CONNECTION_TOOLS,      # 11 clean connection management tools
@@ -105,13 +105,13 @@ ALL_TOOLS: list[Type[BaseTool]] = [
     *CTE_TOOLS,               # 1 unified tool - modular CTE management with domain support
 
     # Additional management tools
-    *CLUSTER_MANAGEMENT_TOOLS,    # Cluster management tools
-    *CLIENTMGMT_TOOLS,            # Client management tools
-    *BANNER_MANAGEMENT_TOOLS,     # Banner management tools
-    *INTERFACES_MANAGEMENT_TOOLS, # Interface management tools
-    *DDC_MANAGEMENT_TOOLS,        # DDC management tools
-    *CCKM_TOOLS,                  # Cloud Key Management tools
-    *DATA_PROTECTION_TOOLS,       # Data Protection tools
+    *CLUSTER_MANAGEMENT_TOOLS,    # 9 tools - Cluster management tools
+    *CLIENTMGMT_TOOLS,            # 20 tools - Client management tools
+    *BANNER_MANAGEMENT_TOOLS,     # 2 tools - Banner management tools
+    *INTERFACES_MANAGEMENT_TOOLS, # 7 tools - Interface management tools
+    *DDC_MANAGEMENT_TOOLS,        # 10 tools - DDC management tools
+    *CCKM_TOOLS,                  # 1 unified tool - modular CCKM management with domain support
+    *DATA_PROTECTION_TOOLS,       # 10 tools - Data Protection tools
 ]
 
 all = ["BaseTool", "ALL_TOOLS"]
