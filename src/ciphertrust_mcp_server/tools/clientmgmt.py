@@ -1,182 +1,197 @@
 from typing import Optional, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from .base import BaseTool
 
 # --- CLIENTS SUBCOMMANDS ---
 class ClientListParams(BaseModel):
-    ca_id: Optional[str] = None
-    client_id: Optional[str] = None
-    client_meta_data: Optional[str] = None
-    client_mgmt_profile_id: Optional[str] = None
-    client_name: Optional[str] = None
-    limit: Optional[int] = None
-    sha256_fingerprint: Optional[str] = None
-    skip: Optional[int] = None
-    state: Optional[str] = None
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    ca_id: Optional[str] = Field(None, description="ID of the trusted Certificate Authority.")
+    client_id: Optional[str] = Field(None, description="An identifier of registered CipherTrust Manager client.")
+    client_meta_data: Optional[str] = Field(None, description="Filter the results by client_metadata fields.")
+    client_mgmt_profile_id: Optional[str] = Field(None, description="ID of the Client Management Profile.")
+    client_name: Optional[str] = Field(None, description="A friendly name of client to be registered.")
+    limit: Optional[int] = Field(None, description="The maximum number of resources to return.")
+    sha256_fingerprint: Optional[str] = Field(None, description="The SHA256 fingerprint of the client certificate.")
+    skip: Optional[int] = Field(None, description="The index of the first resource to return.")
+    state: Optional[str] = Field(None, description="The state of the client.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ClientGetParams(BaseModel):
-    client_id: str
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    client_id: str = Field(..., description="An identifier of registered CipherTrust Manager client.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ClientRegisterParams(BaseModel):
-    reg_token: str
-    csr: Optional[str] = None
-    cert_file: Optional[str] = None
-    client_type: Optional[str] = None
-    client_name: Optional[str] = None
-    cn: Optional[str] = None
-    csrfile: Optional[str] = None
-    dns: Optional[str] = None
-    do_not_modify_subject_dn: Optional[bool] = None
-    email: Optional[str] = None
-    enc_alg: Optional[str] = None
-    ips: Optional[str] = None
-    names: Optional[str] = None
-    pass_: Optional[str] = None
-    private_key_file: Optional[str] = None
-    size: Optional[int] = None
-    subject_dn_field_to_modify: Optional[str] = None
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    reg_token: str = Field(..., description="The registration token for the client.")
+    csr: Optional[str] = Field(None, description="CSR of the node.")
+    cert_file: Optional[str] = Field(None, description="File containing certificate issued by a CA known to CipherTrust Manager.")
+    client_type: Optional[str] = Field(None, description="CipherTrust Manager client type.")
+    client_name: Optional[str] = Field(None, description="A friendly name of client to be registered.")
+    cn: Optional[str] = Field(None, description="Common Name.")
+    csrfile: Optional[str] = Field(None, description="File containing CSR of registering CipherTrust Manager client.")
+    dns: Optional[str] = Field(None, description="DNS of the client.")
+    do_not_modify_subject_dn: Optional[bool] = Field(None, description="Do not modify the subject DN.")
+    email: Optional[str] = Field(None, description="Email of the client.")
+    enc_alg: Optional[str] = Field(None, description="Encryption algorithm.")
+    ips: Optional[str] = Field(None, description="IP addresses of the client.")
+    names: Optional[str] = Field(None, description="Names of the client.")
+    pass_: Optional[str] = Field(None, description="Password for the private key.")
+    private_key_file: Optional[str] = Field(None, description="Private key file.")
+    size: Optional[int] = Field(None, description="Size of the key.")
+    subject_dn_field_to_modify: Optional[str] = Field(None, description="Subject DN field to modify.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ClientDeleteParams(BaseModel):
-    client_id: str
-    nowarning: Optional[bool] = None
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    client_id: str = Field(..., description="An identifier of registered CipherTrust Manager client.")
+    nowarning: Optional[bool] = Field(None, description="Don't show warning messages.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ClientRenewParams(BaseModel):
-    client_id: str
-    alg: Optional[str] = None
-    ca_id: Optional[str] = None
-    cert_duration: Optional[int] = None
-    clientcsr: Optional[str] = None
-    cn: Optional[str] = None
-    dns: Optional[str] = None
-    do_not_modify_subject_dn: Optional[bool] = None
-    email: Optional[str] = None
-    enc_alg: Optional[str] = None
-    ext_cert: Optional[str] = None
-    ips: Optional[str] = None
-    names: Optional[str] = None
-    pass_: Optional[str] = None
-    private_key_bytes: Optional[str] = None
-    private_key_file: Optional[str] = None
-    size: Optional[int] = None
-    subject_dn_field_to_modify: Optional[str] = None
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    client_id: str = Field(..., description="An identifier of registered CipherTrust Manager client.")
+    alg: Optional[str] = Field(None, description="Algorithm for the new certificate.")
+    ca_id: Optional[str] = Field(None, description="ID of the trusted Certificate Authority.")
+    cert_duration: Optional[int] = Field(None, description="Duration in days for which the CipherTrust Manager client certificate is valid.")
+    clientcsr: Optional[str] = Field(None, description="CSR of the client.")
+    cn: Optional[str] = Field(None, description="Common Name.")
+    dns: Optional[str] = Field(None, description="DNS of the client.")
+    do_not_modify_subject_dn: Optional[bool] = Field(None, description="Do not modify the subject DN.")
+    email: Optional[str] = Field(None, description="Email of the client.")
+    enc_alg: Optional[str] = Field(None, description="Encryption algorithm.")
+    ext_cert: Optional[str] = Field(None, description="External certificate.")
+    ips: Optional[str] = Field(None, description="IP addresses of the client.")
+    names: Optional[str] = Field(None, description="Names of the client.")
+    pass_: Optional[str] = Field(None, description="Password for the private key.")
+    private_key_bytes: Optional[str] = Field(None, description="Private key in bytes.")
+    private_key_file: Optional[str] = Field(None, description="Private key file.")
+    size: Optional[int] = Field(None, description="Size of the key.")
+    subject_dn_field_to_modify: Optional[str] = Field(None, description="Subject DN field to modify.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ClientRevokeParams(BaseModel):
-    client_id: str
-    revoke_reason: Optional[str] = None
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    client_id: str = Field(..., description="An identifier of registered CipherTrust Manager client.")
+    revoke_reason: Optional[str] = Field(None, description="Reason for revocation.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ClientSelfParams(BaseModel):
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 # --- PROFILES SUBCOMMANDS ---
 class ProfileCreateParams(BaseModel):
-    ca_id: Optional[str] = None
-    cert_duration: Optional[int] = None
-    csr_params_jsonfile: Optional[str] = None
-    csr_parameters: Optional[str] = None
-    groups: Optional[str] = None
-    name: str
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    name: str = Field(..., description="Name of the client management profile.")
+    ca_id: Optional[str] = Field(None, description="ID of the trusted Certificate Authority.")
+    cert_duration: Optional[int] = Field(None, description="Duration in days for which the client certificate is valid.")
+    csr_params_jsonfile: Optional[str] = Field(None, description="JSON file containing the CSR parameters.")
+    csr_parameters: Optional[str] = Field(None, description="CSR parameters as a JSON string.")
+    groups: Optional[str] = Field(None, description="Comma-separated list of groups to associate with the profile.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ProfileDeleteParams(BaseModel):
-    profile_id: str
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    profile_id: str = Field(..., description="An identifier of the client profile.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ProfileGetParams(BaseModel):
-    profile_id: str
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    profile_id: str = Field(..., description="An identifier of the client profile.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ProfileListParams(BaseModel):
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ProfileUpdateParams(BaseModel):
-    profile_id: str
-    ca_id: Optional[str] = None
-    cert_duration: Optional[int] = None
-    csr_params_jsonfile: Optional[str] = None
-    csr_parameters: Optional[str] = None
-    groups: Optional[str] = None
-    name: Optional[str] = None
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+    profile_id: str = Field(..., description="An identifier of the client profile.")
+    name: Optional[str] = Field(None, description="New name for the client management profile.")
+    ca_id: Optional[str] = Field(None, description="New ID of the trusted Certificate Authority.")
+    cert_duration: Optional[int] = Field(None, description="New duration in days for which the client certificate is valid.")
+    csr_params_jsonfile: Optional[str] = Field(None, description="New JSON file containing the CSR parameters.")
+    csr_parameters: Optional[str] = Field(None, description="New CSR parameters as a JSON string.")
+    groups: Optional[str] = Field(None, description="New comma-separated list of groups to associate with the profile.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
-# --- TOKENS SUBCOMMANDS ---
-class TokenCreateParams(BaseModel):
-    ca_id: Optional[str] = None
-    cert_duration: Optional[int] = None
-    client_mgmt_profile_id: Optional[str] = None
-    label: Optional[str] = None
-    life_time: Optional[str] = None
-    max_clients: Optional[int] = None
-    name_prefix: Optional[str] = None
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+# --- REGISTRATION TOKENS SUBCOMMANDS ---
+class RegistrationTokenCreateParams(BaseModel):
+    ca_id: Optional[str] = Field(None, description="ID of the trusted Certificate Authority.")
+    cert_duration: Optional[int] = Field(None, description="Duration in days for which the client certificate is valid.")
+    client_mgmt_profile_id: Optional[str] = Field(None, description="ID of the Client Management Profile.")
+    label: Optional[str] = Field(None, description="Label for the registration token.")
+    life_time: Optional[str] = Field(None, description="Lifetime of the registration token.")
+    max_clients: Optional[int] = Field(None, description="Maximum number of clients that can use this token.")
+    name_prefix: Optional[str] = Field(None, description="Prefix for the name of the clients registered with this token.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
-class TokenDeleteParams(BaseModel):
-    reg_token: str
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+class RegistrationTokenDeleteParams(BaseModel):
+    token_id: str = Field(..., description="An identifier of the client registration token.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
-class TokenGetParams(BaseModel):
-    reg_token: str
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+class RegistrationTokenGetParams(BaseModel):
+    token_id: str = Field(..., description="An identifier of the client registration token.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
-class TokenListParams(BaseModel):
-    ca_id: Optional[str] = None
-    client_mgmt_profile_id: Optional[str] = None
-    label: Optional[str] = None
-    max_clients: Optional[int] = None
-    name_prefix: Optional[str] = None
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+class RegistrationTokenListParams(BaseModel):
+    ca_id: Optional[str] = Field(None, description="ID of the trusted Certificate Authority.")
+    client_mgmt_profile_id: Optional[str] = Field(None, description="ID of the Client Management Profile.")
+    label: Optional[str] = Field(None, description="Label for the registration token.")
+    max_clients: Optional[int] = Field(None, description="Maximum number of clients that can use this token.")
+    name_prefix: Optional[str] = Field(None, description="Prefix for the name of the clients registered with this token.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
-class TokenUpdateParams(BaseModel):
-    reg_token: str
-    ca_id: Optional[str] = None
-    cert_duration: Optional[int] = None
-    client_mgmt_profile_id: Optional[str] = None
-    label: Optional[str] = None
-    life_time: Optional[str] = None
-    max_clients: Optional[int] = None
-    name_prefix: Optional[str] = None
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+class RegistrationTokenUpdateParams(BaseModel):
+    token_id: str = Field(..., description="An identifier of the client registration token.")
+    ca_id: Optional[str] = Field(None, description="New ID of the trusted Certificate Authority.")
+    cert_duration: Optional[int] = Field(None, description="New duration in days for which the client certificate is valid.")
+    client_mgmt_profile_id: Optional[str] = Field(None, description="New ID of the Client Management Profile.")
+    label: Optional[str] = Field(None, description="New label for the registration token.")
+    life_time: Optional[str] = Field(None, description="New lifetime of the registration token.")
+    max_clients: Optional[int] = Field(None, description="New maximum number of clients that can use this token.")
+    name_prefix: Optional[str] = Field(None, description="New prefix for the name of the clients registered with this token.")
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
-class TokenWebcertFingerprintParams(BaseModel):
-    domain: Optional[str] = None
-    auth_domain: Optional[str] = None
+class RegistrationTokenWebcertFingerprintParams(BaseModel):
+    domain: Optional[str] = Field(None, description="The CipherTrust Manager Domain that the command will operate in.")
+    auth_domain: Optional[str] = Field(None, description="The CipherTrust Manager domain where the user is authenticated.")
 
 class ClientMgmtTool(BaseTool):
     name = "clientmgmt"
-    description = "CipherTrust Manager client management operations (clients, profiles, tokens)."
+    description = (
+        "Manages CipherTrust Manager client operations, including clients, profiles, and registration tokens. "
+        "This tool wraps `ksctl clientmgmt` commands."
+    )
 
     def get_schema(self):
         return {
             "type": "object",
             "properties": {
-                "action": {"type": "string", "enum": [
-                    "clients_list", "clients_get", "clients_register", "clients_delete", "clients_renew", "clients_revoke", "clients_self",
-                    "profiles_create", "profiles_delete", "profiles_get", "profiles_list", "profiles_update",
-                    "tokens_create", "tokens_delete", "tokens_get", "tokens_list", "tokens_update", "tokens_webcert_fingerprint"
-                ]},
-                "params": {"type": "object"}
+                "action": {
+                    "type": "string",
+                    "enum": [
+                        "clients_list", "clients_get", "clients_register", "clients_delete", "clients_renew", "clients_revoke", "clients_self",
+                        "profiles_create", "profiles_delete", "profiles_get", "profiles_list", "profiles_update",
+                        "registration_tokens_create", "registration_tokens_delete", "registration_tokens_get", "registration_tokens_list", "registration_tokens_update", "registration_tokens_webcert_fingerprint"
+                    ],
+                    "description": (
+                        "The specific action to perform. Actions are grouped by functionality:\n"
+                        "- `clients_*`: Manage client registrations.\n"
+                        "- `profiles_*`: Manage client profiles.\n"
+                        "- `registration_tokens_*`: Manage client registration tokens."
+                    )
+                },
+                "params": {
+                    "type": "object",
+                    "description": "A dictionary of parameters for the specified action. The required parameters depend on the selected action."
+                }
             },
             "required": ["action"]
         }
@@ -202,12 +217,12 @@ class ClientMgmtTool(BaseTool):
             if p.skip is not None: cmd += ["--skip", str(p.skip)]
             if p.state: cmd += ["--state", p.state]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         elif action == "clients_get":
             p = ClientGetParams(**params)
             cmd = ["clientmgmt", "clients", "get", "--client-id", p.client_id]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         elif action == "clients_register":
             p = ClientRegisterParams(**params)
             cmd = ["clientmgmt", "clients", "register", "--reg-token", p.reg_token]
@@ -228,13 +243,13 @@ class ClientMgmtTool(BaseTool):
             if p.size is not None: cmd += ["--size", str(p.size)]
             if p.subject_dn_field_to_modify: cmd += ["--subject-dn-field-to-modify", p.subject_dn_field_to_modify]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         elif action == "clients_delete":
             p = ClientDeleteParams(**params)
             cmd = ["clientmgmt", "clients", "delete", "--client-id", p.client_id]
             if p.nowarning: cmd += ["--nowarning"]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         elif action == "clients_renew":
             p = ClientRenewParams(**params)
             cmd = ["clientmgmt", "clients", "renew", "--client-id", p.client_id]
@@ -256,56 +271,56 @@ class ClientMgmtTool(BaseTool):
             if p.size is not None: cmd += ["--size", str(p.size)]
             if p.subject_dn_field_to_modify: cmd += ["--subject-dn-field-to-modify", p.subject_dn_field_to_modify]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         elif action == "clients_revoke":
             p = ClientRevokeParams(**params)
             cmd = ["clientmgmt", "clients", "revoke", "--client-id", p.client_id]
             if p.revoke_reason: cmd += ["--revoke-reason", p.revoke_reason]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         elif action == "clients_self":
             cmd = ["clientmgmt", "clients", "self"]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         # --- PROFILES ---
         elif action == "profiles_create":
             p = ProfileCreateParams(**params)
             cmd = ["clientmgmt", "profiles", "create", "--name", p.name]
-            if p.ca_id: cmd += ["--ca_id", p.ca_id]
+            if p.ca_id: cmd += ["--ca-id", p.ca_id]
             if p.cert_duration is not None: cmd += ["--cert-duration", str(p.cert_duration)]
             if p.csr_params_jsonfile: cmd += ["--csr-params-jsonfile", p.csr_params_jsonfile]
-            if p.csr_parameters: cmd += ["--csr_parameters", p.csr_parameters]
+            if p.csr_parameters: cmd += ["--csr-parameters", p.csr_parameters]
             if p.groups: cmd += ["--groups", p.groups]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         elif action == "profiles_delete":
             p = ProfileDeleteParams(**params)
             cmd = ["clientmgmt", "profiles", "delete", "--profile-id", p.profile_id]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         elif action == "profiles_get":
             p = ProfileGetParams(**params)
             cmd = ["clientmgmt", "profiles", "get", "--profile-id", p.profile_id]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         elif action == "profiles_list":
             cmd = ["clientmgmt", "profiles", "list"]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         elif action == "profiles_update":
             p = ProfileUpdateParams(**params)
             cmd = ["clientmgmt", "profiles", "update", "--profile-id", p.profile_id]
-            if p.ca_id: cmd += ["--ca_id", p.ca_id]
+            if p.ca_id: cmd += ["--ca-id", p.ca_id]
             if p.cert_duration is not None: cmd += ["--cert-duration", str(p.cert_duration)]
             if p.csr_params_jsonfile: cmd += ["--csr-params-jsonfile", p.csr_params_jsonfile]
-            if p.csr_parameters: cmd += ["--csr_parameters", p.csr_parameters]
+            if p.csr_parameters: cmd += ["--csr-parameters", p.csr_parameters]
             if p.groups: cmd += ["--groups", p.groups]
             if p.name: cmd += ["--name", p.name]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
-        # --- TOKENS ---
-        elif action == "tokens_create":
-            p = TokenCreateParams(**params)
+            return await self.ksctl.execute(cmd)
+        # --- REGISTRATION TOKENS ---
+        elif action == "registration_tokens_create":
+            p = RegistrationTokenCreateParams(**params)
             cmd = ["clientmgmt", "tokens", "create"]
             if p.ca_id: cmd += ["--ca-id", p.ca_id]
             if p.cert_duration is not None: cmd += ["--cert-duration", str(p.cert_duration)]
@@ -315,24 +330,24 @@ class ClientMgmtTool(BaseTool):
             if p.max_clients is not None: cmd += ["--max-clients", str(p.max_clients)]
             if p.name_prefix: cmd += ["--name-prefix", p.name_prefix]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
-        elif action == "tokens_delete":
-            p = TokenDeleteParams(**params)
-            cmd = ["clientmgmt", "tokens", "delete", "--reg-token", p.reg_token]
+            return await self.ksctl.execute(cmd)
+        elif action == "registration_tokens_delete":
+            p = RegistrationTokenDeleteParams(**params)
+            cmd = ["clientmgmt", "tokens", "delete", "--token-id", p.token_id]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
-        elif action == "tokens_get":
-            p = TokenGetParams(**params)
-            cmd = ["clientmgmt", "tokens", "get", "--reg-token", p.reg_token]
+            return await self.ksctl.execute(cmd)
+        elif action == "registration_tokens_get":
+            p = RegistrationTokenGetParams(**params)
+            cmd = ["clientmgmt", "tokens", "get", "--token-id", p.token_id]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
-        elif action == "tokens_list":
+            return await self.ksctl.execute(cmd)
+        elif action == "registration_tokens_list":
             cmd = ["clientmgmt", "tokens", "list"]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
-        elif action == "tokens_update":
-            p = TokenUpdateParams(**params)
-            cmd = ["clientmgmt", "tokens", "update", "--reg-token", p.reg_token]
+            return await self.ksctl.execute(cmd)
+        elif action == "registration_tokens_update":
+            p = RegistrationTokenUpdateParams(**params)
+            cmd = ["clientmgmt", "tokens", "update", "--token-id", p.token_id]
             if p.ca_id: cmd += ["--ca-id", p.ca_id]
             if p.cert_duration is not None: cmd += ["--cert-duration", str(p.cert_duration)]
             if p.client_mgmt_profile_id: cmd += ["--client-mgmt-profile-id", p.client_mgmt_profile_id]
@@ -341,11 +356,11 @@ class ClientMgmtTool(BaseTool):
             if p.max_clients is not None: cmd += ["--max-clients", str(p.max_clients)]
             if p.name_prefix: cmd += ["--name-prefix", p.name_prefix]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
-        elif action == "tokens_webcert_fingerprint":
+            return await self.ksctl.execute(cmd)
+        elif action == "registration_tokens_webcert_fingerprint":
             cmd = ["clientmgmt", "tokens", "webcert-fingerprint"]
             self.add_domain_auth_params(cmd, params)
-            return self.ksctl.execute(cmd)
+            return await self.ksctl.execute(cmd)
         else:
             raise ValueError(f"Unknown action: {action}")
 
