@@ -51,7 +51,6 @@ class ConnectionManagementTool(BaseTool):
             'hadoop': HadoopOperations(self.execute_with_domain),
             'luna_hsm': LunaHSMOperations(self.execute_with_domain),
             'smb': SMBOperations(self.execute_with_domain),
-            'dsm': DSMOperations(self.execute_with_domain),
             'scp': SCPOperations(self.execute_with_domain),
             'sap_dc': SAPDCOperations(self.execute_with_domain),
             'log_forwarder': LogForwarderOperations(self.execute_with_domain),
@@ -90,14 +89,14 @@ class ConnectionManagementTool(BaseTool):
     def description(self) -> str:
         return (
             "Connection Management operations for managing connections across various cloud providers and services. "
-            "Supports AWS, Azure, GCP, OCI, Salesforce, Akeyless, Hadoop, Luna HSM, SMB, DSM, SCP, SAP Data Custodian, "
+            "Supports AWS, Azure, GCP, OCI, Salesforce, Akeyless, Hadoop, Luna HSM, SMB, SCP, SAP Data Custodian, "
             "Log Forwarder (Elasticsearch, Loki, Syslog), Confidential Computing, External CM, LDAP, OIDC, and CM connections. "
             "Also supports specialized operations for Luna HSM servers and STC partitions, Hadoop nodes, External CM nodes and trusted CAs, "
             "and CSR generation. Each cloud provider has specific operations and parameters - see action_requirements in schema for details. "
             "IMPORTANT: Some connections require file paths for certificates, keys, or configuration files. "
             "File-requiring parameters include: GCP (key_file), AWS (iamroleanywhere), Azure (certificate_file, server_cert_file), "
             "Salesforce (certificate_file, tls_client_cert_with_private_key_file), Luna HSM (certificate_file, partitions_json_file), "
-            "Hadoop (keytab_file, nodes_json_file), SCP (private_key_file), DSM (certificate_file, nodes_json_file), "
+            "Hadoop (keytab_file, nodes_json_file), SCP (private_key_file), "
             "External CM (certificate_file, nodes_json_file), LDAP (certificate_file, root_ca_files), CM (certificate_file, client_cert_file), "
             "and all log forwarders (certificate_file). These parameters are clearly marked with 'REQUIRES FILE PATH' in their descriptions."
         )
