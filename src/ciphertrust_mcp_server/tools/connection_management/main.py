@@ -12,7 +12,6 @@ from .akeyless_operations import AkeylessOperations
 from .hadoop_operations import HadoopOperations
 from .luna_hsm_operations import LunaHSMOperations
 from .smb_operations import SMBOperations
-from .dsm_operations import DSMOperations
 from .scp_operations import SCPOperations
 from .sap_dc_operations import SAPDCOperations
 from .log_forwarder_operations import LogForwarderOperations
@@ -21,7 +20,6 @@ from .external_cm_operations import ExternalCMOperations
 from .ldap_operations import LDAPOperations
 from .oidc_operations import OIDCOperations
 from .cm_operations import CMOperations
-# New specialized operations
 from .elasticsearch_log_forwarder_operations import ElasticsearchLogForwarderOperations
 from .loki_log_forwarder_operations import LokiLogForwarderOperations
 from .syslog_log_forwarder_operations import SyslogLogForwarderOperations
