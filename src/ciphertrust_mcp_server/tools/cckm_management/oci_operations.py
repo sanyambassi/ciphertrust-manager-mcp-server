@@ -2,11 +2,17 @@
 
 from typing import Any, Dict, List
 from .base import CCKMOperations
-from .constants import OCI_PARAMETERS, CLOUD_OPERATIONS
+from .constants import CLOUD_OPERATIONS
+from .oci import (
+    get_key_operations, build_key_command,
+    get_vault_operations, build_vault_command,
+    get_compartment_operations, build_compartment_command,
+    OCISmartIDResolver
+)
 
 
 class OCIOperations(CCKMOperations):
-    """OCI key operations for CCKM."""
+    """Handles OCI operations for CCKM by building and executing ksctl commands."""
     
     def get_operations(self) -> List[str]:
         """Return list of supported OCI operations."""
@@ -14,125 +20,87 @@ class OCIOperations(CCKMOperations):
     
     def get_schema_properties(self) -> Dict[str, Any]:
         """Return schema properties for OCI operations."""
+        key_ops = get_key_operations()
+        vault_ops = get_vault_operations()
+        compartment_ops = get_compartment_operations()
+        
         return {
-            "oci_params": {
-                "type": "object",
-                "properties": OCI_PARAMETERS,
-                "description": "OCI-specific parameters"
-            }
+            **key_ops.get("schema_properties", {}),
+            **vault_ops.get("schema_properties", {}),
+            **compartment_ops.get("schema_properties", {}),
         }
-    
+
     def get_action_requirements(self) -> Dict[str, Dict[str, Any]]:
         """Return action-specific parameter requirements for OCI."""
         return {
-            "list": {
-                "required": [],
-                "optional": ["compartment_id", "vault_id", "limit", "skip", "domain", "auth_domain"]
-            },
-            "get": {
-                "required": ["id"],
-                "optional": ["domain", "auth_domain"]
-            },
-            "create": {
-                "required": ["alias", "compartment_id", "vault_id"],
-                "optional": ["key_shape", "protection_mode", "algorithm", "domain", "auth_domain"]
-            },
-            "update": {
-                "required": ["id"],
-                "optional": ["alias", "description", "enabled", "tags", "domain", "auth_domain"]
-            },
-            "delete": {
-                "required": ["id"],
-                "optional": ["domain", "auth_domain"]
-            },
-            "enable": {
-                "required": ["id"],
-                "optional": ["domain", "auth_domain"]
-            },
-            "disable": {
-                "required": ["id"],
-                "optional": ["domain", "auth_domain"]
-            },
-            "rotate": {
-                "required": ["id"],
-                "optional": ["domain", "auth_domain"]
-            },
-            "backup": {
-                "required": ["id"],
-                "optional": ["domain", "auth_domain"]
-            },
-            "restore": {
-                "required": ["backup_data"],
-                "optional": ["domain", "auth_domain"]
-            }
+            **get_key_operations()["action_requirements"],
+            **get_vault_operations()["action_requirements"],
+            **get_compartment_operations()["action_requirements"],
         }
-    
+
     async def execute_operation(self, action: str, params: Dict[str, Any]) -> Any:
         """Execute OCI operation."""
-        oci_params = params.get("oci_params", {})
+        # Start with generic oci_params
+        oci_params = params.get("oci_params", {}).copy()
         
-        # Build base command
-        cmd = ["cckm", "oci", "keys"]
+        # Merge service-specific params into oci_params
+        service_specific_keys = [
+            "oci_keys_params",
+            "oci_vaults_params",
+            "oci_compartments_params"
+        ]
         
-        # Add action-specific command
-        if action == "list":
-            cmd.append("list")
-            if oci_params.get("compartment_id"):
-                cmd.extend(["--compartment-id", oci_params["compartment_id"]])
-            if oci_params.get("vault_id"):
-                cmd.extend(["--vault-id", oci_params["vault_id"]])
-            if oci_params.get("limit"):
-                cmd.extend(["--limit", str(oci_params["limit"])])
-            if oci_params.get("skip"):
-                cmd.extend(["--skip", str(oci_params["skip"])])
-                
-        elif action == "get":
-            cmd.extend(["get", "--id", oci_params["id"]])
-            
-        elif action == "create":
-            cmd.extend(["create", 
-                       "--alias", oci_params["alias"],
-                       "--compartment-id", oci_params["compartment_id"],
-                       "--vault-id", oci_params["vault_id"]])
-            if oci_params.get("key_shape"):
-                cmd.extend(["--key-shape", str(oci_params["key_shape"])])
-            if oci_params.get("protection_mode"):
-                cmd.extend(["--protection-mode", oci_params["protection_mode"]])
-            if oci_params.get("algorithm"):
-                cmd.extend(["--algorithm", oci_params["algorithm"]])
-                
-        elif action == "update":
-            cmd.extend(["update", "--id", oci_params["id"]])
-            if oci_params.get("alias"):
-                cmd.extend(["--alias", oci_params["alias"]])
-            if oci_params.get("description"):
-                cmd.extend(["--description", oci_params["description"]])
-            if oci_params.get("enabled") is not None:
-                cmd.extend(["--enabled", "yes" if oci_params["enabled"] else "no"])
-            if oci_params.get("tags"):
-                cmd.extend(["--tags", str(oci_params["tags"])])
-                
-        elif action == "delete":
-            cmd.extend(["delete", "--id", oci_params["id"]])
-            
-        elif action == "enable":
-            cmd.extend(["enable", "--id", oci_params["id"]])
-            
-        elif action == "disable":
-            cmd.extend(["disable", "--id", oci_params["id"]])
-            
-        elif action == "rotate":
-            cmd.extend(["rotate", "--id", oci_params["id"]])
-            
-        elif action == "backup":
-            cmd.extend(["backup", "--id", oci_params["id"]])
-            
-        elif action == "restore":
-            cmd.extend(["restore", "--backup-data", oci_params["backup_data"]])
-            
+        for service_key in service_specific_keys:
+            if service_key in params:
+                oci_params.update(params[service_key])
+        
+        # Create smart resolver for ID resolution
+        smart_resolver = OCISmartIDResolver(self)
+        
+        # Check if this operation needs ID resolution
+        if self._needs_id_resolution(action, oci_params):
+            await self._resolve_ids(action, oci_params, smart_resolver, params.get("cloud_provider", "oci"))
+        
+        # Route to appropriate command builder based on operation type
+        if action.startswith("keys_"):
+            cmd = build_key_command(action, oci_params)
+        elif action.startswith("vaults_"):
+            cmd = build_vault_command(action, oci_params)
+        elif action.startswith("compartments_"):
+            cmd = build_compartment_command(action, oci_params)
         else:
             raise ValueError(f"Unsupported OCI action: {action}")
         
         # Execute command
+        # Pass domain parameters to execute_command
         result = self.execute_command(cmd, params.get("domain"), params.get("auth_domain"))
-        return result.get("data", result.get("stdout", "")) 
+        return result
+    
+    def _needs_id_resolution(self, action: str, oci_params: Dict[str, Any]) -> bool:
+        """Check if this operation needs ID resolution."""
+        id_operations = [
+            "keys_get", "keys_delete", "keys_enable", "keys_disable", "keys_refresh", 
+            "keys_restore", "keys_schedule_deletion", "keys_cancel_deletion", 
+            "keys_change_compartment", "keys_enable_auto_rotation", "keys_disable_auto_rotation", 
+            "keys_delete_backup", "keys_add_version", "keys_get_version", "keys_list_version",
+            "keys_schedule_deletion_version", "keys_cancel_schedule_deletion_version",
+            "vaults_get", "compartments_get", "compartments_delete"
+        ]
+        
+        return action in id_operations and "id" in oci_params
+    
+    async def _resolve_ids(self, action: str, oci_params: Dict[str, Any], smart_resolver: OCISmartIDResolver, cloud_provider: str):
+        """Resolve IDs in the parameters."""
+        if "id" in oci_params:
+            original_id = oci_params["id"]
+            
+            if action.startswith("keys_"):
+                resolved_id = await smart_resolver.resolve_key_id(original_id, oci_params, cloud_provider)
+            elif action.startswith("vaults_"):
+                resolved_id = await smart_resolver.resolve_vault_id(original_id, oci_params, cloud_provider)
+            elif action.startswith("compartments_"):
+                resolved_id = await smart_resolver.resolve_compartment_id(original_id, oci_params, cloud_provider)
+            else:
+                resolved_id = original_id
+            
+            oci_params["id"] = resolved_id 

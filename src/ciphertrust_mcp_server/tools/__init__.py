@@ -48,6 +48,9 @@ from .crypto import CRYPTO_TOOLS
 # Import unified CTE management tool
 from .cte_management import CTE_TOOLS
 
+# Import scheduler management tools
+from .scheduler_management import SCHEDULER_TOOLS
+
 # Import cluster management tools
 from .cluster_management import CLUSTER_MANAGEMENT_TOOLS
 from .clientmgmt import CLIENTMGMT_TOOLS
@@ -102,6 +105,9 @@ ALL_TOOLS_UNSORTED: list[Type[BaseTool]] = [
 
     # CTE (CipherTrust Transparent Encryption) management
     *CTE_TOOLS,               # Unified modular CTE management
+
+    # Scheduler management
+    *SCHEDULER_TOOLS,         # Scheduler configuration and job management
 
     # Additional management tools
     *CLUSTER_MANAGEMENT_TOOLS,    # Cluster management
