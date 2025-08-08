@@ -5,9 +5,103 @@ including creating, listing, getting, deleting, and modifying scheduler configur
 as well as managing scheduler job runs.
 """
 
-from typing import Any, Optional
+from typing import Any, Optional, Dict
 from pydantic import BaseModel, Field
 from .base import BaseTool
+import re
+
+
+def validate_scheduler_job_type(job_type: str) -> None:
+    """Validate scheduler job type."""
+    valid_job_types = [
+        "key-rotation", "cckm-synchronization", "backup", "cckm-key-rotation", 
+        "cckm-xks-credential-rotation", "sync-crl", "user-password-expiry-notification", 
+        "cckm-add-containers", "cckm-key-backup"
+    ]
+    if job_type not in valid_job_types:
+        raise ValueError(f"Invalid job_type '{job_type}'. "
+                        f"Valid values: {', '.join(valid_job_types)}")
+
+
+def validate_scheduler_params(params: Dict[str, Any], job_type: str) -> None:
+    """Validate parameters for scheduler operations."""
+    # Validate job type
+    validate_scheduler_job_type(job_type)
+    
+    # Validate required parameters based on job type
+    if job_type == "cckm-synchronization":
+        required_params = ["cloud_name"]
+        missing_params = []
+        
+        for param in required_params:
+            if param not in params or params[param] is None:
+                missing_params.append(param)
+        
+        if missing_params:
+            raise ValueError(f"Missing required parameters for cckm-synchronization: {', '.join(missing_params)}. "
+                            f"Required parameters: {', '.join(required_params)}")
+        
+        # Validate cloud_name
+        valid_clouds = ["aws", "hsm-luna", "dsm", "oci", "sfdc", "gcp", "sap", "AzureCloud"]
+        if params.get("cloud_name") not in valid_clouds:
+            raise ValueError(f"Invalid cloud_name '{params.get('cloud_name')}'. "
+                            f"Valid values: {', '.join(valid_clouds)}")
+    
+    elif job_type == "cckm-add-containers":
+        required_params = ["cloud_name", "connection_id"]
+        missing_params = []
+        
+        for param in required_params:
+            if param not in params or params[param] is None:
+                missing_params.append(param)
+        
+        if missing_params:
+            raise ValueError(f"Missing required parameters for cckm-add-containers: {', '.join(missing_params)}. "
+                            f"Required parameters: {', '.join(required_params)}")
+    
+    elif job_type == "key-rotation":
+        # key-rotation doesn't have specific required parameters beyond the basic ones
+        pass
+    
+    elif job_type == "backup":
+        required_params = ["backup_type"]
+        missing_params = []
+        
+        for param in required_params:
+            if param not in params or params[param] is None:
+                missing_params.append(param)
+        
+        if missing_params:
+            raise ValueError(f"Missing required parameters for backup: {', '.join(missing_params)}. "
+                            f"Required parameters: {', '.join(required_params)}")
+        
+        # Validate backup_type
+        valid_backup_types = ["database", "scp"]
+        if params.get("backup_type") not in valid_backup_types:
+            raise ValueError(f"Invalid backup_type '{params.get('backup_type')}'. "
+                            f"Valid values: {', '.join(valid_backup_types)}")
+
+
+def validate_cron_expression(cron_expr: str) -> None:
+    """Validate cron expression format."""
+    if not cron_expr or not isinstance(cron_expr, str):
+        raise ValueError("Cron expression must be a non-empty string")
+    
+    # Basic cron validation (5 fields: minute hour day month weekday)
+    parts = cron_expr.split()
+    if len(parts) != 5:
+        raise ValueError(f"Invalid cron expression '{cron_expr}'. "
+                        f"Expected 5 fields (minute hour day month weekday), got {len(parts)}")
+    
+    # Validate each field
+    for i, part in enumerate(parts):
+        if not part or part == "":
+            raise ValueError(f"Empty field in cron expression at position {i+1}")
+        
+        # Basic validation - allow common cron patterns
+        if not re.match(r'^(\*|[0-9,\-*/]+)$', part):
+            raise ValueError(f"Invalid cron field '{part}' at position {i+1}. "
+                            f"Expected format: number, range, list, or *")
 
 
 # Scheduler Config Parameter Models
@@ -46,6 +140,15 @@ class SchedulerConfigCreateParams(BaseModel):
     synchronize_all: Optional[bool] = Field(None, description="Synchronize all keys from all vaults/KMS")
     take_cloud_key_backup: Optional[bool] = Field(None, description="Take cloud key backup during Azure synchronization")
     
+    # CCKM add-containers specific parameters
+    connection_id: Optional[str] = Field(None, description="Connection ID for CCKM add-containers operation")
+    discover_only: Optional[bool] = Field(None, description="Whether to just discover container details or add to CCKM as well")
+    enable_success_audit_event: Optional[bool] = Field(None, description="Enable or disable audit recording of successful operations")
+    aws_filter: Optional[str] = Field(None, description="Filter to be applied on discovered AWS accounts before adding to CCKM")
+    aws_regions: Optional[str] = Field(None, description="AWS regions to be added to CCKM (comma-separated)")
+    aws_role: Optional[str] = Field(None, description="AWS role to be assumed")
+    aws_role_external_id: Optional[str] = Field(None, description="AWS role external ID")
+    
     # Backup specific parameters
     backup_type: Optional[str] = Field(None, description="Type of backup (database, scp)")
     backup_key: Optional[str] = Field(None, description="Backup encryption key ID")
@@ -76,22 +179,24 @@ class SchedulerConfigListParams(BaseModel):
 
 class SchedulerConfigGetParams(BaseModel):
     """Parameters for getting a scheduler configuration."""
-    id: str = Field(..., description="ID of the scheduler configuration")
-    domain: Optional[str] = Field(None, description="Domain to operate in")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain")
+    id: str = Field(..., description="ID of the scheduler configuration to get.")
+    # Domain support
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SchedulerConfigDeleteParams(BaseModel):
     """Parameters for deleting a scheduler configuration."""
-    id: str = Field(..., description="ID of the scheduler configuration")
-    domain: Optional[str] = Field(None, description="Domain to operate in")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain")
+    id: str = Field(..., description="ID of the scheduler configuration to delete.")
+    # Domain support
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SchedulerConfigModifyParams(BaseModel):
     """Parameters for modifying a scheduler configuration."""
     id: str = Field(..., description="ID of the scheduler configuration")
-    job_type: str = Field(..., description="Type of scheduler job being modified")
+    job_type: Optional[str] = Field(None, description="Type of scheduler job being modified")
     run_at: Optional[str] = Field(None, description="New cron expression")
     description: Optional[str] = Field(None, description="New description")
     disabled: Optional[bool] = Field(None, description="New disabled status")
@@ -107,7 +212,22 @@ class SchedulerConfigModifyParams(BaseModel):
     # CCKM synchronization modification parameters
     cloud_name: Optional[str] = Field(None, description="New cloud provider")
     kms: Optional[str] = Field(None, description="New KMS resources")
+    key_vaults: Optional[str] = Field(None, description="New Azure key vaults")
+    key_rings: Optional[str] = Field(None, description="New GCP key rings")
+    oci_vaults: Optional[str] = Field(None, description="New OCI vaults")
+    organizations: Optional[str] = Field(None, description="New Salesforce organizations")
+    domains: Optional[str] = Field(None, description="New DSM domains")
+    partitions: Optional[str] = Field(None, description="New HSM partitions")
+    groups: Optional[str] = Field(None, description="New SAP groups")
+    sync_item: Optional[str] = Field(None, description="New Azure sync items")
     synchronize_all: Optional[bool] = Field(None, description="Synchronize all keys from all vaults/KMS")
+    connection_id: Optional[str] = Field(None, description="Connection ID for CCKM add-containers operation")
+    discover_only: Optional[bool] = Field(None, description="Whether to just discover container details or add to CCKM as well")
+    enable_success_audit_event: Optional[bool] = Field(None, description="Enable or disable audit recording of successful operations")
+    aws_filter: Optional[str] = Field(None, description="Filter to be applied on discovered AWS accounts before adding to CCKM")
+    aws_regions: Optional[str] = Field(None, description="AWS regions to be added to CCKM (comma-separated)")
+    aws_role: Optional[str] = Field(None, description="AWS role to be assumed")
+    aws_role_external_id: Optional[str] = Field(None, description="AWS role external ID")
     
     domain: Optional[str] = Field(None, description="Domain to operate in")
     auth_domain: Optional[str] = Field(None, description="Authentication domain")
@@ -138,9 +258,10 @@ class SchedulerJobListParams(BaseModel):
 
 class SchedulerJobGetParams(BaseModel):
     """Parameters for getting a scheduler job."""
-    id: str = Field(..., description="ID of the job run")
-    domain: Optional[str] = Field(None, description="Domain to operate in")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain")
+    id: str = Field(..., description="ID of the scheduler job to get.")
+    # Domain support
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SchedulerJobDeleteParams(BaseModel):
@@ -170,7 +291,9 @@ class SchedulerManagementTool(BaseTool):
             "Supports cron expressions for flexible scheduling (e.g., '0 9 * * *' for daily at 9 AM, "
             "'0 9 * * 1' for Mondays at 9 AM). "
             "Jobs can be configured with start/end dates, run on specific cluster nodes, "
-            "and include operation-specific parameters like key queries, cloud resources, and backup settings."
+            "and include operation-specific parameters like key queries, cloud resources, and backup settings. "
+            "REQUIRED PARAMETERS: job_type, name, run_at. For cckm-synchronization: cloud_name. "
+            "For cckm-add-containers: cloud_name, connection_id. For backup: backup_type."
         )
     
     def get_schema(self) -> dict[str, Any]:
@@ -190,9 +313,9 @@ class SchedulerManagementTool(BaseTool):
                 **self.get_domain_auth_params(),
                 
                 # Scheduler config create parameters
-                "job_type": {"type": "string", "description": "Type of scheduler job"},
-                "name": {"type": "string", "description": "Name of the scheduler configuration"},
-                "run_at": {"type": "string", "description": "Cron expression (e.g., '0 9 * * *')"},
+                "job_type": {"type": "string", "description": "Type of scheduler job. REQUIRED. Valid values: key-rotation, cckm-synchronization, backup, cckm-key-rotation, cckm-xks-credential-rotation, sync-crl, user-password-expiry-notification, cckm-add-containers, cckm-key-backup"},
+                "name": {"type": "string", "description": "Name of the scheduler configuration. REQUIRED"},
+                "run_at": {"type": "string", "description": "Cron expression (e.g., '0 9 * * *'). REQUIRED. Format: minute hour day month weekday"},
                 "description": {"type": "string", "description": "Description of the scheduler configuration"},
                 "disabled": {"type": "boolean", "description": "Whether to disable the job on creation"},
                 "start_date": {"type": "string", "description": "Start date/time for activation"},
@@ -210,7 +333,7 @@ class SchedulerManagementTool(BaseTool):
                 "offset": {"type": "integer", "description": "Offset time for replacement key"},
                 
                 # CCKM synchronization parameters
-                "cloud_name": {"type": "string", "description": "Cloud provider"},
+                "cloud_name": {"type": "string", "description": "Cloud provider. REQUIRED for cckm-synchronization and cckm-add-containers. Valid values: aws, hsm-luna, dsm, oci, sfdc, gcp, sap, AzureCloud"},
                 "kms": {"type": "string", "description": "KMS resource IDs/names"},
                 "key_vaults": {"type": "string", "description": "Azure vault IDs/names"},
                 "key_rings": {"type": "string", "description": "Google key ring IDs/names"},
@@ -222,9 +345,16 @@ class SchedulerManagementTool(BaseTool):
                 "sync_item": {"type": "string", "description": "Azure sync items"},
                 "synchronize_all": {"type": "boolean", "description": "Synchronize all keys"},
                 "take_cloud_key_backup": {"type": "boolean", "description": "Take cloud key backup"},
+                "connection_id": {"type": "string", "description": "Connection ID for CCKM add-containers operation. REQUIRED for cckm-add-containers"},
+                "discover_only": {"type": "boolean", "description": "Whether to just discover container details or add to CCKM as well"},
+                "enable_success_audit_event": {"type": "boolean", "description": "Enable or disable audit recording of successful operations"},
+                "aws_filter": {"type": "string", "description": "Filter to be applied on discovered AWS accounts before adding to CCKM"},
+                "aws_regions": {"type": "string", "description": "AWS regions to be added to CCKM (comma-separated)"},
+                "aws_role": {"type": "string", "description": "AWS role to be assumed"},
+                "aws_role_external_id": {"type": "string", "description": "AWS role external ID"},
                 
                 # Backup parameters
-                "backup_type": {"type": "string", "description": "Backup type"},
+                "backup_type": {"type": "string", "description": "Backup type. REQUIRED for backup job type. Valid values: database, scp"},
                 "backup_key": {"type": "string", "description": "Backup encryption key"},
                 "backup_location": {"type": "string", "description": "Backup location"},
                 
@@ -275,6 +405,13 @@ class SchedulerManagementTool(BaseTool):
     
     async def _create_config(self, params: SchedulerConfigCreateParams) -> Any:
         """Create a scheduler configuration."""
+        # Validate parameters before creating the command
+        try:
+            validate_cron_expression(params.run_at)
+            validate_scheduler_params(params.dict(), params.job_type)
+        except ValueError as e:
+            return {"error": f"Scheduler validation failed: {str(e)}"}
+        
         cmd = ["scheduler", "configs", "create", params.job_type]
         
         # Required parameters
@@ -341,6 +478,24 @@ class SchedulerManagementTool(BaseTool):
             if params.take_cloud_key_backup is not None:
                 cmd.append("--take-cloud-key-backup" if params.take_cloud_key_backup else "--take-cloud-key-backup=false")
         
+        elif params.job_type == "cckm-add-containers":
+            if params.cloud_name:
+                cmd.extend(["--cloud_name", params.cloud_name])
+            if params.connection_id:
+                cmd.extend(["--conn", params.connection_id])
+            if params.discover_only is not None:
+                cmd.append("--discover-only" if params.discover_only else "--discover-only=false")
+            if params.enable_success_audit_event is not None:
+                cmd.append("--enable-success-audit-event" if params.enable_success_audit_event else "--enable-success-audit-event=false")
+            if params.aws_filter:
+                cmd.extend(["--aws-filter", params.aws_filter])
+            if params.aws_regions:
+                cmd.extend(["--aws-regions", params.aws_regions])
+            if params.aws_role:
+                cmd.extend(["--aws-role", params.aws_role])
+            if params.aws_role_external_id:
+                cmd.extend(["--aws-role-external-id", params.aws_role_external_id])
+        
         elif params.job_type == "backup":
             if params.backup_type:
                 cmd.extend(["--backup-type", params.backup_type])
@@ -398,7 +553,18 @@ class SchedulerManagementTool(BaseTool):
     
     async def _modify_config(self, params: SchedulerConfigModifyParams) -> Any:
         """Modify a scheduler configuration."""
-        cmd = ["scheduler", "configs", "modify", params.job_type, "--id", params.id]
+        # Get job_type if not provided
+        job_type = params.job_type
+        if not job_type:
+            # Get current config to extract job_type
+            get_params = SchedulerConfigGetParams(id=params.id, domain=params.domain, auth_domain=params.auth_domain)
+            current_config = await self._get_config(get_params)
+            if isinstance(current_config, dict):
+                job_type = current_config.get("operation", "").replace("_", "-")
+            if not job_type:
+                raise ValueError("Could not determine job type for scheduler configuration")
+        
+        cmd = ["scheduler", "configs", "modify", job_type, "--id", params.id]
         
         # Common modifiable parameters
         if params.run_at:
@@ -415,7 +581,7 @@ class SchedulerManagementTool(BaseTool):
             cmd.extend(["--run-on", params.run_on])
         
         # Job type specific parameters
-        if params.job_type == "key-rotation":
+        if job_type == "key-rotation":
             if params.key_query_json:
                 cmd.extend(["--key-query-json", params.key_query_json])
             if params.metadata_json:
@@ -423,13 +589,44 @@ class SchedulerManagementTool(BaseTool):
             if params.deactivate_replaced_key is not None:
                 cmd.extend(["--deactivate-replaced-key", str(params.deactivate_replaced_key)])
         
-        elif params.job_type == "cckm-synchronization":
-            if params.cloud_name:
-                cmd.extend(["--cloud_name", params.cloud_name])
+        elif job_type == "cckm-synchronization":
+            # Note: Based on help output, --cloud_name is NOT available in modify, only in create
             if params.kms:
                 cmd.extend(["--kms", params.kms])
+            if params.key_vaults:
+                cmd.extend(["--key_vaults", params.key_vaults])
+            if params.key_rings:
+                cmd.extend(["--key_rings", params.key_rings])
+            if params.oci_vaults:
+                cmd.extend(["--oci_vaults", params.oci_vaults])
+            if params.organizations:
+                cmd.extend(["--organizations", params.organizations])
+            if params.domains:
+                cmd.extend(["--domains", params.domains])
+            if params.partitions:
+                cmd.extend(["--partitions", params.partitions])
+            if params.groups:
+                cmd.extend(["--groups", params.groups])
+            if params.sync_item:
+                cmd.extend(["--sync_item", params.sync_item])
             if params.synchronize_all is not None:
-                cmd.append("--synchronize-all" if params.synchronize_all else "--synchronize-all=false")
+                cmd.append("--synchronize_all" if params.synchronize_all else "--synchronize_all=false")
+        
+        elif job_type == "cckm-add-containers":
+            if params.connection_id:
+                cmd.extend(["--conn", params.connection_id])
+            if params.discover_only is not None:
+                cmd.append("--discover-only" if params.discover_only else "--discover-only=false")
+            if params.enable_success_audit_event is not None:
+                cmd.append("--enable-success-audit-event" if params.enable_success_audit_event else "--enable-success-audit-event=false")
+            if params.aws_filter:
+                cmd.extend(["--aws-filter", params.aws_filter])
+            if params.aws_regions:
+                cmd.extend(["--aws-regions", params.aws_regions])
+            if params.aws_role:
+                cmd.extend(["--aws-role", params.aws_role])
+            if params.aws_role_external_id:
+                cmd.extend(["--aws-role-external-id", params.aws_role_external_id])
         
         result = self.execute_with_domain(cmd, params.domain, params.auth_domain)
         return result.get("data", result.get("stdout", ""))

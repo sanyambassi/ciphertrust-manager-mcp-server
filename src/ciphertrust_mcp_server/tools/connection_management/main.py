@@ -233,13 +233,21 @@ class ConnectionManagementTool(BaseTool):
         requirements = schema.get("action_requirements", {}).get(action, {})
         required_params = requirements.get("required", [])
         
+        # Get cloud provider and params
+        cloud_provider = action.split("_")[0]
+        cloud_params_key = f"{cloud_provider}_params"
+        cloud_params = params.get(cloud_params_key, {})
+        
+        # Special handling for JSON file approach
+        if cloud_params.get("json_file"):
+            # When json_file is provided, only validate that json_file exists
+            # Individual parameters are not required as they can be in the JSON file
+            return True
+        
         # Check if all required parameters are present
         for param in required_params:
             # Check in the main params and in cloud-specific params
-            cloud_provider = action.split("_")[0]
-            cloud_params_key = f"{cloud_provider}_params"
-            
-            if param not in params and (cloud_params_key not in params or param not in params[cloud_params_key]):
+            if param not in params and param not in cloud_params:
                 return False
         
         return True 

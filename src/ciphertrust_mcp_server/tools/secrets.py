@@ -19,51 +19,44 @@ class SecretListParams(BaseModel):
     sha256_fingerprint: Optional[str] = Field(None, description="Filter by SHA256 fingerprint (supports wildcards)")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to list secrets from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SecretCreateParams(BaseModel):
     """Parameters for creating a secret."""
-    name: Optional[str] = Field(None, description="Secret name, ID or URI")
-    autoname: bool = Field(False, description="Generate automatic name for secret")
-    data_type: str = Field("blob", description="Secret data type (blob, password, or seed)")
-    material: Optional[str] = Field(None, description="Secret material data (encoding depends on data type)")
-    id_size: Optional[int] = Field(None, description="Size of ID for the managed object")
-    include_material: bool = Field(False, description="Include secret bytes in the response")
-    jsonfile: Optional[str] = Field(None, description="JSON file with secret parameters")
-    nodelete: bool = Field(False, description="Secret cannot be deleted")
-    noexport: bool = Field(False, description="Secret cannot be exported")
-    ownerid: Optional[str] = Field(None, description="The user's ID")
-    passwordconfig: Optional[str] = Field(None, description="JSON file with password config parameters")
-    ret: bool = Field(False, description="Return existing secret with same name if it exists")
+    name: str = Field(..., description="Name of the secret.")
+    description: Optional[str] = Field(None, description="Description of the secret.")
+    type: str = Field(..., description="Type of the secret. Can be 'password', 'text', or 'file'.")
+    value: Optional[str] = Field(None, description="Value of the secret.")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create secret in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SecretGetParams(BaseModel):
     """Parameters for getting a secret."""
-    name: str = Field(..., description="Secret name, ID or URI")
+    id: str = Field(..., description="ID of the secret to retrieve.")
+    file: Optional[str] = Field(None, description="File path to save the secret to.")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get secret from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SecretDeleteParams(BaseModel):
     """Parameters for deleting a secret."""
-    name: str = Field(..., description="Secret name, ID or URI")
+    id: str = Field(..., description="ID of the secret to delete.")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete secret from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SecretModifyParams(BaseModel):
     """Parameters for modifying a secret."""
-    name: str = Field(..., description="Secret name, ID or URI")
-    jsonfile: Optional[str] = Field(None, description="JSON file with secret modification parameters")
+    id: str = Field(..., description="ID of the secret to update.")
+    name: Optional[str] = Field(None, description="New name for the secret.")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify secret in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 # Advanced Parameter Models
@@ -72,7 +65,7 @@ class SecretExportParams(BaseModel):
     name: str = Field(..., description="Secret name, ID or URI")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to export secret from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SecretDestroyParams(BaseModel):
@@ -80,7 +73,7 @@ class SecretDestroyParams(BaseModel):
     name: str = Field(..., description="Secret name, ID or URI")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to destroy secret in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SecretVersionParams(BaseModel):
@@ -91,7 +84,7 @@ class SecretVersionParams(BaseModel):
     include_material: bool = Field(False, description="Include secret bytes in the response")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to version secret in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SecretListVersionParams(BaseModel):
@@ -104,7 +97,7 @@ class SecretListVersionParams(BaseModel):
     secretstate: Optional[str] = Field(None, description="Filter by state (Pre-Active, Active, Deactivated, etc.)")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to list versions from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
 class SecretsManagementTool(BaseTool):

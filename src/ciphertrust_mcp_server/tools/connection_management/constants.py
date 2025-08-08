@@ -4,11 +4,11 @@
 COMMON_SCHEMA_PROPERTIES = {
     "domain": {
         "type": "string",
-        "description": "Domain for the operation"
+        "description": "The CipherTrust Manager domain where the action, operation, or execution will be performed. This specifies the target environment for the command."
     },
     "auth_domain": {
         "type": "string", 
-        "description": "Authentication domain for the operation"
+        "description": "The CipherTrust Manager domain where the user is created and authenticated. Unless explicitly specified, this defaults to 'root'. This is used for access control and does not affect the command's execution target."
     }
 }
 
@@ -74,10 +74,11 @@ OCI_PARAMETERS = {
     **COMMON_CONNECTION_PARAMETERS,
     "tenancy_ocid": {"type": "string", "description": "OCI tenancy OCID"},
     "user_ocid": {"type": "string", "description": "OCI user OCID"},
-    "fingerprint": {"type": "string", "description": "OCI fingerprint"},
-    "private_key": {"type": "string", "description": "OCI private key"},
-    "region": {"type": "string", "description": "OCI region"},
-    "conn_creds": {"type": "string", "description": "OCI connection credentials (REQUIRES FILE PATH - provide path to credentials file)"}
+    "fingerprint": {"type": "string", "description": "OCI fingerprint (supports both colon-separated format like '00:30:31:52:64:84:f0:7f:cb:d0:55:29:93:b7:e5:54' and continuous format like '003031526484f07fcbd0552993b7e554')"},
+    "oci_region": {"type": "string", "description": "OCI region"},
+    "conn_creds": {"type": "string", "description": "OCI connection credentials file path (REQUIRES FILE PATH - provide path to JSON file with key_file content and optional pass_phrase). This is the primary method for OCI connections."},
+    "key_file": {"type": "string", "description": "OCI private key input (can be file path or pasted PEM content). The tool will automatically create a temporary conn_creds JSON file. Alternative to conn_creds for direct key specification."},
+    "pass_phrase": {"type": "string", "description": "Pass phrase for the OCI private key (optional, only used when key_file is specified)"}
 }
 
 # Salesforce connection parameters

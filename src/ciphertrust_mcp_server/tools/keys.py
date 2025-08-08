@@ -82,7 +82,7 @@ class KeyCreateParams(BaseModel):
     cte_permissions_groups: Optional[str] = Field(None, description="Comma-separated groups for permissions (default: 'CTE Clients')")
     cte_encryption_mode: Optional[str] = Field(None, description="CTE encryption mode: CBC, CBC_CS1, or XTS (default: CBC)")
     
-    # ===== NEWLY ADDED PARAMETERS =====
+    # Additional parameters
     
     # Critical missing parameters
     ret: bool = Field(False, description="Return existing key with same name if it exists")
@@ -593,7 +593,7 @@ class KeyCreateTool(BaseTool):
         if params.rotation_frequency_days:
             args.extend(["--rotation-frequency-days", params.rotation_frequency_days])
         
-        # ===== NEW PARAMETERS =====
+        # Additional parameters
         
         # Critical missing parameters
         if params.ret:
@@ -1283,7 +1283,7 @@ class KeyManagementTool(BaseTool):
                 # Modify parameters
                 "remove_labels": {"type": "string"},
                 
-                # ===== NEW PARAMETERS =====
+                # Additional parameters
                 
                 # Critical missing parameters
                 "ret": {"type": "boolean", "default": False, "description": "Return existing key with same name if it exists"},

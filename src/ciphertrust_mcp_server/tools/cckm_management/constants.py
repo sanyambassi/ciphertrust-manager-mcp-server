@@ -12,11 +12,11 @@ COMMON_SCHEMA_PROPERTIES = {
     },
     "domain": {
         "type": "string",
-        "description": "Domain for the operation"
+        "description": "The CipherTrust Manager domain where the action, operation, or execution will be performed. This specifies the target environment for the command."
     },
     "auth_domain": {
         "type": "string", 
-        "description": "Authentication domain for the operation"
+        "description": "The CipherTrust Manager domain where the user is created and authenticated. Unless explicitly specified, this defaults to 'root'. This is used for access control and does not affect the command's execution target."
     }
 }
 
@@ -354,7 +354,7 @@ CLOUD_OPERATIONS = {
         "kms_list", "kms_get", "kms_add", "kms_update", "kms_delete", "kms_archive", "kms_recover", 
         "kms_get_account", "kms_get_all_regions", "kms_update_acls",
         # Reports operations
-        "reports_list", "reports_get", "reports_generate", "reports_download", "reports_delete", "reports_get_reports",
+        "reports_list", "reports_get", "reports_get_report", "reports_generate", "reports_download", "reports_delete", "reports_get_reports",
         # Bulk job operations
         "bulkjob_list", "bulkjob_get", "bulkjob_create", "bulkjob_cancel",
         # Log groups operations
@@ -387,15 +387,18 @@ CLOUD_OPERATIONS = {
     ],
     "google": [
         # Key operations
-        "keys_list", "keys_get", "keys_create", "keys_update", "keys_delete", "keys_enable", "keys_disable", "keys_rotate", "keys_destroy", "keys_restore",
+        "keys_list", "keys_get", "keys_create", "keys_update", "keys_enable", "keys_disable", "keys_rotate", "keys_restore",
         "keys_add_version", "keys_cancel_schedule_destroy", "keys_disable_auto_rotation", "keys_disable_version", "keys_download_metadata", 
         "keys_download_public_key", "keys_enable_auto_rotation", "keys_enable_version", "keys_get_update_all_versions_status", 
-        "keys_get_version", "keys_list_version", "keys_policy", "keys_re_import", "keys_refresh", "keys_refresh_version", "keys_schedule_destroy", 
-        "keys_upload_key", "keys_update_all_versions_jobs",
+        "keys_get_version", "keys_list_version", "keys_policy", "keys_policy_get", "keys_policy_update", "keys_policy_get_iam_roles",
+        "keys_re_import", "keys_refresh", "keys_refresh_version", "keys_schedule_destroy", 
+        "keys_upload", "keys_update_all_versions_jobs",
+        "keys_synchronize", "keys_synchronize_version",
         # Key synchronization operations
         "keys_sync_jobs_start", "keys_sync_jobs_get", "keys_sync_jobs_status", "keys_sync_jobs_cancel",
         # Key ring operations
-        "keyrings_list", "keyrings_get", "keyrings_create", "keyrings_delete", "keyrings_update_acls",
+        "keyrings_list", "keyrings_get", "keyrings_delete", "keyrings_update", "keyrings_update_acls",
+        "keyrings_add_key_rings", "keyrings_get_key_rings",
         # Location operations
         "locations_get_locations",
         # Project operations
@@ -407,13 +410,16 @@ CLOUD_OPERATIONS = {
         # Key operations
         "keys_list", "keys_get", "keys_create", "keys_update", "keys_delete", "keys_enable", "keys_disable", "keys_rotate", "keys_backup", "keys_restore",
         "keys_enable_auto_rotation", "keys_disable_auto_rotation", "keys_cancel_deletion", "keys_change_compartment", "keys_delete_backup",
-        "keys_get_version", "keys_refresh", "keys_schedule_deletion_version", "keys_upload_key",
+        "keys_add_version", "keys_get_version", "keys_list_version", "keys_refresh", "keys_schedule_deletion", "keys_schedule_deletion_version", 
+        "keys_cancel_schedule_deletion_version", "keys_upload", "keys_update",
+        # Key synchronization operations
+        "keys_sync_jobs_start", "keys_sync_jobs_get", "keys_sync_jobs_status", "keys_sync_jobs_cancel",
         # Compartment operations
         "compartments_list", "compartments_get", "compartments_add", "compartments_delete", "compartments_get_compartments",
-        "compartments_get_defined_tags",
+        "compartments_get_defined_tags", "compartments_add_compartments",
         # External vault operations
-        "external_vaults_list", "external_vaults_get", "external_vaults_create", "external_vaults_block_key",
-        "external_vaults_unblock_key", "external_vaults_block_vault", "external_vaults_unblock_vault",
+        "external_vaults_create", "external_vaults_block_key", "external_vaults_unblock_key", 
+        "external_vaults_block_vault", "external_vaults_unblock_vault",
         # Issuer operations
         "issuers_list", "issuers_get", "issuers_create", "issuers_update", "issuers_delete",
         # Region operations
@@ -423,7 +429,8 @@ CLOUD_OPERATIONS = {
         # Tenancy operations
         "tenancy_list", "tenancy_get", "tenancy_add", "tenancy_delete",
         # Vault operations
-        "vaults_list", "vaults_get", "vaults_add", "vaults_update", "vaults_delete", "vaults_get_vaults", "vaults_update_acls"
+        "vaults_list", "vaults_get", "vaults_add", "vaults_update", "vaults_delete", "vaults_get_vaults", "vaults_update_acls",
+        "vaults_add_vaults"
     ],
     "microsoft": [
         # Key operations

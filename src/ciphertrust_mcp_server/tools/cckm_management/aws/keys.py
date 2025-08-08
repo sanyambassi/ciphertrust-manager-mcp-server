@@ -17,63 +17,171 @@ def get_key_operations() -> Dict[str, Any]:
                     "key_users_roles": {"type": "string"},
                     "multiregion": {"type": "boolean"},
                     "policy_template": {"type": "string"},
-                    "aws_tags_jsonfile": {"type": "string"},
-                    "aws_policy_jsonfile": {"type": "string"},
-                    "aws_keycreate_jsonfile": {"type": "string"},
-                    "aws_create_key_kms_params_jsonfile": {"type": "string"},
-                    "days": {"type": "integer"},
-                    "material": {"type": "string"},
-                    "description": {"type": "string"},
-                    "enabled": {"type": "boolean"},
-                    "tags": {"type": "string"},
-                    "key_usage": {"type": "string"},
-                    "origin": {"type": "string"},
-                    "bypass_policy_lockout_safety_check": {"type": "boolean"},
-                    "alias": {"type": "string"},
-                    "region": {"type": "string"},
-                    "id": {"type": "string"},
-                    "limit": {"type": "integer"},
-                    "skip": {"type": "integer"},
-                    "key_state": {"type": "string"},
-                    "sort": {"type": "string"},
-                    "policy_template_name": {"type": "string"},
-                    "aws_policycreate_jsonfile": {"type": "string"},
-                    "aws_policyupdate_jsonfile": {"type": "string"},
-                    "custom_key_store_id": {"type": "string"},
-                    "source_key_tier": {"type": "string"},
-                    "sourceKey_identifier": {"type": "string"},
-                    "source_key_identifier": {"type": "string"},
-                    "blocked": {"type": "string"},
-                    "linked_state": {"type": "string"},
-                    "aws_policy_jsonfile": {"type": "string"},
-                    "arn": {"type": "string", "description": "AWS key ARN for filtering"},
-                    "key_expiration": {"type": "boolean", "description": "Enable key expiration"},
-                    "valid_to": {"type": "string", "description": "Key expiration time in format 2021-04-01T01:00:15Z"},
-                    "aws_uploadkey_jsonfile": {"type": "string", "description": "AWS upload key parameters in JSON file"},
-                    "aws_key_upload_kms_params_jsonfile": {"type": "string", "description": "AWS KMS upload parameters in JSON file"},
-                    "kms_list": {"type": "string", "description": "Name or ID of KMS resources for synchronization (comma-separated)"},
-                    "regions": {"type": "string", "description": "List of AWS regions for synchronization (comma-separated)"},
-                    "synchronize_all": {"type": "boolean", "description": "Synchronize all keys from all KMS and regions"}
+                    "aws_tags_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing AWS key tags. Format: [{\"Key\": \"Environment\", \"Value\": \"Production\"}, {\"Key\": \"Project\", \"Value\": \"MyApp\"}]. Use absolute file paths for reliability."
+                    },
+                    "aws_policy_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing AWS key policy. Format: {\"Version\": \"2012-10-17\", \"Statement\": [{\"Sid\": \"Enable IAM User Permissions\", \"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"arn:aws:iam::123456789012:root\"}, \"Action\": \"kms:*\", \"Resource\": \"*\"}]}. Use absolute file paths for reliability."
+                    },
+                    "aws_keycreate_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing complete AWS key creation parameters. This file overrides individual CLI parameters. Format: {\"alias\": \"my-key\", \"region\": \"us-east-1\", \"kms\": \"my-kms\", \"customer_masterkey_spec\": \"SYMMETRIC_DEFAULT\", \"key_usage\": \"ENCRYPT_DECRYPT\"}. Use absolute file paths for reliability."
+                    },
+                    "aws_create_key_kms_params_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing AWS KMS-specific parameters for key creation. Use absolute file paths for reliability."
+                    },
+                    "aws_importmaterial_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing AWS key material import parameters. Format includes wrapping key specifications and material. Use absolute file paths for reliability."
+                    },
+                    "aws_uploadkey_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing AWS key upload parameters. Format: {\"source_key_identifier\": \"local-key-name\", \"alias\": \"uploaded-key\", \"region\": \"us-east-1\", \"kms\": \"my-kms\"}. Use absolute file paths for reliability."
+                    },
+                    "aws_key_upload_kms_params_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing AWS KMS-specific upload parameters. Use absolute file paths for reliability."
+                    },
+                    
+                    # Basic key parameters
+                    "days": {
+                        "type": "integer", 
+                        "description": "Number of days for key deletion schedule (7-30 days)"
+                    },
+                    "material": {
+                        "type": "string", 
+                        "description": "Key material for import operations"
+                    },
+                    "description": {
+                        "type": "string", 
+                        "description": "Human-readable description of the key"
+                    },
+                    "enabled": {
+                        "type": "boolean", 
+                        "description": "Whether the key is enabled for cryptographic operations"
+                    },
+                    "tags": {
+                        "type": "string", 
+                        "description": "Key tags in comma-separated format"
+                    },
+                    "key_usage": {
+                        "type": "string", 
+                        "description": "Key usage type: ENCRYPT_DECRYPT or SIGN_VERIFY"
+                    },
+                    "origin": {
+                        "type": "string", 
+                        "description": "Key origin: AWS_KMS, EXTERNAL, or AWS_CLOUDHSM"
+                    },
+                    "bypass_policy_lockout_safety_check": {
+                        "type": "boolean", 
+                        "description": "Bypass policy lockout safety check when updating key policy"
+                    },
+                    "alias": {
+                        "type": "string", 
+                        "description": "Key alias name (must start with 'alias/')"
+                    },
+                    "region": {
+                        "type": "string", 
+                        "description": "AWS region for key operations (e.g., us-east-1, eu-west-1)"
+                    },
+                    "id": {
+                        "type": "string", 
+                        "description": "AWS key ID, ARN, or alias. Smart resolution automatically converts aliases/ARNs to UUIDs. CRITICAL FOR AI ASSISTANTS: Always use this 'id' parameter for key identification operations, even when users specify key names, aliases, or ARNs - never use 'name' or 'alias' parameters."
+                    },
+                    "limit": {
+                        "type": "integer", 
+                        "description": "Maximum number of results to return (default: 10)"
+                    },
+                    "skip": {
+                        "type": "integer", 
+                        "description": "Number of results to skip for pagination (default: 0)"
+                    },
+                    "key_state": {
+                        "type": "string", 
+                        "description": "Filter by key state: Enabled, Disabled, PendingDeletion, etc."
+                    },
+                    "sort": {
+                        "type": "string", 
+                        "description": "Sort parameter for ordering results"
+                    },
+                    "policy_template_name": {
+                        "type": "string", 
+                        "description": "Name of the policy template"
+                    },
+                    "aws_policycreate_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing policy template creation parameters. Use absolute file paths for reliability."
+                    },
+                    "aws_policyupdate_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing policy template update parameters. Use absolute file paths for reliability."
+                    },
+                    "custom_key_store_id": {
+                        "type": "string", 
+                        "description": "Custom key store ID for CloudHSM or external key stores"
+                    },
+                    "source_key_tier": {
+                        "type": "string", 
+                        "description": "Source key tier: local, dsm, hsm-luna, external-cm"
+                    },
+                    "sourceKey_identifier": {
+                        "type": "string", 
+                        "description": "Source key identifier (legacy parameter name)"
+                    },
+                    "source_key_identifier": {
+                        "type": "string", 
+                        "description": "Source key identifier for upload/import operations"
+                    },
+                    "blocked": {
+                        "type": "string", 
+                        "description": "Key blocked status filter"
+                    },
+                    "linked_state": {
+                        "type": "string", 
+                        "description": "Key linked state filter"
+                    },
+                    "arn": {
+                        "type": "string", 
+                        "description": "AWS key ARN for filtering (format: arn:aws:kms:region:account:key/key-id)"
+                    },
+                    "key_expiration": {
+                        "type": "boolean", 
+                        "description": "Enable key expiration for imported key material"
+                    },
+                    "valid_to": {
+                        "type": "string", 
+                        "description": "Key expiration time in ISO format (e.g., 2021-04-01T01:00:15Z). Required when key_expiration is true."
+                    },
+                    "kms_list": {"type": "string", "description": "Name or ID of KMS resources for synchronization/refresh (comma-separated)"},
+                    "regions": {"type": "string", "description": "List of AWS regions for synchronization/refresh (comma-separated)"},
+                    "synchronize_all": {"type": "boolean", "description": "Synchronize/refresh all keys from all KMS and regions. Note: 'synchronize' and 'refresh' are equivalent terms for this operation."}
                 }
             }
         },
         "action_requirements": {
-            "keys_create": {"required": ["alias", "region", "kms"], "optional": ["customer_masterkey_spec", "description", "enabled", "tags", "key_usage", "origin", "external_accounts", "key_admins", "key_users", "key_admins_roles", "key_users_roles", "multiregion", "policy_template", "bypass_policy_lockout_safety_check", "aws_tags_jsonfile", "aws_policy_jsonfile", "aws_keycreate_jsonfile", "aws_create_key_kms_params_jsonfile"]},
+            # CRITICAL FOR AI ASSISTANTS: Parameter usage depends on operation type:
+            # - EXISTING key operations (get, delete, enable, disable, update) use 'id' parameter
+            # - NEW key operations (create, upload) use specific 'alias' or 'key_name' parameters  
+            # - Alias management uses both 'id' (existing key) and 'alias' (alias to manage)
+            "keys_create": {"required": ["alias", "region", "kms"], "optional": ["customer_masterkey_spec", "description", "enabled", "tags", "key_usage", "origin", "external_accounts", "key_admins", "key_users", "key_admins_roles", "key_users_roles", "multiregion", "policy_template", "bypass_policy_lockout_safety_check", "aws_tags_jsonfile", "aws_policy_jsonfile", "aws_keycreate_jsonfile", "aws_create_key_kms_params_jsonfile"]},  # alias: name for new key
             "keys_list": {"required": [], "optional": ["alias", "enabled", "limit", "skip", "key_state", "origin", "sort", "region", "kms", "customer_masterkey_spec", "tags", "cloud_name", "gone", "id", "job_config_id", "key_material_origin", "keyid", "kms_id", "multi_region", "multi_region_key_type", "rotation_job_enabled"]},
-            "keys_delete": {"required": ["id"], "optional": []},
-            "keys_schedule_deletion": {"required": ["id", "days"], "optional": []},
-            "keys_add_tags": {"required": ["id", "aws_tags_jsonfile"], "optional": []},
-            "keys_policy": {"required": ["id", "aws_policy_jsonfile"], "optional": []},
+            "keys_delete": {"required": ["id"], "optional": []},  # id parameter accepts key ID, ARN, or alias
+            "keys_schedule_deletion": {"required": ["id", "days"], "optional": []},  # id parameter accepts key ID, ARN, or alias
+            "keys_add_tags": {"required": ["id", "aws_tags_jsonfile"], "optional": []},  # id parameter accepts key ID, ARN, or alias
+            "keys_policy": {"required": ["id", "aws_policy_jsonfile"], "optional": []},  # id parameter accepts key ID, ARN, or alias
             "keys_import_material": {"required": ["id", "source_key_identifier"], "optional": ["source_key_tier", "key_expiration", "valid_to", "aws_importmaterial_jsonfile"]},
-            "keys_enable": {"required": ["id"], "optional": []},
-            "keys_disable": {"required": ["id"], "optional": []},
+            "keys_enable": {"required": ["id"], "optional": []},  # id parameter accepts key ID, ARN, or alias
+            "keys_disable": {"required": ["id"], "optional": []},  # id parameter accepts key ID, ARN, or alias
             "keys_add_alias": {"required": ["id", "alias"], "optional": []},
             "keys_delete_alias": {"required": ["id", "alias"], "optional": []},
             "keys_update_description": {"required": ["id", "description"], "optional": []},
-            "keys_get": {"required": ["id"], "optional": []},
+            "keys_get": {"required": ["id"], "optional": []},  # id parameter accepts key ID, ARN, or alias
             "keys_cancel_deletion": {"required": ["id"], "optional": []},
             "keys_delete_material": {"required": ["id"], "optional": []},
-            "keys_upload": {"required": ["source_key_identifier", "region", "kms"], "optional": ["alias", "description", "customer_masterkey_spec", "key_usage", "key_expiration", "valid_to", "source_key_tier", "external_accounts", "key_admins", "key_users", "key_admins_roles", "key_users_roles", "multiregion", "policy_template", "bypass_policy_lockout_safety_check", "aws_tags_jsonfile", "aws_policy_jsonfile", "aws_uploadkey_jsonfile", "aws_key_upload_kms_params_jsonfile"]},
+            "keys_upload": {"required": ["source_key_identifier", "region", "kms"], "optional": ["alias", "description", "customer_masterkey_spec", "key_usage", "key_expiration", "valid_to", "source_key_tier", "external_accounts", "key_admins", "key_users", "key_admins_roles", "key_users_roles", "multiregion", "policy_template", "bypass_policy_lockout_safety_check", "aws_tags_jsonfile", "aws_policy_jsonfile", "aws_uploadkey_jsonfile", "aws_key_upload_kms_params_jsonfile"]},  # alias: optional name for uploaded key
             "keys_download_public_key": {"required": ["id"], "optional": []},
             "keys_block": {"required": ["id"], "optional": []},
             "keys_unblock": {"required": ["id"], "optional": []},

@@ -26,7 +26,10 @@ def get_key_operations() -> Dict[str, Any]:
                     "release_policy": {"type": "string", "description": "Key release policy in JSON format"},
                     
                     # Common parameters
-                    "id": {"type": "string", "description": "Key ID"},
+                    "id": {
+                        "type": "string", 
+                        "description": "Azure key ID, name, or identifier. Smart resolution automatically handles key name to ID conversion. CRITICAL FOR AI ASSISTANTS: Always use this 'id' parameter for key identification operations, even when users specify key names - never use 'name' or 'key_name' parameters."
+                    },
                     "alias": {"type": "string", "description": "Key alias"},
                     "description": {"type": "string", "description": "Key description"},
                     "tags": {"type": "object", "description": "Key tags"},
@@ -37,9 +40,22 @@ def get_key_operations() -> Dict[str, Any]:
                     "skip": {"type": "integer", "description": "Number of results to skip"},
                     
                     # JSON file parameters
-                    "azure_keycreate_jsonfile": {"type": "string", "description": "Azure key create parameters in JSON file"},
-                    "azure_tags_jsonfile": {"type": "string", "description": "Azure tags in JSON file"},
-                    "azure_updatekey_params": {"type": "string", "description": "Azure update key parameters in JSON file"},
+                    "azure_keycreate_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing Azure key creation parameters. Format: {\"key_name\": \"my-key\", \"key_vault\": \"my-vault\", \"kty\": \"RSA\", \"key_size\": 2048, \"key_ops\": [\"encrypt\", \"decrypt\"], \"enabled\": true}. Use absolute file paths for reliability."
+                    },
+                    "azure_tags_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing Azure key tags. Format: {\"Environment\": \"Production\", \"Project\": \"MyApp\", \"Owner\": \"TeamA\"}. Use absolute file paths for reliability."
+                    },
+                    "azure_updatekey_params": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing Azure key update parameters. Format: {\"enabled\": true, \"exp\": 1735689600, \"key_ops\": [\"encrypt\", \"decrypt\"], \"tags\": {\"Updated\": \"2025-01-01\"}}. Use absolute file paths for reliability."
+                    },
+                    "azure_keyupload_jsonfile": {
+                        "type": "string", 
+                        "description": "Path to JSON file containing Azure key upload parameters. Format: {\"key_name\": \"uploaded-key\", \"key_vault\": \"my-vault\", \"source_key_identifier\": \"local-key\", \"source_key_tier\": \"local\", \"kty\": \"RSA\"}. Use absolute file paths for reliability."
+                    },
                     
                     # Backup and restore
                     "backup_data": {"type": "string", "description": "Backup data for restore operations"},
@@ -48,9 +64,9 @@ def get_key_operations() -> Dict[str, Any]:
                     
                     # Job operations
                     "job_id": {"type": "string", "description": "Job ID for sync operations"},
-                    "key_vaults": {"type": "string", "description": "Comma-separated list of vault names for sync"},
-                    "synchronize_all": {"type": "boolean", "description": "Synchronize all keys from all vaults"},
-                    "take_cloud_key_backup": {"type": "boolean", "description": "Take cloud key backup while synchronizing"},
+                    "key_vaults": {"type": "string", "description": "Comma-separated list of vault names for synchronization/refresh"},
+                    "synchronize_all": {"type": "boolean", "description": "Synchronize/refresh all keys from all vaults. Note: 'synchronize' and 'refresh' are equivalent terms for this operation."},
+                    "take_cloud_key_backup": {"type": "boolean", "description": "Take cloud key backup while synchronizing/refreshing"},
                     
                     # Metadata export
                     "file_path": {"type": "string", "description": "File path for metadata download"},
@@ -75,11 +91,14 @@ def get_key_operations() -> Dict[str, Any]:
             }
         },
         "action_requirements": {
-            "keys_list": {"required": [], "optional": ["vault_name", "limit", "skip", "key_name"]},
-            "keys_get": {"required": ["id"], "optional": []},
-            "keys_create": {"required": ["key_name", "key_vault", "kty"], "optional": ["key_size", "crv", "key_ops", "enabled", "exp", "nbf", "exportable", "release_policy", "azure_keycreate_jsonfile", "azure_tags_jsonfile"]},
-            "keys_update": {"required": ["id"], "optional": ["enabled", "exp", "nbf", "key_ops", "tags", "azure_updatekey_params"]},
-            "keys_delete": {"required": ["id"], "optional": []},
+            # CRITICAL FOR AI ASSISTANTS: Parameter usage depends on operation type:
+            # - EXISTING key operations (get, delete, enable, disable, update) use 'id' parameter
+            # - NEW key operations (create, upload) use specific 'key_name' parameters  
+            "keys_create": {"required": ["key_name", "key_vault"], "optional": ["description", "enabled", "kty", "key_size", "curve", "key_ops", "tags", "exp", "nbf", "azure_keycreate_jsonfile", "azure_tags_jsonfile"]},  # key_name: name for new key
+            "keys_list": {"required": [], "optional": ["limit", "skip", "vault_name", "key_name", "enabled", "tags", "kty", "key_size", "curve", "key_ops"]},
+            "keys_get": {"required": ["id"], "optional": []},  # id parameter accepts key ID, name, or identifier
+            "keys_update": {"required": ["id"], "optional": ["description", "enabled", "tags", "exp", "nbf", "key_ops", "azure_updatekey_params"]},  # id parameter accepts key ID, name, or identifier
+            "keys_delete": {"required": ["id"], "optional": []},  # id parameter accepts key ID, name, or identifier
             "keys_enable": {"required": ["id"], "optional": []},
             "keys_disable": {"required": ["id"], "optional": []},
             "keys_rotate": {"required": ["id"], "optional": []},
@@ -89,7 +108,7 @@ def get_key_operations() -> Dict[str, Any]:
             "keys_export": {"required": ["id"], "optional": []},
             "keys_hard_delete": {"required": ["id"], "optional": []},
             "keys_recover": {"required": ["id"], "optional": []},
-            "keys_upload": {"required": ["key_name", "key_vault"], "optional": ["local_key_identifier", "source_key_identifier", "azure_keyupload_jsonfile", "source_key_tier", "dsm_key_identifier", "luna_key_identifier", "external_cm_key_identifier", "pfx", "pfx_password", "hsm", "kek_kid", "key_ops", "enabled", "exp", "nbf", "exportable", "release_policy", "azure_tags_jsonfile"]},
+            "keys_upload": {"required": ["key_name", "key_vault"], "optional": ["local_key_identifier", "source_key_identifier", "azure_keyupload_jsonfile", "source_key_tier", "dsm_key_identifier", "luna_key_identifier", "external_cm_key_identifier", "pfx", "pfx_password", "hsm", "kek_kid", "key_ops", "enabled", "exp", "nbf", "exportable", "release_policy", "azure_tags_jsonfile"]},  # key_name: name for uploaded key
             "keys_download_metadata": {"required": [], "optional": ["vault_name", "limit", "skip", "file_path"]},
             "keys_enable_backup_job": {"required": ["id"], "optional": []},
             "keys_enable_rotation_job": {"required": ["id"], "optional": []},
