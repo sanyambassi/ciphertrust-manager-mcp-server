@@ -1174,35 +1174,6 @@ class KeyListLabelsTool(BaseTool):
 
 
 # Export all key tools
-KEY_TOOLS = [
-    # Core CRUD
-    KeyListTool,
-    KeyCreateTool,
-    KeyGetTool,
-    KeyDeleteTool,
-    KeyModifyTool,
-    
-    # Lifecycle
-    KeyArchiveTool,
-    KeyRecoverTool,
-    KeyRevokeTool,
-    KeyReactivateTool,
-    KeyDestroyTool,
-    
-    # Operations
-    KeyExportTool,
-    KeyCloneTool,
-    KeyGenerateKcvTool,
-    
-    # Aliases
-    KeyAliasAddTool,
-    KeyAliasDeleteTool,
-    KeyAliasModifyTool,
-    
-    # Advanced
-    KeyQueryTool,
-    KeyListLabelsTool,
-]
 
 class KeyManagementTool(BaseTool):
     name = "key_management"
@@ -1743,5 +1714,4 @@ class KeyManagementTool(BaseTool):
             return result.get("data", result.get("stdout", ""))
         else:
             raise ValueError(f"Unknown action: {action}")
-
 KEY_TOOLS = [KeyManagementTool]
