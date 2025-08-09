@@ -274,8 +274,8 @@ class KeyCreateParams(BaseModel):
                     return {"valid": False, "error": original_error, "conversion_error": str(e2)}
             return {"valid": False, "error": original_error}
 
-    def generate_test_material(self) -> Optional[str]:
-        """Generate test material for the specified algorithm."""
+    def generate_test_key_material(self) -> Optional[str]:
+        """Generate test key material for the specified algorithm."""
         
         algorithm_upper = self.algorithm.upper()
         
@@ -1374,7 +1374,7 @@ class KeyManagementTool(BaseTool):
             "type": "object",
             "properties": {
                 "action": {"type": "string", "enum": [
-                    "list", "create", "get", "delete", "modify", "archive", "recover", "revoke", "reactivate", "destroy", "export", "clone", "generate_kcv", "alias_add", "alias_delete", "alias_modify", "query", "list_labels", "validate_import", "generate_test_material"
+                    "list", "create", "get", "delete", "modify", "archive", "recover", "revoke", "reactivate", "destroy", "export", "clone", "generate_kcv", "alias_add", "alias_delete", "alias_modify", "query", "list_labels", "validate_import", "generate_test_key_material"
                 ]},
                 # List parameters
                 "limit": {"type": "integer", "default": 10},
@@ -1933,9 +1933,9 @@ class KeyManagementTool(BaseTool):
             # Validate import parameters without creating the key
             params = KeyCreateParams(**kwargs)
             return params.validate_import_parameters()
-        elif action == "generate_test_material":
-            # Generate test material by creating and then deleting a key
-            algorithm = kwargs.get("algorithm", "AES").upper()
+        elif action == "generate_test_key_material":
+            # Generate test key material by creating and then deleting a key
+            algorithm = (kwargs.get("algorithm") or kwargs.get("type", "AES")).upper()
             size = kwargs.get("size")
             curve_id = kwargs.get("curve_id")
             count = kwargs.get("count", 1)
