@@ -10,99 +10,107 @@ from .base import BaseTool
 # Core CRUD Parameter Models
 class SecretListParams(BaseModel):
     """Parameters for listing secrets."""
-    limit: int = Field(10, description="Maximum number of secrets to return")
-    skip: int = Field(0, description="Offset at which to start the search")
-    name: Optional[str] = Field(None, description="Filter by secret name, ID or URI")
-    object_type: Optional[str] = Field(None, description="Filter by object type (Secret Data or Opaque Object)")
-    secretversion: Optional[int] = Field(None, description="Filter by secret version")
-    sha1_fingerprint: Optional[str] = Field(None, description="Filter by SHA1 fingerprint (supports wildcards)")
-    sha256_fingerprint: Optional[str] = Field(None, description="Filter by SHA256 fingerprint (supports wildcards)")
+    limit: int = Field(10, description="The maximum number of secret information structures that can be returned by this query")
+    skip: int = Field(0, description="The offset at which the search is started. Start with 0 initially, then use the limit value returned in this query for the next query")
+    name: Optional[str] = Field(None, description="Secret name, ID or URI")
+    object_type: Optional[str] = Field(None, description="Filter by object type: 'Secret Data' or 'Opaque Object' (both are non-cryptographic secrets)")
+    secretversion: Optional[int] = Field(None, description="Filters results to those with matching versions of a secret")
+    sha1_fingerprint: Optional[str] = Field(None, description="Filters results to those with matching SHA1 fingerprints. The '?' and '*' wildcard characters may be used")
+    sha256_fingerprint: Optional[str] = Field(None, description="Filters results to those with matching SHA256 fingerprints. The '?' and '*' wildcard characters may be used")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to list secrets from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
 class SecretCreateParams(BaseModel):
     """Parameters for creating a secret."""
-    name: str = Field(..., description="Name of the secret.")
-    description: Optional[str] = Field(None, description="Description of the secret.")
-    type: str = Field(..., description="Type of the secret. Can be 'password', 'text', or 'file'.")
-    value: Optional[str] = Field(None, description="Value of the secret.")
+    name: Optional[str] = Field(None, description="Secret name, ID or URI (optional if using --autoname)")
+    autoname: bool = Field(False, description="Secret will be created with default name if this flag is passed in")
+    data_type: str = Field("blob", description="Secret data type: 'blob' (default), 'password', or 'seed'")
+    material: Optional[str] = Field(None, description="The secret data. Encoding requirements: SECRETSEED must be hex-encoded, SECRETPASSWORD must be UTF-8 encoded, OPAQUE must be base64 URL encoded")
+    id_size: Optional[int] = Field(None, description="Size of ID for the managed object")
+    include_material: bool = Field(False, description="Include secret bytes in the response. Otherwise, only key metadata is returned")
+    jsonfile: Optional[str] = Field(None, description="Secret information passed in JSON format via a file. Parameters passed via the command line will override values in the JSON file")
+    nodelete: bool = Field(False, description="Secret cannot be deleted if this flag is passed in")
+    noexport: bool = Field(False, description="Secret cannot be exported if this flag is passed in")
+    ownerid: Optional[str] = Field(None, description="The user's ID who will own this secret")
+    passwordconfig: Optional[str] = Field(None, description="Path to JSON file containing password configuration parameters")
+    ret: bool = Field(False, description="While creating a secret, return an existing secret with the same name if it exists")
     # Domain support
-    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
-    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
 class SecretGetParams(BaseModel):
     """Parameters for getting a secret."""
-    id: str = Field(..., description="ID of the secret to retrieve.")
-    file: Optional[str] = Field(None, description="File path to save the secret to.")
+    name: str = Field(..., description="Secret name, ID or URI to retrieve")
+    file: Optional[str] = Field(None, description="File path to save the secret material to (optional)")
     # Domain support
-    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
-    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
 class SecretDeleteParams(BaseModel):
     """Parameters for deleting a secret."""
-    id: str = Field(..., description="ID of the secret to delete.")
+    name: str = Field(..., description="Secret name, ID or URI to delete")
     # Domain support
-    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
-    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
 class SecretModifyParams(BaseModel):
     """Parameters for modifying a secret."""
-    id: str = Field(..., description="ID of the secret to update.")
-    name: Optional[str] = Field(None, description="New name for the secret.")
+    name: str = Field(..., description="Secret name, ID or URI to modify")
+    jsonfile: Optional[str] = Field(None, description="Path to JSON file containing the secret metadata to update")
     # Domain support
-    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed.")
-    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
+    domain: Optional[str] = Field(None, description="The domain where the action/operation will be performed")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
 # Advanced Parameter Models
 class SecretExportParams(BaseModel):
     """Parameters for exporting a secret."""
-    name: str = Field(..., description="Secret name, ID or URI")
+    name: str = Field(..., description="Secret name, ID or URI to export")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to export secret from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
 class SecretDestroyParams(BaseModel):
     """Parameters for destroying a secret's material."""
-    name: str = Field(..., description="Secret name, ID or URI")
+    name: str = Field(..., description="Secret name, ID or URI whose material should be destroyed")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to destroy secret in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
 class SecretVersionParams(BaseModel):
     """Parameters for creating a new version of a secret."""
-    name: str = Field(..., description="Secret name, ID or URI")
-    material: Optional[str] = Field(None, description="Secret material data for new version")
+    name: str = Field(..., description="Secret name, ID or URI to create a new version for")
+    material: Optional[str] = Field(None, description="Secret material data for the new version")
     id_size: Optional[int] = Field(None, description="Size of ID for the managed object")
     include_material: bool = Field(False, description="Include secret bytes in the response")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to version secret in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
 class SecretListVersionParams(BaseModel):
     """Parameters for listing secret versions."""
-    name: str = Field(..., description="Secret name, ID or URI")
+    name: str = Field(..., description="Secret name, ID or URI to list versions for")
     limit: int = Field(10, description="Maximum number of versions to return")
     skip: int = Field(0, description="Offset at which to start the search")
-    secretfields: Optional[str] = Field(None, description="Comma separated fields ('meta', 'links') to include")
+    secretfields: Optional[str] = Field(None, description="Comma separated fields ('meta', 'links') to include in the response")
     secretlinktype: Optional[str] = Field(None, description="Filter by link types (supports wildcards)")
     secretstate: Optional[str] = Field(None, description="Filter by state (Pre-Active, Active, Deactivated, etc.)")
     # Domain support
     domain: Optional[str] = Field(None, description="Domain to list versions from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
+    auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
 class SecretsManagementTool(BaseTool):
     name = "secrets_management"
-    description = "Secret management operations (list, create, get, delete, modify, export, destroy, version, list_version)"
+    description = "Manage non-cryptographic objects in CipherTrust Manager including passwords, API keys, JWT tokens, AWS credentials, connection strings, and other secret data. Supports creating, listing, retrieving, modifying, exporting, versioning, and destroying secrets with proper encoding requirements (SECRETSEED as hex, SECRETPASSWORD as UTF-8, OPAQUE as base64 URL encoded)."
 
     def get_schema(self) -> dict:
         return {
@@ -174,6 +182,8 @@ class SecretsManagementTool(BaseTool):
         elif action == "get":
             params = SecretGetParams(**kwargs)
             args = ["secrets", "get", "--name", params.name]
+            if params.file:
+                args.extend(["--file", params.file])
             result = self.execute_with_domain(args, params.domain, params.auth_domain)
             return result.get("data", result.get("stdout", ""))
         elif action == "delete":
