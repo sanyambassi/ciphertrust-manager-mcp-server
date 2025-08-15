@@ -1,4 +1,5 @@
 # CipherTrust Manager MCP Server
+[![Trust Score](https://archestra.ai/mcp-catalog/api/badge/quality/sanyambassi/ciphertrust-manager-mcp-server)](https://archestra.ai/mcp-catalog/sanyambassi__ciphertrust-manager-mcp-server)
 
 This project implements an independently-developed CipherTrust MCP (Model Context Protocol) server that allows AI Assistants like Claude or Cursor to interact with CipherTrust Manager resources using the ksctl CLI.
 
