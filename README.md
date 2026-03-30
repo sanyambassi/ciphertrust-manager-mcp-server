@@ -47,6 +47,10 @@ The MCP server exposes a set of tools and endpoints for clients (such as Claude 
 - JSON-RPC communication over stdin/stdout
 - Configurable via environment variables
 
+## Hosted deployment
+
+A hosted deployment is available on [Fronteir AI](https://fronteir.ai/mcp/sanyambassi-ciphertrust-manager-mcp-server).
+
 ## Prerequisites
 
 - **Git**
