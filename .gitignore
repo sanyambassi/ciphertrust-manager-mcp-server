@@ -97,3 +97,10 @@ test_*.py
 *.temp
 temp/
 tmp/
+
+# Local unpublished tool snapshots
+*_orig.py
+*_orig_v*.py
+
+# Local ksctl help dump
+markdown/
