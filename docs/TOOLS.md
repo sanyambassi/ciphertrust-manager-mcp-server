@@ -40,14 +40,16 @@ This document lists all grouped tools available in the CipherTrust MCP Server, w
 - **groupmap_management**: Group mapping management operations (list, create, get, delete, modify).
 - **key_policy_management**: Key policy management operations (list, create, get, update, delete).
 - **licensing_management**: Licensing management operations (features_list, licenses_add, licenses_delete, licenses_get, licenses_list, lockdata, trials_activate, trials_deactivate, trials_get, trials_list).
-- **metrics_management**: Prometheus metrics operations (status, enable, disable, get, renew_token).
-- **network_management**: Network management operations (ping, checkport, lookup, traceroute, interfaces_list).
-- **ntp_management**: NTP management operations (status, servers_list, servers_add, servers_get, servers_delete).
-- **properties_management**: System properties management operations (list, get, modify, reset).
+- **metrics_management**: Prometheus metrics operations (status, enable, disable, get, renew_token). Requires the root domain.
+- **network_management**: Network management operations (ping, checkport, lookup, traceroute, interfaces_list). interfaces_list requires the root domain.
+- **ntp_management**: NTP management operations (status, servers_list, servers_add, servers_get, servers_delete). Requires the root domain.
+- **cluster_management**: Cluster operations (new, delete, info, summary, join, fulljoin, nodes_list, nodes_get, nodes_delete). Requires the root domain.
+- **master_kek_management**: Master KEK operations (list, get, rotate). Requires the root domain.
+- **properties_management**: System properties management operations (list, get, modify, reset). Requires the root domain.
 - **proxy_management**: Proxy and proxy protocol allow proxies management operations (list, add, update, delete, test, protocol_allow_list, protocol_allow_add, protocol_allow_get, protocol_allow_update, protocol_allow_delete, protocol_allow_reset).
 - **quorum_management**: Quorum management operations (list, get, activate, approve, deny, revoke, delete, get_resources_list, policy_activate, policy_deactivate, policy_status, profiles_list, profiles_get, profiles_update).
 - **record_management**: Audit record and alarm config management operations (record_list, record_get, alarm_config_list, alarm_config_create, alarm_config_get, alarm_config_update, alarm_config_delete).
-- **rotkey_management**: Root of Trust key management operations (list, get, rotate, delete).
+- **rotkey_management**: Root of Trust key management operations (list, get, rotate, delete). Requires the root domain.
 - **scp_management**: SCP public key management operations (public_key_get, public_key_rotate).
 - **secrets_management**: Secret management operations (list, create, get, delete, modify, export, destroy, version, list_version).
 - **service_management**: Service management operations (status, restart, reset).

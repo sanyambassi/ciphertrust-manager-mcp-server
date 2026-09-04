@@ -29,8 +29,8 @@ class ConnectionLDAPCreateParams(BaseModel):
     root_ca: Optional[str] = Field(None, description="PEM encoded certificate for server trust")
     disable_auto_create: bool = Field(False, description="Disable automatic user creation on login")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create connection in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create connection in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionLDAPListParams(BaseModel):
@@ -40,16 +40,16 @@ class ConnectionLDAPListParams(BaseModel):
     strategy: str = Field("ldap", description="Filter by connection strategy")
     sort: Optional[str] = Field(None, description="Sort field (prefix with - for descending)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list connections from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list connections from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionLDAPGetParams(BaseModel):
     """Parameters for getting an LDAP connection."""
     id: str = Field(..., description="ID of the connection")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get connection from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get connection from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionLDAPDeleteParams(BaseModel):
@@ -57,8 +57,8 @@ class ConnectionLDAPDeleteParams(BaseModel):
     id: str = Field(..., description="ID of the connection")
     force: bool = Field(False, description="Delete associated sub-domain users and groupmaps silently")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete connection from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete connection from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionLDAPModifyParams(BaseModel):
@@ -82,8 +82,8 @@ class ConnectionLDAPModifyParams(BaseModel):
     root_ca: Optional[str] = Field(None, description="PEM encoded certificate for server trust")
     disable_auto_create: Optional[bool] = Field(None, description="Disable automatic user creation on login")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify connection in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify connection in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionLDAPTestParams(BaseModel):
@@ -99,8 +99,8 @@ class ConnectionLDAPTestParams(BaseModel):
     search_filter: Optional[str] = Field(None, description="LDAP search filter to restrict allowed users")
     insecure_skip_verify: bool = Field(False, description="Disable server certificate verification")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain context (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain context (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionLDAPManagementTool(BaseTool):

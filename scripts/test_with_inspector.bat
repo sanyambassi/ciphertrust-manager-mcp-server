@@ -6,7 +6,7 @@ echo Starting CipherTrust MCP Server Testing...
 REM Check if Node.js is installed
 node --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo Node.js is not installed. Please install Node.js first.
+    echo Node.js is not installed. Inspector 2.5 requires Node.js 22.19.0 or higher.
     exit /b 1
 )
 
@@ -43,13 +43,13 @@ goto invalid_choice
 :ui_test
 echo Starting MCP Inspector UI...
 echo Make sure CIPHERTRUST_URL, CIPHERTRUST_USER, CIPHERTRUST_PASSWORD are set
-npx @modelcontextprotocol/inspector uv run ciphertrust-mcp-server
+npx @modelcontextprotocol/inspector uv run --no-sync ciphertrust-mcp-server
 goto end
 
 :cli_test
 echo Running CLI automated tests...
 echo Make sure CIPHERTRUST_URL, CIPHERTRUST_USER, CIPHERTRUST_PASSWORD are set
-npx @modelcontextprotocol/inspector --cli uv run ciphertrust-mcp-server --method tools/list
+npx @modelcontextprotocol/inspector --cli uv run --no-sync ciphertrust-mcp-server --method tools/list
 goto end
 
 :unit_test
@@ -87,7 +87,7 @@ if defined CIPHERTRUST_PASSWORD (
 )
 echo.
 echo 5. Testing mock server responses...
-uv run python -c "import json; mock_response = {'jsonrpc': '2.0', 'id': 1, 'result': {'capabilities': {'tools': {}}, 'protocolVersion': '2024-11-05', 'serverInfo': {'name': 'ciphertrust-mcp-server', 'version': '0.1.0'}}}; print('Mock initialize response valid:', 'result' in mock_response); tools_response = {'jsonrpc': '2.0', 'id': 2, 'result': {'tools': [{'name': 'key_management', 'description': 'Key management operations'}, {'name': 'system_information', 'description': 'System information'}]}}; print('Mock tools response valid:', len(tools_response['result']['tools']) > 0)"
+uv run python -c "import json; mock_response = {'jsonrpc': '2.0', 'id': 1, 'result': {'capabilities': {'tools': {}}, 'protocolVersion': '2024-11-05', 'serverInfo': {'name': 'ciphertrust-mcp-server', 'version': '0.2.0'}}}}}; print('Mock initialize response valid:', 'result' in mock_response); tools_response = {'jsonrpc': '2.0', 'id': 2, 'result': {'tools': [{'name': 'key_management', 'description': 'Key management operations'}, {'name': 'system_information', 'description': 'System information'}]}}; print('Mock tools response valid:', len(tools_response['result']['tools']) > 0)"
 echo.
 echo ================================================
 echo Full Mock Test Suite completed - no external connections made
@@ -126,8 +126,8 @@ uv run python -m pytest tests/test_integration_simple.py -v -s --tb=short
 echo.
 echo 3. Testing MCP Inspector CLI with real connection...
 echo This will test actual CipherTrust Manager connectivity
-npx @modelcontextprotocol/inspector --cli uv run ciphertrust-mcp-server --method tools/call --tool-name system_information --tool-arg action=get
-npx @modelcontextprotocol/inspector --cli uv run ciphertrust-mcp-server --method tools/list
+npx @modelcontextprotocol/inspector --cli uv run --no-sync ciphertrust-mcp-server --method tools/call --tool-name system_information --tool-arg action=get
+npx @modelcontextprotocol/inspector --cli uv run --no-sync ciphertrust-mcp-server --method tools/list
 echo.
 echo ================================================
 echo Full Integration Test Suite completed

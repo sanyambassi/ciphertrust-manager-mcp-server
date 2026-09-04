@@ -13,7 +13,7 @@ class BackupKeyCreateParams(BaseModel):
     scope: str = Field("system", description="Scope of the backup key (system or domain)")
     default: bool = Field(False, description="Set this backup key as default")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create backup key in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create backup key in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -24,7 +24,7 @@ class BackupKeyListParams(BaseModel):
     scope: str = Field("system", description="Scope of the backup key (system or domain)")
     default: bool = Field(False, description="Return only the default backup key")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list backup keys from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list backup keys from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -32,7 +32,7 @@ class BackupKeyGetParams(BaseModel):
     """Parameters for getting backup key information."""
     id: str = Field(..., description="Backup key ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get backup key from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get backup key from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -40,7 +40,7 @@ class BackupKeyDeleteParams(BaseModel):
     """Parameters for deleting a backup key."""
     id: str = Field(..., description="Backup key ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete backup key from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete backup key from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -48,7 +48,7 @@ class BackupKeyDefaultParams(BaseModel):
     """Parameters for setting default backup key."""
     id: str = Field(..., description="Backup key ID to set as default")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to set default in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to set default in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root'if not specified.")
 
 
@@ -59,7 +59,7 @@ class BackupKeyDownloadParams(BaseModel):
     file: Optional[str] = Field(None, description="File name to write downloaded backup key to")
     hint: Optional[str] = Field(None, description="Password hint for the backup key")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to download backup key from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to download backup key from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -69,7 +69,7 @@ class BackupKeyUploadParams(BaseModel):
     file: Optional[str] = Field(None, description="File name to read backup key from")
     scope: str = Field("system", description="Scope of the backup key (scope is auto-detected, this flag is ignored)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to upload backup key to (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to upload backup key to (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -78,7 +78,7 @@ class BackupKeyInspectParams(BaseModel):
     file: str = Field(..., description="Backup key file name to inspect")
     bkpassword: Optional[str] = Field(None, description="Backup key password to test (optional)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain context (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain context (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 

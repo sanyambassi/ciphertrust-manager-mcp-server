@@ -24,8 +24,8 @@ class Settings(BaseSettings):
     ciphertrust_jwt: Optional[str] = None
     ciphertrust_nosslverify: bool = False
     ciphertrust_timeout: int = 30
-    ciphertrust_domain: str = "root"
-    ciphertrust_auth_domain: str = "root"
+    ciphertrust_domain: str = Field(default="root")
+    ciphertrust_auth_domain: str = Field(default="root")
 
     # ksctl settings
     ksctl_download_url: Optional[str] = None
@@ -34,11 +34,18 @@ class Settings(BaseSettings):
 
     # MCP server settings
     mcp_server_name: str = "ciphertrust-manager"
-    mcp_server_version: str = "0.1.0"
+    mcp_server_version: str = "0.2.0"
     
     # Logging
     log_level: str = "INFO"
     debug_mode: bool = False
+
+    @field_validator("ciphertrust_domain", "ciphertrust_auth_domain", mode="before")
+    @classmethod
+    def empty_domain_is_root(cls, v):
+        if v is None or (isinstance(v, str) and not v.strip()):
+            return "root"
+        return v.strip() if isinstance(v, str) else v
 
     @field_validator("ciphertrust_url")
     @classmethod

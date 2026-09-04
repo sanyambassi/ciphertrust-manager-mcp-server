@@ -16,21 +16,20 @@ parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
 
-# Virtual environments
-.env
-.venv
-env/
+# Virtual Environment
+.venv/
 venv/
 ENV/
-env.bak/
-venv.bak/
+env/
+
+# uv
+.venv/
+uv.lock
 
 # IDE
 .vscode/
@@ -38,42 +37,63 @@ venv.bak/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 
-# Project specific
-config/*.json
-config/*.yaml
-config/*.yml
-*.log
-*.pid
-*.lock
-uv.lock
-
-# Sensitive data
-.env*
+# Environment files
+.env
+.env.*
 !.env.example
-credentials.json
-secrets.json
-*.pem
-*.key
-*.cert
-*.p12
-*.pfx
+.env.local
 
-# Database files
-*.db
-*.sqlite
-*.sqlite3
+# Node (local Inspector install)
+node_modules/
+
+# ksctl
+ksctl
+ksctl.exe
+ksctl_images.zip
+.ciphertrust-mcp/
+.ksctl/
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Distribution
+dist/
+build/
+
+# Sensitive test files and credentials
+*_test.py
+test_*.py
+*_jsonrpc*.py
+*_vaults.json
+*_certificate*.json
+*_report*.json
+*_params.json
+*_watch*.json
+*_create*.json
+
+# AWS/Azure/Cloud credentials
+*credentials*.json
+*config*.json
+*secret*.json
+*key*.json
+*account*.json
+*subscription*.json
+*tenant*.json
 
 # Temporary files
-tmp/
+*.tmp
+*.temp
 temp/
-*.tmp 
+tmp/

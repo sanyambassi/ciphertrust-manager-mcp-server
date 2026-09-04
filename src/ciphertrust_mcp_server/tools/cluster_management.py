@@ -52,7 +52,10 @@ class ClusterNodesDeleteParams(BaseModel):
 
 class ClusterManagementTool(BaseTool):
     name = "cluster_management"
-    description = "Manage CipherTrust Manager clusters (create, join, delete, info, summary, node management)"
+    description = (
+        "Manage CipherTrust Manager clusters (create, join, delete, info, summary, node management). "
+        "Only available when CIPHERTRUST_DOMAIN is root."
+    )
 
     def get_schema(self):
         return {
@@ -86,26 +89,29 @@ class ClusterManagementTool(BaseTool):
             "required": ["action"],
         }
 
+    def _result(self, cmd: list[str]):
+        result = self.ksctl.execute(cmd)
+        return result.get("data", result.get("stdout", ""))
+
     async def execute(self, **kwargs):
+        self.require_root_domain()
         action = kwargs.get("action")
         if action == "new":
             params = ClusterNewParams(**kwargs)
             cmd = ["cluster", "new", "--host", params.host]
             if params.public_address:
                 cmd += ["--public-address", params.public_address]
-            return self.ksctl.execute(cmd)
+            return self._result(cmd)
         elif action == "delete":
             params = ClusterDeleteParams(**kwargs)
             cmd = ["cluster", "delete"]
             if params.yes:
                 cmd.append("-y")
-            return self.ksctl.execute(cmd)
+            return self._result(cmd)
         elif action == "info":
-            cmd = ["cluster", "info"]
-            return self.ksctl.execute(cmd)
+            return self._result(["cluster", "info"])
         elif action == "summary":
-            cmd = ["cluster", "summary"]
-            return self.ksctl.execute(cmd)
+            return self._result(["cluster", "summary"])
         elif action == "join":
             params = ClusterJoinParams(**kwargs)
             cmd = ["cluster", "join", "--host", params.host, "--member", params.member]
@@ -123,7 +129,7 @@ class ClusterManagementTool(BaseTool):
                 cmd += ["--public-address", params.public_address]
             if params.yes:
                 cmd.append("-y")
-            return self.ksctl.execute(cmd)
+            return self._result(cmd)
         elif action == "fulljoin":
             params = ClusterFullJoinParams(**kwargs)
             cmd = ["cluster", "fulljoin", "--member", params.member, "--newnodehost", params.newnodehost]
@@ -147,17 +153,17 @@ class ClusterManagementTool(BaseTool):
             if params.block:
                 cmd.append("--block")
                 
-            return self.ksctl.execute(cmd)
+            return self._result(cmd)
         elif action == "nodes_list":
             params = ClusterNodesListParams(**kwargs)
             cmd = ["cluster", "nodes", "list"]
             if params.allowlist:
                 cmd += ["--allowlist", params.allowlist]
-            return self.ksctl.execute(cmd)
+            return self._result(cmd)
         elif action == "nodes_get":
             params = ClusterNodesGetParams(**kwargs)
             cmd = ["cluster", "nodes", "get", "--id", params.id]
-            return self.ksctl.execute(cmd)
+            return self._result(cmd)
         elif action == "nodes_delete":
             params = ClusterNodesDeleteParams(**kwargs)
             cmd = ["cluster", "nodes", "delete", "--id", params.id]
@@ -165,7 +171,7 @@ class ClusterManagementTool(BaseTool):
                 cmd.append("--force")
             if params.yes:
                 cmd.append("-y")
-            return self.ksctl.execute(cmd)
+            return self._result(cmd)
         else:
             raise ValueError(f"Unknown action: {action}")
 

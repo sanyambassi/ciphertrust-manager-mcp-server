@@ -16,8 +16,8 @@ class ConnectionUsersListParams(BaseModel):
     username: Optional[str] = Field(None, description="Filter by username")
     useremail: Optional[str] = Field(None, description="Filter by user email")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list users from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list users from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionUsersGetParams(BaseModel):
@@ -25,8 +25,8 @@ class ConnectionUsersGetParams(BaseModel):
     id: str = Field(..., description="ID of the connection")
     user_id: Optional[str] = Field(None, description="ID of the user (optional for token owner)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get user from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get user from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Connection Users Management Tools

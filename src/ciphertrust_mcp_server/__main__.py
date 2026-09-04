@@ -9,15 +9,11 @@ from .server import CipherTrustMCPServer
 
 
 def setup_logging() -> None:
-    """Configure logging."""
-    # For MCP servers, we should log to stderr to avoid interfering with stdio communication
     logging.basicConfig(
         level=getattr(logging, settings.log_level.upper()),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[logging.StreamHandler(sys.stderr)],
     )
-    
-    # Set httpx logging to WARNING unless in debug mode
     if not settings.debug_mode:
         logging.getLogger("httpx").setLevel(logging.WARNING)
 
@@ -30,13 +26,19 @@ async def async_main() -> None:
     await server.run()
 
 
+def _is_closed_stdio(exc: BaseException) -> bool:
+    if isinstance(exc, (BrokenPipeError, ConnectionResetError, KeyboardInterrupt)):
+        return True
+    return isinstance(exc, ValueError) and "closed file" in str(exc).lower()
+
+
 def main() -> None:
     """Main entry point."""
     try:
         asyncio.run(async_main())
-    except KeyboardInterrupt:
-        pass
     except Exception as e:
+        if _is_closed_stdio(e):
+            return
         logging.error(f"Server error: {e}")
         sys.exit(1)
 

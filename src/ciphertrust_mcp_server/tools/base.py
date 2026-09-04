@@ -49,6 +49,15 @@ class BaseTool(ABC):
         """Execute the tool with given parameters."""
         pass
 
+    def require_root_domain(self, operation: Optional[str] = None) -> None:
+        """Raise if CIPHERTRUST_DOMAIN is not root. Empty/blank is treated as root."""
+        from ..config import settings
+
+        domain = (settings.ciphertrust_domain or "").strip().lower()
+        if domain not in ("", "root"):
+            name = operation or self.name
+            raise ValueError(f"{name} is only available in the root domain")
+
     def execute_with_domain(self, args: list[str], domain: Optional[str] = None, auth_domain: Optional[str] = None) -> dict[str, Any]:
         """Execute ksctl command with optional domain override.
         
@@ -67,11 +76,10 @@ class BaseTool(ABC):
         # Clone args to avoid modifying the original
         domain_args = args.copy()
         
-        # Add domain parameters if specified
-        if domain:
-            domain_args.extend(["--domain", domain])
-        if auth_domain:
-            domain_args.extend(["--auth-domain", auth_domain])
+        if isinstance(domain, str) and domain.strip():
+            domain_args.extend(["--domain", domain.strip()])
+        if isinstance(auth_domain, str) and auth_domain.strip():
+            domain_args.extend(["--auth-domain", auth_domain.strip()])
         
         return self.ksctl.execute(domain_args)
     
@@ -98,10 +106,10 @@ class BaseTool(ABC):
         
         try:
             # Temporarily override settings
-            if domain:
-                settings.ciphertrust_domain = domain
-            if auth_domain:
-                settings.ciphertrust_auth_domain = auth_domain
+            if domain and domain.strip():
+                settings.ciphertrust_domain = domain.strip()
+            if auth_domain and auth_domain.strip():
+                settings.ciphertrust_auth_domain = auth_domain.strip()
             
             # Execute with overridden settings
             return self.ksctl.execute(args)
@@ -118,23 +126,25 @@ class BaseTool(ABC):
             "domain": {
                 "anyOf": [{"type": "string"}, {"type": "null"}],
                 "default": None,
-                "description": "The CipherTrust Manager domain where the action, operation, or execution will be performed. This specifies the target environment for the command.",
+                "description": "Defaults to root if omitted.",
                 "title": "Domain"
             },
             "auth_domain": {
                 "anyOf": [{"type": "string"}, {"type": "null"}],
                 "default": None,
-                "description": "The CipherTrust Manager domain where the user is created and authenticated. Unless explicitly specified, this defaults to 'root'. This is used for access control and does not affect the command's execution target.",
+                "description": "Defaults to root if omitted.",
                 "title": "Auth Domain"
             }
         }
 
     def add_domain_auth_params(self, cmd: list[str], kwargs: dict[str, Any]) -> None:
         """Add domain and auth-domain parameters to command if specified."""
-        if kwargs.get("domain"):
-            cmd.extend(["--domain", kwargs["domain"]])
-        if kwargs.get("auth_domain"):
-            cmd.extend(["--auth-domain", kwargs["auth_domain"]])
+        domain = kwargs.get("domain")
+        auth_domain = kwargs.get("auth_domain")
+        if isinstance(domain, str) and domain.strip():
+            cmd.extend(["--domain", domain.strip()])
+        if isinstance(auth_domain, str) and auth_domain.strip():
+            cmd.extend(["--auth-domain", auth_domain.strip()])
 
     def execute_command(self, cmd: list[str]) -> str:
         """Execute a ksctl command and return the result."""

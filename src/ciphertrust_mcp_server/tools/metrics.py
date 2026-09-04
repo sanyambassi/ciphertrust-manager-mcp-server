@@ -154,7 +154,10 @@ class MetricsManagementTool(BaseTool):
 
     @property
     def description(self) -> str:
-        return "Manage Prometheus metrics operations (status, enable, disable, get, renew_token)"
+        return (
+            "Manage Prometheus metrics operations (status, enable, disable, get, renew_token). "
+            "Only available when CIPHERTRUST_DOMAIN is root."
+        )
 
     def get_schema(self) -> dict[str, Any]:
         return {
@@ -175,6 +178,7 @@ class MetricsManagementTool(BaseTool):
         }
 
     async def execute(self, **kwargs: Any) -> Any:
+        self.require_root_domain()
         action = kwargs.get("action")
         if action == "status":
             result = self.ksctl.execute(["metrics", "prometheus", "status"])

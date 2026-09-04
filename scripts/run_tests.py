@@ -30,8 +30,8 @@ def test_inspector_cli():
     print("Running MCP Inspector CLI tests...")
     
     commands = [
-        "npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/list",
-        "npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name system_information --tool-arg action=get"
+        "npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/list --format json",
+        "npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name system_information --tool-arg action=get --format json"
     ]
     
     for cmd in commands:
@@ -56,7 +56,7 @@ def main():
     
     # Check prerequisites
     if not run_command("node --version"):
-        print("❌ Node.js not found. Please install Node.js first.")
+        print("❌ Node.js not found. Inspector 2.5 requires Node.js 22.19.0 or higher.")
         sys.exit(1)
     
     if not run_command("uv --version"):

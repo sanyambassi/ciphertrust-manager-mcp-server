@@ -15,8 +15,8 @@ class GroupListParams(BaseModel):
     connection_id: Optional[str] = Field(None, description="ID of the connection whose groups are to be enumerated")
     user_filter: Optional[str] = Field(None, description="ID of the user whose groups are to be enumerated")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list groups from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list groups from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupCreateParams(BaseModel):
@@ -26,16 +26,16 @@ class GroupCreateParams(BaseModel):
     ids: Optional[str] = Field(None, description="Comma-separated list of user IDs that belong to the group")
     jsonfile: Optional[str] = Field(None, description="Group information passed in JSON format via a file")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create group in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create group in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupGetParams(BaseModel):
     """Parameters for getting a group."""
     name: str = Field(..., description="Group name")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get group from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get group from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupDeleteParams(BaseModel):
@@ -43,8 +43,8 @@ class GroupDeleteParams(BaseModel):
     name: str = Field(..., description="Group name")
     force: bool = Field(False, description="When true, groupmaps within this group will be deleted")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete group from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete group from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupAddUserParams(BaseModel):
@@ -52,8 +52,8 @@ class GroupAddUserParams(BaseModel):
     name: str = Field(..., description="Group name")
     userid: str = Field(..., description="ID of user to be added to the group")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify group in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify group in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupRemoveUserParams(BaseModel):
@@ -61,8 +61,8 @@ class GroupRemoveUserParams(BaseModel):
     name: str = Field(..., description="Group name")
     userid: str = Field(..., description="ID of user to be removed from the group")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify group in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify group in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupAddClientParams(BaseModel):
@@ -70,8 +70,8 @@ class GroupAddClientParams(BaseModel):
     name: str = Field(..., description="Group name")
     clientid: str = Field(..., description="ID of client to be added to the group")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify group in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify group in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupRemoveClientParams(BaseModel):
@@ -79,8 +79,8 @@ class GroupRemoveClientParams(BaseModel):
     name: str = Field(..., description="Group name")
     clientid: str = Field(..., description="ID of client to be removed from the group")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify group in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify group in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupManagementTool(BaseTool):

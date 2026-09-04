@@ -44,8 +44,8 @@ class VKeysCreateParams(BaseModel):
     type: Optional[str] = Field(None, description="Type of id parameter: 'id', 'name', or 'slug'")
     
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create key version in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create key version in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class VKeysListParams(BaseModel):
@@ -63,8 +63,8 @@ class VKeysListParams(BaseModel):
     skip: int = Field(0, description="Offset to start search from")
     
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list key versions from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list key versions from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class VKeysGetParams(BaseModel):
@@ -77,8 +77,8 @@ class VKeysGetParams(BaseModel):
     type: Optional[str] = Field(None, description="Type of id parameter: 'id', 'name', or 'slug'")
     
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get key version from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get key version from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class VKeysExportParams(BaseModel):
@@ -103,8 +103,8 @@ class VKeysExportParams(BaseModel):
     wrappubk: Optional[str] = Field(None, description="Deprecated: use 'wrap-public-key' instead")
     
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to export key version from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to export key version from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Versioned Keys Management Tools

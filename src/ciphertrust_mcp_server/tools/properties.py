@@ -31,13 +31,20 @@ class PropertiesResetParams(BaseModel):
 
 class SystemPropertiesManagementTool(BaseTool):
     name = "system_properties_management"
-    description = "System properties management operations (list, get, modify, reset)"
+    description = (
+        "System properties management operations (list, get, modify, reset). "
+        "Only available when CIPHERTRUST_DOMAIN is root."
+    )
 
     def get_schema(self) -> dict:
         return {
             "type": "object",
             "properties": {
-                "action": {"type": "string", "enum": ["list", "get", "modify", "reset"]},
+                "action": {
+                    "type": "string",
+                    "enum": ["list", "get", "modify", "reset"],
+                    "description": "Requires the root domain",
+                },
                 **PropertiesListParams.model_json_schema()["properties"],
                 **PropertiesGetParams.model_json_schema()["properties"],
                 **PropertiesModifyParams.model_json_schema()["properties"],
@@ -47,6 +54,7 @@ class SystemPropertiesManagementTool(BaseTool):
         }
 
     async def execute(self, action: str, **kwargs: Any) -> Any:
+        self.require_root_domain()
         if action == "list":
             params = PropertiesListParams(**kwargs)
             args = ["properties", "list"]

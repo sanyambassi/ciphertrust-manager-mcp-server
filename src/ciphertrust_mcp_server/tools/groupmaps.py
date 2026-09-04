@@ -15,8 +15,8 @@ class GroupMapListParams(BaseModel):
     connection_group: Optional[str] = Field(None, description="Filter by connection group name (supports wildcards)")
     ks_group: Optional[str] = Field(None, description="Filter by CipherTrust Manager group name")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list group mappings from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list group mappings from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupMapCreateParams(BaseModel):
@@ -25,24 +25,24 @@ class GroupMapCreateParams(BaseModel):
     connection_group: str = Field(..., description="Connection group name")
     ks_group: str = Field(..., description="CipherTrust Manager group name")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create group mapping in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create group mapping in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupMapGetParams(BaseModel):
     """Parameters for getting a group mapping."""
     id: str = Field(..., description="Group map ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get group mapping from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get group mapping from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupMapDeleteParams(BaseModel):
     """Parameters for deleting a group mapping."""
     id: str = Field(..., description="Group map ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete group mapping from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete group mapping from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupMapModifyParams(BaseModel):
@@ -50,8 +50,8 @@ class GroupMapModifyParams(BaseModel):
     id: str = Field(..., description="Group map ID")
     ks_group: str = Field(..., description="New CipherTrust Manager group name")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify group mapping in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify group mapping in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class GroupMapManagementTool(BaseTool):

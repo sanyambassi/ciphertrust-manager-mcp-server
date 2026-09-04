@@ -37,7 +37,10 @@ class NtpServersDeleteParams(BaseModel):
 
 class NtpManagementTool(BaseTool):
     name = "ntp_management"
-    description = "NTP management operations (status, servers_list, servers_add, servers_get, servers_delete)"
+    description = (
+        "NTP management operations (status, servers_list, servers_add, servers_get, servers_delete). "
+        "Only available when CIPHERTRUST_DOMAIN is root."
+    )
 
     def get_schema(self) -> dict:
         return {
@@ -54,6 +57,7 @@ class NtpManagementTool(BaseTool):
         }
 
     async def execute(self, action: str, **kwargs: Any) -> Any:
+        self.require_root_domain()
         if action == "status":
             result = self.ksctl.execute(["ntp", "status"])
             return result.get("data", result.get("stdout", ""))

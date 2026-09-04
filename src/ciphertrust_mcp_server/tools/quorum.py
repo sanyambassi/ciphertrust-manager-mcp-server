@@ -27,7 +27,7 @@ class QuorumListParams(BaseModel):
     state: Optional[str] = Field(None, description="Filter by quorum state")
     uri: Optional[str] = Field(None, description="Filter by resource URI")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list quorums from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list quorums from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -39,7 +39,7 @@ class QuorumGetParams(BaseModel):
     """
     id: str = Field(..., description="Quorum ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get quorum from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get quorum from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -51,7 +51,7 @@ class QuorumActivateParams(BaseModel):
     id: str = Field(..., description="Quorum ID")
     quorum_reason: Optional[str] = Field(None, description="Reason to activate the quorum")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to activate quorum in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to activate quorum in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -63,7 +63,7 @@ class QuorumApproveParams(BaseModel):
     id: str = Field(..., description="Quorum ID")
     note: Optional[str] = Field(None, description="Additional note for approval")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to approve quorum in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to approve quorum in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -75,7 +75,7 @@ class QuorumDenyParams(BaseModel):
     id: str = Field(..., description="Quorum ID")
     note: Optional[str] = Field(None, description="Additional note for denial")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to deny quorum in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to deny quorum in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -86,7 +86,7 @@ class QuorumRevokeParams(BaseModel):
     """
     id: str = Field(..., description="Quorum ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to revoke quorum vote in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to revoke quorum vote in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -97,7 +97,7 @@ class QuorumDeleteParams(BaseModel):
     """
     id: str = Field(..., description="Quorum ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete quorum from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete quorum from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -108,7 +108,7 @@ class QuorumGetResourcesListParams(BaseModel):
     """
     id: str = Field(..., description="Quorum ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get resources from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get resources from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -121,7 +121,7 @@ class QuorumPolicyActivateParams(BaseModel):
     """
     actions: str = Field(..., description="Comma-separated list of actions/operations to enable quorum for")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to activate policy in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to activate policy in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -132,7 +132,7 @@ class QuorumPolicyDeactivateParams(BaseModel):
     """
     actions: str = Field(..., description="Comma-separated list of actions/operations to disable quorum for")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to deactivate policy in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to deactivate policy in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -147,7 +147,7 @@ class QuorumPolicyStatusParams(BaseModel):
     sort: Optional[str] = Field(None, description="Sort by name, createdAt, or updatedAt (prefix with '-' for descending)")
     operation: Optional[str] = Field(None, description="Filter by quorum operation")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get policy status from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get policy status from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -164,7 +164,7 @@ class QuorumProfilesListParams(BaseModel):
     category: Optional[str] = Field(None, description="Filter by quorum profile category")
     label: Optional[str] = Field(None, description="Filter by quorum profile label")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list profiles from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list profiles from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -175,7 +175,7 @@ class QuorumProfilesGetParams(BaseModel):
     """
     profile_id: str = Field(..., description="Quorum Profile ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get profile from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get profile from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 
@@ -190,7 +190,7 @@ class QuorumProfilesUpdateParams(BaseModel):
     voter_groups: Optional[str] = Field(None, description="Comma-separated list of voter groups allowed to approve")
     excluded_groups: Optional[str] = Field(None, description="Comma-separated list of groups excluded from quorum")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to update profile in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to update profile in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified.")
 
 

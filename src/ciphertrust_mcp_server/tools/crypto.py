@@ -23,8 +23,8 @@ class CryptoEncryptParams(BaseModel):
     nae_key_version_header: bool = Field(False, description="Prepend 3-byte NAE key-version header")
     ciphertext_file: Optional[str] = Field(None, description="Output file for ciphertext JSON blob")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class CryptoDecryptParams(BaseModel):
@@ -33,8 +33,8 @@ class CryptoDecryptParams(BaseModel):
     ciphertext_file: Optional[str] = Field(None, description="File containing ciphertext JSON blob")
     plaintext_file: Optional[str] = Field(None, description="Output file for decrypted plaintext")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class CryptoReencryptParams(BaseModel):
@@ -52,8 +52,8 @@ class CryptoReencryptParams(BaseModel):
     nae_key_version_header: bool = Field(False, description="Prepend NAE header to new ciphertext")
     reencrypt_ciphertext_file: Optional[str] = Field(None, description="Output file for re-encrypted ciphertext")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Signing Parameter Models
@@ -67,8 +67,8 @@ class CryptoSignParams(BaseModel):
     sign_pad: str = Field("PKCS1", description="RSA padding (PKCS1 or PSS)")
     salt_length: Optional[int] = Field(None, description="Salt length for PSS padding")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class CryptoVerifyParams(BaseModel):
@@ -82,8 +82,8 @@ class CryptoVerifyParams(BaseModel):
     sign_pad: str = Field("PKCS1", description="RSA padding (PKCS1 or PSS)")
     salt_length: Optional[int] = Field(None, description="Salt length for PSS padding")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Format Preserving Encryption Parameter Models
@@ -100,8 +100,8 @@ class CryptoHideParams(BaseModel):
     tweakalg: Optional[str] = Field(None, description="Tweak algorithm (SHA1, SHA256, SHA512)")
     ciphertext_file: Optional[str] = Field(None, description="Output file for ciphertext")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class CryptoUnhideParams(BaseModel):
@@ -117,8 +117,8 @@ class CryptoUnhideParams(BaseModel):
     tweakalg: Optional[str] = Field(None, description="Tweak algorithm (SHA1, SHA256, SHA512)")
     ciphertext_file: Optional[str] = Field(None, description="Output file for plaintext")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to operate in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Cryptographic Operation Tools

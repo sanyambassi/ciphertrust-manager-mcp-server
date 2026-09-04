@@ -4,11 +4,11 @@
 COMMON_SCHEMA_PROPERTIES = {
     "domain": {
         "type": "string",
-        "description": "The CipherTrust Manager domain where the action, operation, or execution will be performed. This specifies the target environment for the command."
+        "description": "Defaults to root if omitted."
     },
     "auth_domain": {
-        "type": "string", 
-        "description": "The CipherTrust Manager domain where the user is created and authenticated. Unless explicitly specified, this defaults to 'root'. This is used for access control and does not affect the command's execution target."
+        "type": "string",
+        "description": "Defaults to root if omitted."
     }
 }
 

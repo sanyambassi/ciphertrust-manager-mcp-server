@@ -17,8 +17,8 @@ class BackupCreateParams(BaseModel):
     filters: Optional[str] = Field(None, description="JSON filters for domain-scoped backups to specify resources to include")
     filters_jsonfile: Optional[str] = Field(None, description="JSON file containing filters for domain-scoped backups")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create backup in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create backup in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupListParams(BaseModel):
@@ -27,24 +27,24 @@ class BackupListParams(BaseModel):
     skip: int = Field(0, description="Offset at which to start the search")
     scope: str = Field("system", description="Scope of the backup (system or domain)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list backups from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list backups from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupGetParams(BaseModel):
     """Parameters for getting backup information."""
     id: str = Field(..., description="Backup ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get backup from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get backup from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupDeleteParams(BaseModel):
     """Parameters for deleting a backup."""
     id: str = Field(..., description="Backup ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete backup from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete backup from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupRestoreParams(BaseModel):
@@ -52,15 +52,15 @@ class BackupRestoreParams(BaseModel):
     id: str = Field(..., description="Backup ID")
     force: bool = Field(False, description="Skip version check prior to restore")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to restore backup in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to restore backup in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupStatusParams(BaseModel):
     """Parameters for getting backup status."""
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get status from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get status from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupDownloadParams(BaseModel):
@@ -68,24 +68,24 @@ class BackupDownloadParams(BaseModel):
     id: str = Field(..., description="Backup ID")
     file: Optional[str] = Field(None, description="File name to write downloaded backup to")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to download backup from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to download backup from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupUploadParams(BaseModel):
     """Parameters for uploading a backup."""
     file: Optional[str] = Field(None, description="File name to read backup from")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to upload backup to (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to upload backup to (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupInspectParams(BaseModel):
     """Parameters for inspecting a backup."""
     file: str = Field(..., description="Backup file name to inspect")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain context (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain context (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupScpParams(BaseModel):
@@ -99,8 +99,8 @@ class BackupScpParams(BaseModel):
     path_to: str = Field(..., description="Destination path for SCP transfer")
     public_key: str = Field(..., description="Public key for host verification")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain context (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain context (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupScpStatusParams(BaseModel):
@@ -108,8 +108,8 @@ class BackupScpStatusParams(BaseModel):
     id: str = Field(..., description="Backup ID")
     scpid: str = Field(..., description="SCP ID")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain context (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain context (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class BackupManagementTool(BaseTool):

@@ -17,8 +17,8 @@ class TokenCreateParams(BaseModel):
     user: Optional[str] = Field(None, description="CipherTrust Manager username (if not using env/config)")
     password: Optional[str] = Field(None, description="CipherTrust Manager password (if not using env/config)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create token in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create token in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class TokenListParams(BaseModel):
@@ -55,8 +55,8 @@ class TokenRevokeParams(BaseModel):
     client_id: str = Field(..., description="ID linking client to the refresh token")
     refresh_token: str = Field(..., description="Refresh token to be revoked")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to revoke token in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to revoke token in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class TokenManagementTool(BaseTool):

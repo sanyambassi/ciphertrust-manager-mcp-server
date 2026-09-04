@@ -55,13 +55,20 @@ class NetworkInterfacesListParams(BaseModel):
 
 class NetworkManagementTool(BaseTool):
     name = "network_management"
-    description = "Network management operations (ping, checkport, lookup, traceroute, interfaces_list)"
+    description = (
+        "Network management operations (ping, checkport, lookup, traceroute, interfaces_list). "
+        "interfaces_list is only available when CIPHERTRUST_DOMAIN is root."
+    )
 
     def get_schema(self) -> dict:
         return {
             "type": "object",
             "properties": {
-                "action": {"type": "string", "enum": ["ping", "checkport", "lookup", "traceroute", "interfaces_list"]},
+                "action": {
+                    "type": "string",
+                    "enum": ["ping", "checkport", "lookup", "traceroute", "interfaces_list"],
+                    "description": "interfaces_list requires the root domain",
+                },
                 **NetworkPingParams.model_json_schema()["properties"],
                 **NetworkCheckPortParams.model_json_schema()["properties"],
                 **NetworkLookupParams.model_json_schema()["properties"],
@@ -139,6 +146,7 @@ class NetworkManagementTool(BaseTool):
             result = self.ksctl.execute(args)
             return result.get("data", result.get("stdout", ""))
         elif action == "interfaces_list":
+            self.require_root_domain("interfaces_list")
             args = ["network", "interfaces", "list"]
             result = self.ksctl.execute(args)
             return result.get("data", result.get("stdout", ""))

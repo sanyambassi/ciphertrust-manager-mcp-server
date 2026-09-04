@@ -53,6 +53,7 @@ The MCP server exposes a set of tools and endpoints for clients (such as Claude 
 - **Python 3.11 or higher**
 - **uv** for dependency management
 - **Access to a CipherTrust Manager instance**
+- **Valid CipherTrust Manager credentials**
 
 ### Installing Git (Windows)
 
@@ -194,16 +195,16 @@ This project includes comprehensive testing capabilities using the Model Context
 uv run ciphertrust-mcp-server
 # Then send JSON-RPC commands (see TESTING.md for details)
 
-# Interactive UI testing (opens browser interface)
-npx @modelcontextprotocol/inspector uv run ciphertrust-mcp-server
+# Interactive UI (Inspector 2.5+). Open the printed URL; it includes MCP_INSPECTOR_API_TOKEN.
+npx @modelcontextprotocol/inspector uv run --no-sync ciphertrust-mcp-server
 
 # Quick CLI testing
 # Get tools
-npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/list
+npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/list --format json
 # Get system information
-npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name system_information --tool-arg action=get
+npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name system_information --tool-arg action=get --format json
 # Get 2 keys
-npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name key_management --tool-arg action=list --tool-arg limit=2
+npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name key_management --tool-arg action=list --tool-arg limit=2 --format json
 ```
 
 ### Available Testing Methods
@@ -216,11 +217,9 @@ npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.js
 
 ### NPM Scripts
 
-After creating a `package.json` file:
-
 ```bash
-npm run test:inspector:ui     # Open interactive testing interface
-npm run test:inspector:cli    # Run automated CLI tests
+npm run test:inspector:ui     # Open Inspector UI (uses project .env)
+npm run test:inspector:cli    # List tools via Inspector CLI
 npm run test:python          # Run Python unit tests
 npm run test:full           # Run complete test suite
 ```
@@ -375,7 +374,7 @@ LOG_LEVEL=INFO
 - You'll see log output like in the AI assistant's MCP log:
 
 ```
-2025-06-16 02:22:30,462 - ciphertrust_mcp_server.server - INFO - Starting ciphertrust-manager v0.1.0
+2025-06-16 02:22:30,462 - ciphertrust_mcp_server.server - INFO - Starting ciphertrust-manager v0.2.0
 2025-06-16 02:22:30,838 - ciphertrust_mcp_server.server - INFO - Successfully connected to CipherTrust Manager
 2025-06-16 02:22:30,838 - ciphertrust_mcp_server.server - INFO - MCP server ready and waiting for JSON-RPC messages on stdin...
 ```
@@ -383,8 +382,8 @@ LOG_LEVEL=INFO
 ### Dependencies
 
 The `pyproject.toml` file includes these dependencies:
-- `mcp>=1.0.0`
-- `pydantic>=2.0.0`
+- `mcp>=2.1.1,<3`
+- `pydantic>=2.12.0`
 - `pydantic-settings>=2.0.0`
 - `httpx>=0.27.0`
 - `python-dotenv>=1.0.0`

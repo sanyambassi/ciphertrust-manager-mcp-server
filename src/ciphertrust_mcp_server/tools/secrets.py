@@ -18,7 +18,7 @@ class SecretListParams(BaseModel):
     sha1_fingerprint: Optional[str] = Field(None, description="Filters results to those with matching SHA1 fingerprints. The '?' and '*' wildcard characters may be used")
     sha256_fingerprint: Optional[str] = Field(None, description="Filters results to those with matching SHA256 fingerprints. The '?' and '*' wildcard characters may be used")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list secrets from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list secrets from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
@@ -72,7 +72,7 @@ class SecretExportParams(BaseModel):
     """Parameters for exporting a secret."""
     name: str = Field(..., description="Secret name, ID or URI to export")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to export secret from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to export secret from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
@@ -80,7 +80,7 @@ class SecretDestroyParams(BaseModel):
     """Parameters for destroying a secret's material."""
     name: str = Field(..., description="Secret name, ID or URI whose material should be destroyed")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to destroy secret in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to destroy secret in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
@@ -91,7 +91,7 @@ class SecretVersionParams(BaseModel):
     id_size: Optional[int] = Field(None, description="Size of ID for the managed object")
     include_material: bool = Field(False, description="Include secret bytes in the response")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to version secret in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to version secret in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 
@@ -104,7 +104,7 @@ class SecretListVersionParams(BaseModel):
     secretlinktype: Optional[str] = Field(None, description="Filter by link types (supports wildcards)")
     secretstate: Optional[str] = Field(None, description="Filter by state (Pre-Active, Active, Deactivated, etc.)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list versions from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list versions from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="The domain where the user is created. Defaults to 'root' if not specified")
 
 

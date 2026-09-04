@@ -11,15 +11,15 @@ from .base import BaseTool
 class ScpPublicKeyGetParams(BaseModel):
     """Parameters for getting SCP public key."""
     # Domain support (SCP operations may be system-wide but including for consistency)
-    domain: Optional[str] = Field(None, description="Domain to get SCP public key from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get SCP public key from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ScpPublicKeyRotateParams(BaseModel):
     """Parameters for rotating SCP public key."""
     # Domain support (SCP operations may be system-wide but including for consistency)
-    domain: Optional[str] = Field(None, description="Domain to rotate SCP public key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to rotate SCP public key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ScpManagementTool(BaseTool):

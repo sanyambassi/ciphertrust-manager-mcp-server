@@ -11,8 +11,8 @@ from .base import BaseTool
 class AkeylessConfigGetParams(BaseModel):
     """Parameters for getting Akeyless configuration."""
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get config from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get config from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class AkeylessConfigModifyParams(BaseModel):
@@ -21,15 +21,15 @@ class AkeylessConfigModifyParams(BaseModel):
     sso_access_id: Optional[str] = Field(None, description="The akeyless key ID to be used for Akeyless SSO")
     akeyless_signup_url: Optional[str] = Field(None, description="URL of the akeyless infrastructure for signup (defaults to https://vault.akeyless.io)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify config in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify config in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class AkeylessConfigStatusParams(BaseModel):
     """Parameters for getting Akeyless configuration status."""
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get status from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get status from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Akeyless Customer Fragment Parameter Models
@@ -38,8 +38,8 @@ class AkeylessCustomerFragmentCreateParams(BaseModel):
     name: str = Field(..., description="Name of customer fragment")
     desc: Optional[str] = Field(None, description="Description for customer fragment")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create fragment in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create fragment in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class AkeylessCustomerFragmentDeleteParams(BaseModel):
@@ -47,8 +47,8 @@ class AkeylessCustomerFragmentDeleteParams(BaseModel):
     id: Optional[str] = Field(None, description="Customer fragment ID")
     name: Optional[str] = Field(None, description="Name of customer fragment")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete fragment from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete fragment from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class AkeylessCustomerFragmentListParams(BaseModel):
@@ -58,16 +58,16 @@ class AkeylessCustomerFragmentListParams(BaseModel):
     limit: int = Field(10, description="Maximum number of customer fragments to return")
     skip: int = Field(0, description="Index of the first customer fragment to return")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list fragments from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list fragments from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Akeyless Token Parameter Models
 class AkeylessTokenCreateParams(BaseModel):
     """Parameters for creating an Akeyless token."""
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create token in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create token in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Akeyless Config Management Tools

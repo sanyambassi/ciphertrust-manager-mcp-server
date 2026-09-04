@@ -30,8 +30,8 @@ class KeyListParams(BaseModel):
     sha256_fingerprint: Optional[str] = Field(None, description="Filter by SHA256 fingerprint")
     compare_id_with_uuid: Optional[str] = Field(None, description="Compare ID with UUID (equal/notequal)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list keys from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list keys from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyCreateParams(BaseModel):
@@ -81,8 +81,8 @@ class KeyCreateParams(BaseModel):
     rotation_frequency_days: Optional[str] = Field(None, description="Auto-rotation frequency in days")
     
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
     
     # CTE-specific parameters
     cte_key_type: Optional[str] = Field(None, description="CTE key type: 'standard', 'ldt', or 'xts'")
@@ -311,8 +311,8 @@ class KeyGetParams(BaseModel):
     version: int = Field(-1, description="Key version (-1 for latest)")
     usage_mask: Optional[int] = Field(None, description="Key usage mask for validation")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get key from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get key from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyDeleteParams(BaseModel):
@@ -321,8 +321,8 @@ class KeyDeleteParams(BaseModel):
     type: Optional[str] = Field(None, description="Identifier type (name, id, uri, alias)")
     version: int = Field(-1, description="Key version (-1 for latest)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete key from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete key from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyModifyParams(BaseModel):
@@ -343,8 +343,8 @@ class KeyModifyParams(BaseModel):
     json_content: Optional[str] = Field(None, description="JSON content for modification (alternative to jsonfile)")
     
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
     
     def create_json_file(self) -> Optional[str]:
         """Create a temporary JSON file with modification parameters."""
@@ -380,8 +380,8 @@ class KeyArchiveParams(BaseModel):
     type: Optional[str] = Field(None, description="Identifier type (name, id, uri, alias)")
     version: int = Field(-1, description="Key version (-1 for latest)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to archive key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to archive key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyRecoverParams(BaseModel):
@@ -390,8 +390,8 @@ class KeyRecoverParams(BaseModel):
     type: Optional[str] = Field(None, description="Identifier type (name, id, uri, alias)")
     version: int = Field(-1, description="Key version (-1 for latest)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to recover key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to recover key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyRevokeParams(BaseModel):
@@ -403,8 +403,8 @@ class KeyRevokeParams(BaseModel):
     message: Optional[str] = Field(None, description="Optional revocation message")
     compromise_occurrence_date: Optional[str] = Field(None, description="When compromise occurred")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to revoke key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to revoke key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyReactivateParams(BaseModel):
@@ -415,8 +415,8 @@ class KeyReactivateParams(BaseModel):
     reason_to_reactivate: str = Field(..., description="Reactivation reason")
     message_for_reactivate: Optional[str] = Field(None, description="Optional reactivation message")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to reactivate key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to reactivate key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyDestroyParams(BaseModel):
@@ -425,8 +425,8 @@ class KeyDestroyParams(BaseModel):
     type: Optional[str] = Field(None, description="Identifier type (name, id, uri, alias)")
     version: int = Field(-1, description="Key version (-1 for latest)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to destroy key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to destroy key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Key Operations Parameter Models
@@ -440,8 +440,8 @@ class KeyExportParams(BaseModel):
     wrap_public_key: Optional[str] = Field(None, description="Public key for wrapping")
     cxts: bool = Field(False, description="Export full XTS/CBC-CS1 key material")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to export key from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to export key from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyCloneParams(BaseModel):
@@ -453,8 +453,8 @@ class KeyCloneParams(BaseModel):
     include_material: bool = Field(False, description="Include key material in response")
     jsonfile: Optional[str] = Field(None, description="JSON file for modifying meta values")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to clone key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to clone key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyGenerateKcvParams(BaseModel):
@@ -462,8 +462,8 @@ class KeyGenerateKcvParams(BaseModel):
     name: str = Field(..., description="Key name, ID, URI, or alias")
     type: Optional[str] = Field(None, description="Identifier type (name, id, uri, alias)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get key from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get key from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Alias Parameter Models
@@ -473,8 +473,8 @@ class KeyAliasAddParams(BaseModel):
     alias: str = Field(..., description="Alias to add")
     alias_type: str = Field("string", description="Alias type (string or uri)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyAliasDeleteParams(BaseModel):
@@ -482,8 +482,8 @@ class KeyAliasDeleteParams(BaseModel):
     name: str = Field(..., description="Key name, ID, URI, or alias")
     alias_index: int = Field(..., description="Index of alias to delete")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyAliasModifyParams(BaseModel):
@@ -493,8 +493,8 @@ class KeyAliasModifyParams(BaseModel):
     alias: str = Field(..., description="New alias value")
     alias_type: str = Field("string", description="Alias type (string or uri)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify key in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify key in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Advanced Parameter Models
@@ -503,8 +503,8 @@ class KeyQueryParams(BaseModel):
     query: Optional[str] = Field(None, description="Query parameters in JSON format")
     query_jsonfile: Optional[str] = Field(None, description="JSON file with query parameters")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to query keys in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to query keys in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyListLabelsParams(BaseModel):
@@ -513,8 +513,8 @@ class KeyListLabelsParams(BaseModel):
     skip: int = Field(0, description="Offset at which to start the search")
     label: Optional[str] = Field(None, description="Filter by label selector expression")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list labels from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list labels from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 # Tool Implementations - Core CRUD

@@ -26,7 +26,7 @@ The CipherTrust Manager MCP Server includes multiple testing approaches:
 
 ### Required Software
 
-1. **Node.js** (v18 or higher) - for MCP Inspector
+1. **Node.js 22.19.0 or higher** — required by MCP Inspector 2.5 (`@modelcontextprotocol/inspector`)
    ```bash
    # Windows (using winget)
    winget install OpenJS.NodeJS
@@ -54,8 +54,12 @@ CIPHERTRUST_PASSWORD=your-password
 # Optional
 CIPHERTRUST_NOSSLVERIFY=true  # for test environments
 CIPHERTRUST_TIMEOUT=30
+CIPHERTRUST_DOMAIN=root
+CIPHERTRUST_AUTH_DOMAIN=root
 LOG_LEVEL=DEBUG  # for testing
 ```
+
+`CIPHERTRUST_DOMAIN` and `CIPHERTRUST_AUTH_DOMAIN` default to `root` when omitted or blank.
 
 ## Quick Start
 
@@ -72,16 +76,16 @@ uv pip install pytest pytest-asyncio
 ### 2. Run Quick Test
 
 ```bash
-# Interactive UI testing (opens browser)
-npx @modelcontextprotocol/inspector --config tests/mcp_inspector_config.json --server ciphertrust-local
+# Interactive UI (opens browser). Use the printed URL; it includes MCP_INSPECTOR_API_TOKEN.
+npx @modelcontextprotocol/inspector uv run --no-sync ciphertrust-mcp-server
 
-# Quick CLI testing
+# Quick CLI testing (--server is CLI-only)
 # Get tools
-npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/list
+npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/list --format json
 # Get system information
-npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name system_information --tool-arg action=get
+npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name system_information --tool-arg action=get --format json
 # Get 2 keys
-npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name key_management --tool-arg action=list --tool-arg limit=2
+npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name key_management --tool-arg action=list --tool-arg limit=2 --format json
 ```
 
 ### 3. Try Example AI Assistant Prompts
@@ -184,21 +188,21 @@ Each command (except notifications) should return a JSON-RPC response:
 The MCP Inspector provides a web-based interface for testing:
 
 ```bash
-# Start with default configuration
-npx @modelcontextprotocol/inspector uv run ciphertrust-mcp-server
+# Uses project .env (recommended)
+npx @modelcontextprotocol/inspector uv run --no-sync ciphertrust-mcp-server
 
-# Start with custom configuration
-npx @modelcontextprotocol/inspector --config tests/mcp_inspector_config.json --server ciphertrust-local
+# Read-only catalog file (web loads every entry; --server is ignored)
+npx @modelcontextprotocol/inspector --config tests/mcp_inspector_config.json
+
+# Terminal UI
+npx @modelcontextprotocol/inspector --tui uv run --no-sync ciphertrust-mcp-server
 ```
 
-**Features:**
-- Visual tool testing interface
-- Real-time request/response viewing
-- Resource and prompt exploration
-- Connection management
-- Debug logging
+**Access:** Open the URL printed in the terminal (`http://127.0.0.1:6274?MCP_INSPECTOR_API_TOKEN=...`). A bare `http://localhost:6274` fails auth. If prompted, paste the `Auth token` from the same output.
 
-**Access:** Open http://localhost:6274 in your browser
+Do not start `ciphertrust-mcp-server` in another terminal. Inspector launches it over STDIO.
+
+Transport in the UI: **STDIO**, command `uv`, arguments `run --no-sync ciphertrust-mcp-server`.
 
 ### 3. CLI Automated Testing
 
@@ -209,7 +213,8 @@ Command-line testing for automation and scripting:
 npx @modelcontextprotocol/inspector --cli \
   --config tests/mcp_inspector_config.json \
   --server ciphertrust-local \
-  --method tools/list
+  --method tools/list \
+  --format json
 
 # Test specific tool
 npx @modelcontextprotocol/inspector --cli \
@@ -217,14 +222,16 @@ npx @modelcontextprotocol/inspector --cli \
   --server ciphertrust-local \
   --method tools/call \
   --tool-name system_information \
-  --tool-arg action=get
+  --tool-arg action=get \
+  --format json
 
 # Test with environment variables
 npx @modelcontextprotocol/inspector --cli \
   -e CIPHERTRUST_URL=https://test.example.com \
   -e LOG_LEVEL=DEBUG \
-  uv run ciphertrust-mcp-server \
-  --method tools/list
+  uv run --no-sync ciphertrust-mcp-server \
+  --method tools/list \
+  --format json
 ```
 
 ### 3. Python Unit Tests
@@ -269,7 +276,7 @@ uv run python -m pytest tests/test_integration_simple.py -v -s     # Integration
 
 ### Inspector Configuration
 
-Edit `tests/mcp_inspector_config.json` to customize testing environments:
+Inspector 2 treats `--config` as a read-only server list. `--server` selects an entry only under `--cli`. Edit `tests/mcp_inspector_config.json` to customize environments:
 
 ```json
 {
@@ -300,7 +307,7 @@ Edit `tests/mcp_inspector_config.json` to customize testing environments:
 
 ### Test Scenarios
 
-Customize `tests/test_scenarios.json` for your testing needs:
+`tests/test_scenarios.json` is a manual checklist. Nothing in this repo executes it automatically:
 
 ```json
 {
@@ -388,18 +395,19 @@ uv run ciphertrust-mcp-server
 
 1. **Server Initialization**
    ```bash
-   npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/list
+   npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/list --format json
    ```
 
 2. **Tool Execution**
    ```bash
-   npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name system_information --tool-arg action=get
+   npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name system_information --tool-arg action=get --format json
    ```
 
 3. **Error Handling**
    ```bash
    npx @modelcontextprotocol/inspector --cli --config tests/mcp_inspector_config.json --server ciphertrust-local --method tools/call --tool-name invalid_tool
    ```
+   Inspector 2 exits `5` when the tool is missing or returns `isError: true`.
 
 ### More Test Scenarios
 
@@ -464,6 +472,7 @@ npm run test:full             # Run complete test suite
    # Check: Environment variables and CipherTrust Manager connectivity
    echo $CIPHERTRUST_URL
    ```
+   Open the printed URL with `MCP_INSPECTOR_API_TOKEN`. Do not start a second `ciphertrust-mcp-server` process. Web `--server` is ignored; pick the server in the UI or use `--cli --server`.
 
 4. **Python Import Errors**
    ```bash
@@ -491,18 +500,18 @@ Enable verbose logging for troubleshooting:
 export LOG_LEVEL=DEBUG
 export CIPHERTRUST_NOSSLVERIFY=true
 
-# Run with verbose output
+# Run Inspector CLI with debug on the MCP server
 npx @modelcontextprotocol/inspector --cli \
   --config tests/mcp_inspector_config.json \
   --server ciphertrust-local \
   --method tools/list \
-  --verbose
+  --format json
 ```
 
 ## Resources
 
 - [Example AI Assistant Prompts](EXAMPLE_PROMPTS.md) - Ready-to-use prompts for testing with Claude Desktop/Cursor
-- [MCP Inspector Documentation](https://github.com/modelcontextprotocol/inspector)
+- [MCP Inspector Documentation](https://github.com/modelcontextprotocol/inspector) (v2; this repo pins `@modelcontextprotocol/inspector` `^2.5.0`)
 - [Model Context Protocol Specification](https://modelcontextprotocol.io/)
 - [Python pytest Documentation](https://docs.pytest.org/)
 - [Node.js](https://nodejs.org/en)

@@ -19,8 +19,8 @@ class KeyPolicyListParams(BaseModel):
     created_after: Optional[str] = Field(None, description="Time after which the key policy is created")
     created_before: Optional[str] = Field(None, description="Time before which the key policy is created")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list key policies from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list key policies from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyPolicyCreateParams(BaseModel):
@@ -31,16 +31,16 @@ class KeyPolicyCreateParams(BaseModel):
     permissions_jsonfile: Optional[str] = Field(None, description="File containing permissions in JSON format")
     description: Optional[str] = Field(None, description="Description of the key policy")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create key policy in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create key policy in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyPolicyGetParams(BaseModel):
     """Parameters for getting a key policy."""
     id: str = Field(..., description="Name or ID of the key policy")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get key policy from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get key policy from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyPolicyUpdateParams(BaseModel):
@@ -50,16 +50,16 @@ class KeyPolicyUpdateParams(BaseModel):
     label_selector: Optional[str] = Field(None, description="New label selector for the key policy")
     permissions: Optional[str] = Field(None, description="New permissions for users, clients and groups (JSON string)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to update key policy in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to update key policy in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyPolicyDeleteParams(BaseModel):
     """Parameters for deleting a key policy."""
     id: str = Field(..., description="Name or ID of the key policy")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete key policy from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete key policy from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class KeyPolicyManagementTool(BaseTool):

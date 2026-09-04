@@ -24,7 +24,10 @@ class MkeksRotateParams(BaseModel):
 
 class MasterKekManagementTool(BaseTool):
     name = "master_kek_management"
-    description = "Master KEK management operations (list, get, rotate)"
+    description = (
+        "Master KEK management operations (list, get, rotate). "
+        "Only available when CIPHERTRUST_DOMAIN is root."
+    )
 
     def get_schema(self) -> dict:
         return {
@@ -39,6 +42,7 @@ class MasterKekManagementTool(BaseTool):
         }
 
     async def execute(self, action: str, **kwargs: Any) -> Any:
+        self.require_root_domain()
         if action == "list":
             params = MkeksListParams(**kwargs)
             args = ["mkeks", "list"]

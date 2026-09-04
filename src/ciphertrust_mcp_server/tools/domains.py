@@ -11,7 +11,7 @@ from .base import BaseTool
 class DomainSwitchParams(BaseModel):
     """Parameters for switching domains."""
     domain: str = Field(..., description="Domain to switch to for subsequent operations")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (optional)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain. Defaults to root if omitted.")
 
 
 class DomainGetCurrentParams(BaseModel):

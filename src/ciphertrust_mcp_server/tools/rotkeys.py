@@ -31,7 +31,10 @@ class RotKeyDeleteParams(BaseModel):
 
 class RotKeyManagementTool(BaseTool):
     name = "rotkey_management"
-    description = "Root of Trust key management operations (list, get, rotate, delete)"
+    description = (
+        "Root of Trust key management operations (list, get, rotate, delete). "
+        "Only available when CIPHERTRUST_DOMAIN is root."
+    )
 
     def get_schema(self) -> dict:
         return {
@@ -47,6 +50,7 @@ class RotKeyManagementTool(BaseTool):
         }
 
     async def execute(self, action: str, **kwargs: Any) -> Any:
+        self.require_root_domain()
         if action == "list":
             params = RotKeyListParams(**kwargs)
             args = ["rot-keys", "list", "--limit", str(params.limit), "--skip", str(params.skip)]

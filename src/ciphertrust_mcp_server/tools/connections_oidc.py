@@ -22,8 +22,8 @@ class ConnectionOIDCCreateParams(BaseModel):
     jwks: Optional[str] = Field(None, description="Array of JWKS public keys (use discovery_uri instead)")
     disable_auto_create: bool = Field(False, description="Disable automatic user creation on login")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create connection in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create connection in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionOIDCListParams(BaseModel):
@@ -33,16 +33,16 @@ class ConnectionOIDCListParams(BaseModel):
     strategy: str = Field("oidc", description="Filter by connection strategy")
     sort: Optional[str] = Field(None, description="Sort field (prefix with - for descending)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list connections from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list connections from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionOIDCGetParams(BaseModel):
     """Parameters for getting an OIDC connection."""
     id: str = Field(..., description="ID of the connection")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get connection from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get connection from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionOIDCDeleteParams(BaseModel):
@@ -50,8 +50,8 @@ class ConnectionOIDCDeleteParams(BaseModel):
     id: str = Field(..., description="ID of the connection")
     force: bool = Field(False, description="Delete associated sub-domain users and groupmaps silently")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete connection from (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete connection from (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionOIDCModifyParams(BaseModel):
@@ -69,16 +69,16 @@ class ConnectionOIDCModifyParams(BaseModel):
     jwks: Optional[str] = Field(None, description="Array of JWKS public keys")
     disable_auto_create: Optional[bool] = Field(None, description="Disable automatic user creation on login")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to modify connection in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify connection in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionOIDCRefreshParams(BaseModel):
     """Parameters for refreshing an OIDC connection."""
     id: str = Field(..., description="ID of the connection")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to refresh connection in (defaults to global setting)")
-    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to refresh connection in (defaults to root if omitted)")
+    auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to root if omitted)")
 
 
 class ConnectionOIDCManagementTool(BaseTool):

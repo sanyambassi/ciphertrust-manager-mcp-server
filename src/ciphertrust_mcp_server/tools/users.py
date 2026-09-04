@@ -23,7 +23,7 @@ class UserPwdPolicyCreateParams(BaseModel):
     pwdchngdays: Optional[int] = Field(None, description="Maximum lifetime of the password in days")
     pwdexpirynotificationdays: Optional[int] = Field(14, description="Days before expiry when notifications are sent (0-30, default 14)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to create policy in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create policy in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to 'root' if not specified)")
 
 
@@ -33,7 +33,7 @@ class UserPwdPolicyListParams(BaseModel):
     skip: int = Field(0, description="Offset at which to start the search")
     policy_name: Optional[str] = Field(None, description="Filter by password policy name")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to list policies from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list policies from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to 'root' if not specified)")
 
 
@@ -41,7 +41,7 @@ class UserPwdPolicyGetParams(BaseModel):
     """Parameters for getting a password policy."""
     policy_name: Optional[str] = Field(None, description="Password policy name (if not specified, applied policy is fetched)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to get policy from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get policy from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to 'root' if not specified)")
 
 
@@ -49,7 +49,7 @@ class UserPwdPolicyDeleteParams(BaseModel):
     """Parameters for deleting a password policy."""
     policy_name: str = Field(..., description="Password policy name to delete")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to delete policy from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete policy from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to 'root' if not specified)")
 
 
@@ -68,7 +68,7 @@ class UserPwdPolicyUpdateParams(BaseModel):
     pwdchngdays: Optional[int] = Field(None, description="Maximum lifetime of the password in days")
     pwdexpirynotificationdays: Optional[int] = Field(None, description="Days before expiry when notifications are sent (0-30)")
     # Domain support
-    domain: Optional[str] = Field(None, description="Domain to update policy in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to update policy in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to 'root' if not specified)")
 
 
@@ -88,8 +88,7 @@ class UserCreateParams(BaseModel):
     prevent_ui_login: Optional[bool] = Field(None, description="Disable user login from Web UI")
     is_domain_user: Optional[bool] = Field(None, description="Create user in non-root domain")
     dn: Optional[str] = Field(None, description="DN value for LDAP users")
-    # Domain support (optional - defaults to global settings if not provided)
-    domain: Optional[str] = Field(None, description="Domain to create user in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to create user in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to 'root' if not specified)")
 
 
@@ -103,24 +102,21 @@ class UserListParams(BaseModel):
     groups: Optional[str] = Field(None, description="Filter by multiple groups (comma-separated)")
     return_groups: bool = Field(False, description="Return list of groups for each user")
     sort: Optional[str] = Field(None, description="Sort field (prefix with - for descending)")
-    # Domain support (optional - defaults to global settings if not provided)
-    domain: Optional[str] = Field(None, description="Domain to list users from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to list users from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to 'root' if not specified)")
 
 
 class UserGetParams(BaseModel):
     """Parameters for getting a user."""
     id: str = Field(..., description="User ID (or 'self' for current user)")
-    # Domain support (optional - defaults to global settings if not provided)
-    domain: Optional[str] = Field(None, description="Domain to get user from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to get user from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to 'root' if not specified)")
 
 
 class UserDeleteParams(BaseModel):
     """Parameters for deleting a user."""
     id: str = Field(..., description="User ID")
-    # Domain support (optional - defaults to global settings if not provided)
-    domain: Optional[str] = Field(None, description="Domain to delete user from (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to delete user from (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to 'root' if not specified)")
 
 
@@ -139,8 +135,7 @@ class UserModifyParams(BaseModel):
     prevent_ui_login: Optional[bool] = Field(None, description="Disable Web UI login")
     unlock: bool = Field(False, description="Unlock the user account")
     dn: Optional[str] = Field(None, description="DN value for LDAP users")
-    # Domain support (optional - defaults to global settings if not provided)
-    domain: Optional[str] = Field(None, description="Domain to modify user in (defaults to global setting)")
+    domain: Optional[str] = Field(None, description="Domain to modify user in (defaults to root if omitted)")
     auth_domain: Optional[str] = Field(None, description="Authentication domain (defaults to 'root' if not specified)")
 
 

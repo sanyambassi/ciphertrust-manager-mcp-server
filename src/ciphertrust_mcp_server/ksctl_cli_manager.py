@@ -136,11 +136,12 @@ class KsctlManager:
         if settings.ciphertrust_timeout != 30:  # Only add if not default
             cmd.extend(["--timeout", str(settings.ciphertrust_timeout)])
         
-        if settings.ciphertrust_domain != "root":
-            cmd.extend(["--domain", settings.ciphertrust_domain])
-        
-        if settings.ciphertrust_auth_domain != "root":
-            cmd.extend(["--auth-domain", settings.ciphertrust_auth_domain])
+        domain = (settings.ciphertrust_domain or "").strip() or "root"
+        auth_domain = (settings.ciphertrust_auth_domain or "").strip() or "root"
+        if domain != "root":
+            cmd.extend(["--domain", domain])
+        if auth_domain != "root":
+            cmd.extend(["--auth-domain", auth_domain])
         
         # Add the actual command arguments
         cmd.extend(args)
