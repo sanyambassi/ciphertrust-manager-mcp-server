@@ -65,23 +65,27 @@ class Settings(BaseSettings):
         return f"{self.ciphertrust_url}/downloads/ksctl_images.zip"
 
     def get_ksctl_env(self) -> dict[str, str]:
-        """Get environment variables for ksctl commands."""
+        """Environment for ksctl. Credentials stay out of argv."""
         env = os.environ.copy()
-        
-        # Set ksctl environment variables
-        if self.ciphertrust_user:
-            env["KSCTL_USER"] = self.ciphertrust_user
-        if self.ciphertrust_password:
+        for key in ("KSCTL_JWT", "KSCTL_REFRESHTOKEN", "KSCTL_PASSWORD", "KSCTL_USERNAME"):
+            env.pop(key, None)
+
+        if self.ciphertrust_user and self.ciphertrust_password:
+            env["KSCTL_USERNAME"] = self.ciphertrust_user
             env["KSCTL_PASSWORD"] = self.ciphertrust_password
-        if self.ciphertrust_jwt:
+        elif self.ciphertrust_jwt:
             env["KSCTL_JWT"] = self.ciphertrust_jwt
-        
+
         env["KSCTL_URL"] = self.ciphertrust_url
         env["KSCTL_NOSSLVERIFY"] = str(self.ciphertrust_nosslverify).lower()
         env["KSCTL_TIMEOUT"] = str(self.ciphertrust_timeout)
         env["KSCTL_DOMAIN"] = self.ciphertrust_domain
         env["KSCTL_AUTH_DOMAIN"] = self.ciphertrust_auth_domain
-        
+
+        isolated_home = self.ksctl_path.parent / "ksctl-home"
+        isolated_home.mkdir(parents=True, exist_ok=True)
+        env["HOME"] = str(isolated_home)
+        env["USERPROFILE"] = str(isolated_home)
         return env
 
 

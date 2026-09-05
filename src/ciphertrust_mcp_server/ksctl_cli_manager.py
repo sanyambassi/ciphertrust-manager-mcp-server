@@ -119,17 +119,7 @@ class KsctlManager:
             Dictionary with status, stdout, stderr, and parsed JSON output if applicable
         """
         cmd = [str(self.ksctl_path)]
-        
-        # Add authentication parameters
         cmd.extend(["--url", settings.ciphertrust_url])
-        
-        if settings.ciphertrust_user and settings.ciphertrust_password:
-            cmd.extend(["--user", settings.ciphertrust_user])
-            cmd.extend(["--password", settings.ciphertrust_password])
-        elif settings.ciphertrust_jwt:
-            cmd.extend(["--jwt", settings.ciphertrust_jwt])
-        
-        # Add optional parameters
         if settings.ciphertrust_nosslverify:
             cmd.append("--nosslverify")
         
@@ -162,6 +152,7 @@ class KsctlManager:
                 text=True,
                 input=input_data,
                 timeout=settings.ciphertrust_timeout,
+                env=settings.get_ksctl_env(),
             )
             
             response = {
